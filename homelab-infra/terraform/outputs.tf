@@ -1,7 +1,4 @@
-output "k3s_master_ip" {
-  value = "10.20.20.25"
-}
-
-output "k3s_worker_ip" {
-    value = "10.20.20.26"
+output "k3s_nodes" {
+  description = "Current IP Default"
+  value = proxmox_vm_qemu.k3s_nodes.*.default_ipv4_address
 }

@@ -1,0 +1,21 @@
+---
+all:
+  children:
+    master:
+      hosts:
+        chimera:
+          ansible_host: 10.20.20.25
+        centaur:
+          ansible_host: 10.20.20.26
+        cerberus:
+          ansible_host: 10.20.20.27
+    agent:
+      hosts:
+        minotaur:
+          ansible_host: 10.20.20.28
+        basilisk:
+          ansible_host: 10.20.20.29
+  vars:
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_user: lewi0231
+    ansible_ssh_private_key_file: ~/.ssh/id_rsa

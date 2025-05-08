@@ -57,3 +57,23 @@ variable cpu_type {
     type = string
     description = "CPU type (e.g., x86-64-v2-AES or host)"
 }
+
+variable ip_config {
+    type = string
+    description = "IP config method (e.g., ip=10.20.20.25/24,gw=10.20.20.1) or dhcp"
+}
+
+variable boot_from {
+    type = string
+    description = "Boot order / from (e.g., scsi0)"
+}
+
+variable node_names {
+    type = list(string)
+    description = "Distinct names for the nodes"
+}
+
+variable mac_addresses {
+    type = list(string)
+    description = "Distinct mac address for ip mapping - dhcp"
+}

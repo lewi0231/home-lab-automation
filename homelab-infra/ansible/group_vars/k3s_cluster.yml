@@ -1,0 +1,11 @@
+---
+k3s_version: v1.28.4+k3s1
+k3s_token: "your-secure-token-here" # Should be generated randomly and kept secure
+flannel_iface: "eth0" # Your primary network interface
+apiserver_endpoint: "https://192.168.1.101:6443" # IP of your master node
+
+# Optional: Configure Flux bootstrap
+setup_flux: true
+flux_git_repo: "https://github.com/yourusername/your-flux-repo.git"
+flux_git_branch: "main"
+flux_path: "./clusters/homelab"

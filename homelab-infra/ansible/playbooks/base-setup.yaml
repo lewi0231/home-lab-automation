@@ -1,0 +1,26 @@
+---
+- name: Base setup for all K3s nodes
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install useful base packages
+      apt:
+        name:
+          - curl
+          - vim
+          - htop
+          - net-tools
+          - git
+        state: present
+
+    - name: Ensure hostname is set correctly
+      hostname:
+        name: "{{ inventory_hostname }}"
+
+    - name: Ping to verify Ansible is working
+      ping:
