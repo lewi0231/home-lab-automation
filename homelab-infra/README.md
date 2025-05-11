@@ -1,8 +1,18 @@
 ## Setup
 
+### Infrastructure
+
+I am using Proxmox on baremetal. A full infrastructure diagram to follow.
+
+### Goal
+
+My goal is to use Terraform and Ansible to automate the and record the process of configuring a HA homelab. I'm still learning about all the above - so generally it's a work in progress.
+
+My aim was to utilise Kube-VIP to create a high availability cluster. That is enable fault tolerance for the Control Plan. Kube-vip creates a virtual ip that allows for the nodes to still be able to access the control plan when a node goes down. I've gone with a k3s cluster as this is lightweight - and as it stands i only have a single micro pc to run my vms off. More to come...
+
 ### Terraform
 
-1. Install - I'm using a mac.
+1. Terraform installation (mac)
 
 ```
 brew tap hashicorp/tap
@@ -10,9 +20,11 @@ brew install hashicorp/tap/terraform
 terraform -v  # confirm install
 ```
 
+2. See terraform directory for relevant files (e.g., main.tf). I'm using an ubuntu cloud init template to automatically create the number of VMs I desire. NOTE: I've manually set the mac address for each instance so that I can reserve an IP address for each VM.
+
 ### Ansible
 
-At this point in time I'm in the process of getting to know Ansible. It seems quite understandable - requiring a hosts file and your playbooks (that essentially break what you want to do on each of your hosts into tasks).
+My goal was to use Ansible
 
 I'm moving towards replicating my other homeLab repo here - so that I get more familiar with automation. While I'm at it I intend to make my cluster HA.
 
