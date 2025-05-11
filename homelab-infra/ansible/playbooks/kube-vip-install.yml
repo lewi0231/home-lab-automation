@@ -1,0 +1,83 @@
+---
+# Purpose: Sets up kube-vip and installs k3s in a high availability configuration
+
+- name: Create kube-vip manifest files
+  hosts: master
+  become: true
+  vars_files:
+    - ../vars/k3s-cluster.yml
+  vars:
+    log_dir: /var/log/ansible/k3s-deployment
+  tasks:
+    - name: Create logging directory
+      file:
+        path: "{{ log_dir }}"
+        state: directory
+        mode: "0755"
+      register: create_log_dir
+
+    - name: Create /var/lib/rancher/k3s/server/manifests directory
+      file:
+        path: /var/lib/rancher/k3s/server/manifests
+        state: directory
+        mode: "0755"
+      register: create_manifests_dir
+
+    - name: Create kube-vip-rbac.yaml RBAC
+      get_url:
+        url: https://kube-vip.io/manifests/rbac.yaml
+        dest: /var/lib/rancher/k3s/server/manifests/kube-vip-rbac.yaml
+        mode: "0644"
+      register: kubevip_rbac
+
+    - name: validate kube-vip-rbac.yaml contents
+      stat:
+        path: /var/lib/rancher/k3s/server/manifests/kube-vip-rbac.yaml
+        register: rbac_file
+        failed_when:
+          - not rbac_file.stat.exists
+          - rbac_file.stat.size < 100
+
+    - name: Create kube-vip exectutable - alternative to alias that persists between sessions
+      copy:
+        dest: /usr/local/bin/kube-vip
+        mode: 0755
+        content: |
+          #!/bin/bash
+          set -e  # Exit immediately if a command exits with a non-zero status
+
+          # Log execution
+          echo "[$(date)] Running kube-vip command" >> {{ log_dir }}/kube-vip.log
+
+          ctr image pull ghcr.io/kube-vip/kube-vip:{{ KVVERSION }}
+          ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:{{ KVVERSION }} vip /kube-vip "$@"
+        register: create_kubevip_script
+
+    - name: Validate kue-vip executable permissions
+      stat:
+        path: /usr/local/bin/kube-vip
+      register: kubevip_exec
+      failed_when: not (kubevip_exec.stat.exists and kubevip_exec.stat.exectutable)
+
+    - name: Create the kube-vip manifest
+      shell: |
+        /usr/local/bin/kube-vip manifest daemonset \
+          --interface {{ INTERFACE }} \
+          --address {{ VIP }} \
+          --inCluster \
+          --taint \
+          --controlplane \
+          --services \
+          --arp \
+          --leaderElection > /var/lib/rancher/k3s/server/manifests/kube-vip.yaml 2>> {{ log_dir }}/kube-vip-manifest.log
+      args:
+        creates: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+      register: kubevip_manifest
+
+    - name: Validate kube-vip.yaml contents
+      stat:
+        path: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+      register: kubevip_yaml
+      failed_when:
+        - not kubevip_yaml.stat.exists
+        - kubevip_yaml.stat.size < 100

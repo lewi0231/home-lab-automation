@@ -1,0 +1,87 @@
+---
+- name: Install k3s
+  hosts: master
+  become: true
+  vars_files:
+    - ../vars/k3s-cluster.yml
+  vars:
+    log_dir: "/var/log/ansible/k3s-deployment"
+  tasks:
+    - name: Create server cluster on primary node
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        INSTALL_K3S_EXEC="server --cluster-init --tls-san {{ VIP }} --disable servicelb" \
+        sh - >> {{ log_dir }}/k3s-install-primary.log 2>&1
+      args:
+        creates: /var/lib/rancher/k3s/server/node-token
+      register: k3s_primary_install
+      when: inventory_hostname == "cerberus"
+
+    - name: Wait for k3s to be ready on primary node
+      wait_for:
+        path: /var/lib/rancher/k3s/server/node-token
+        state: present
+        timeout: 300
+      when: inventory_hostname == "cerberus"
+
+    - name: Retrieve the k3s NODE_TOKEN
+      slurp: # More secure than 'command: cat'
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token_b64
+      when: inventory_hostname == "cerberus"
+
+    - name: Set NODE_TOKEN fact
+      set_fact:
+        NODE_TOKEN: "{{ node_token_b64['content'] | b64decode | trim }}"
+      when: inventory_hostname == "cerberus"
+
+    - name: Share NODE_TOKEN with other hosts
+      set_fact:
+        NODE_TOKEN: "{{ hostvars['cerberus']['NODE_TOKEN'] }}"
+      when: inventory_hostname != "cerberus"
+
+    - name: Wait for Virtual IP to be accessible
+      wait_for:
+        host: "{{ VIP }}"
+        port: 6443
+        timeout: 300
+      when: inventory_hostname != "cerberus"
+
+    - name: Install k3s on other server nodes
+      shell: |
+        curl -sfL https://get.k3s.io | \
+        K3S_URL=https://{{ VIP }}:6443 \
+        K3S_TOKEN={{ NODE_TOKEN }} \
+        sh -s - server --tls-san {{ VIP }} --disable servicelb \
+        >> {{ log_dir }}/k3s-install-secondary.log 2>&1
+      args:
+        creates: /var/lib/rancher/k3s/server/token
+      register: k3s_secondary_install
+      when: inventory_hostname != "cerberus"
+
+    - name: Wait for k3s to be fully operational
+      shell: |
+        kubectl get nodes --no-headers | wc -l
+      register: node_count
+      until: node_count.stdout|int >= groups['master']|length
+      retries: 12
+      delay: 10
+      changed_when: false
+      when: inventory_hostname == "cerberus"
+
+    - name: Verify kube-vip is running properly
+      shell: |
+        kubectl get pods -n kube-system | grep kube-vip
+      register: kubevip_status
+      until: "'Running' in kubevip_status.stdout"
+      retries: 6
+      delay: 10
+      changed_when: false
+      when: inventory_hostname == "cerberus"
+
+    - name: Test the Virtual IP connectivity
+      shell: |
+        kubectl --kubeconfig /etc/rancher/k3s/k3s.yaml get nodes
+      register: k3s_nodes
+      changed_when: false
+      when: inventory_hostname == "cerberus"

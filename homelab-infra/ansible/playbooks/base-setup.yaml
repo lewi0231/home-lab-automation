@@ -16,6 +16,9 @@
           - htop
           - net-tools
           - git
+          - jq
+          - containerd
+          - iptables
         state: present
 
     - name: Ensure hostname is set correctly

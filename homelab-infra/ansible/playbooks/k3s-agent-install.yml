@@ -1,0 +1,32 @@
+---
+- name: Retrieve the k3s NODE_TOKEN from cerberus
+  hosts: cerberus
+  gather_facts: false
+  tasks:
+    - name: Read the k3s node token
+      slurp:
+        src: /var/lib/rancher/k3s/server/node-token
+      register: node_token_b64
+
+    - name: Set fact with decoded NODE_TOKEN
+      set_fact:
+        NODE_TOKEN: "{{ node_token_b64['content'] | b64decode | trim }}"
+
+- name: Set NODE_TOKEN on agents
+  hosts: agent
+  vars_files:
+    - ../vars/k3s-cluster.yml
+  vars:
+    log_dir: "/var/log/ansible/k3s-deployment"
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Set NODE_TOKEN fact from cerberus
+      set_fact:
+        NODE_TOKEN: "{{ hostvars['cerberus']['NODE_TOKEN'] }}"
+
+    - name: Install k3s on agent nodes
+      shell: |
+        curl -sfL https://get.k3s.io | K3S_URL=https://{{ VIP }}:6443 K3S_TOKEN={{ NODE_TOKEN }} sh -
+        >> {{ log_dir }}/k3s-install-tertiary.log 2>&1
+      register: k3s_teriary_install

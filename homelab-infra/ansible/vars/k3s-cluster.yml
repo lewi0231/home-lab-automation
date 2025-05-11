@@ -1,0 +1,5 @@
+---
+# K8s Cluster Configuration Variables
+VIP: 10.20.20.99
+INTERFACE: eth0
+KVVERSION: v0.9.1
