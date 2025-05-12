@@ -35,6 +35,14 @@ I'm moving towards replicating my other homeLab repo here - so that I get more f
    • Use Proxmox API tokens instead of password auth if possible
 2. How do i use api tokens instead of password auth? why is this better?
 3. if you're wanting to add logs to your terraform export TF_LOG=TRACE
+4. Check which nodes owns the vip (kube-vip) with `sudo arp -an | grep 10.20.20.99` - found that i can verify the kube-vip assignment is working by looking at the logs for one of the kube-vip pods: `sudo kubectl logs -n kube-system pod-name` -> this will show something like the below (somewhere in the logs):
+   ```
+   I0511 19:16:40.239520       1 leaderelection.go:257] attempting to acquire leader lease kube-system/plndr-cp-lock...
+   2025/05/11 19:16:40 INFO new leader elected "new leader"=cerberus
+   2025/05/11 19:16:40 INFO New leader leader=cerberus
+   ```
+5. Interesting bit of information is around the /32 mask. Kube-vip allocates the ip directly to the interface. By using the /32 subnet mask the network knows that this is a unique subnet with only one available address, so no need for ARP.
+6. I'm using Ansible Vault for my github token - this requires that you run it differently - need to use the `--ask-vault-pass` flag when running your playbook.
 
 ## Cloud Image
 

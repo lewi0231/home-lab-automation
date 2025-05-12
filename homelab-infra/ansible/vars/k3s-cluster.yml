@@ -1,5 +1,10 @@
 ---
-# K8s Cluster Configuration Variables
+# K3s Cluster Configuration Variables
 VIP: 10.20.20.99
 INTERFACE: eth0
 KVVERSION: v0.9.1
+
+# Flux related
+GITHUB_USER: lewi0231
+GITHUB_REPO: home-lab-automation
+FLUX_PATH: clusters/homelab

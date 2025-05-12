@@ -1,0 +1,12 @@
+---
+- name: Remove SSH host keys for all inventory hosts
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove host key for {{ item }}
+      ansible.builtin.known_hosts:
+        path: "{{ lookup('env','HOME') + '/.ssh/known_hosts' }}"
+        name: "{{ item }}"
+        state: absent
+      loop: "{{ groups['all'] }}"
+      delegate_to: localhost

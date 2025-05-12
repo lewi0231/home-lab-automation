@@ -1,0 +1,30 @@
+---
+- name: GitOps Setup
+  hosts: cerberus
+  become: true
+  vars_files:
+    - ../vars/k3s-cluster.yml
+  tasks:
+    - name: Install flux on primary node
+      shell: curl -s https://fluxcd.io/install.sh | sudo bash;
+      args:
+        creates: /usr/local/bin/flux
+
+    - name: Check if Flux has already been bootstrapped
+      command: flux check --pre
+      register: flux_check
+      failed_when: false
+      changed_when: false
+
+    - name: Bootstrap Flux into GitHub repo
+      command: >
+        flux bootstrap github \
+        --owner={{GITHUB_USER}} \
+        --repository={{ GITHUB_REPO }} \
+        --branch=main \
+        --path={{ FLUX_PATH }} \
+        --components-extra=image-reflector-controller,image-automation-controller \
+        --personal
+      environment:
+        GITHUB_TOKEN: "{{ github_token }}"
+      when: flux_check.rc != 0

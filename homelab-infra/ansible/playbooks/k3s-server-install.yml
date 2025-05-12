@@ -40,12 +40,12 @@
         NODE_TOKEN: "{{ hostvars['cerberus']['NODE_TOKEN'] }}"
       when: inventory_hostname != "cerberus"
 
-    - name: Wait for Virtual IP to be accessible
-      wait_for:
-        host: "{{ VIP }}"
-        port: 6443
-        timeout: 300
-      when: inventory_hostname != "cerberus"
+    # - name: Wait for Virtual IP to be accessible
+    #   wait_for:
+    #     host: "{{ VIP }}"
+    #     port: 6443
+    #     timeout: 300
+    #   when: inventory_hostname != "cerberus"
 
     - name: Install k3s on other server nodes
       shell: |
