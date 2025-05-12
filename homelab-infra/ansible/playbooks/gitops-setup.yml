@@ -4,6 +4,7 @@
   become: true
   vars_files:
     - ../vars/k3s-cluster.yml
+    - ../group_vars/all/vault.yml
   tasks:
     - name: Install flux on primary node
       shell: curl -s https://fluxcd.io/install.sh | sudo bash;
@@ -27,4 +28,5 @@
         --personal
       environment:
         GITHUB_TOKEN: "{{ github_token }}"
+        KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       when: flux_check.rc != 0
