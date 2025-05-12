@@ -6,7 +6,7 @@ Live demo: [https://nim-fawn.vercel.app](https://nim-fawn.vercel.app)
 
 ## Features
 
-- Minimal one-page portfolio layout.
+- Minimal one-page portfolio layout. blahblah
 - Blog support with MDX.
 - Responsive and accessible design.
 - Easy to use
