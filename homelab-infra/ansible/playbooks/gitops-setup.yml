@@ -11,14 +11,6 @@
       args:
         creates: /usr/local/bin/flux
 
-    - name: Install github credentials
-      command: >
-        kubectl create secret docker-registry ghcr-credentials \
-        --namespace=web \
-        --docker-server=ghcr.io \
-        --docker-username={{GITHUB_USER}} \
-        --docker-password={{GITHUB_TOKEN}}
-
     - name: Check if Flux has already been bootstrapped
       command: flux check --pre
       register: flux_check
@@ -38,3 +30,11 @@
         GITHUB_TOKEN: "{{ github_token }}"
         KUBECONFIG: /etc/rancher/k3s/k3s.yaml
       when: flux_check.rc != 0
+
+    - name: Install github credentials
+      command: >
+        kubectl create secret docker-registry ghcr-credentials \
+        --namespace=development \
+        --docker-server=ghcr.io \
+        --docker-username={{GITHUB_USER}} \
+        --docker-password={{github_token}}
