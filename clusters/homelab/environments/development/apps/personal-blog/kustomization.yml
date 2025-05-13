@@ -5,3 +5,4 @@ resources:
   - deployment.yaml
   - ingress.yaml
   - image-automation.yaml
+  - metallb-system/metallb-config.yml
