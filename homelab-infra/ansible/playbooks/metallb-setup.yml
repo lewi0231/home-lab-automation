@@ -1,0 +1,35 @@
+- name: Install and Configure MetalLB
+  hosts: master[0]
+  gather_facts: false
+  tasks:
+    - name: Apply MetalLB manifest
+      shell: |
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
+      args:
+        executable: /bin/bash
+
+- name: Label agent nodes for MetalLB Speaker
+  hosts: agent
+  gather_facts: false
+  tasks:
+    - name: Add 'node-role.kubernetes.io/agent=agent' label
+      shell: |
+        kubectl label node {{ inventory_hostname }} node-role.kubernetes.io/agent=agent --overwrite
+      args:
+        executable: /bin/bash
+
+- name: Patch MetalLB Speaker DaemonSet to run only on agent nodes
+  hosts: control_plane[0]
+  gather_facts: false
+  tasks:
+    - name: Patch Speaker DaemonSet with nodeSelector
+      kubernetes.core.k8s_json_patch:
+        kind: DaemonSet
+        namespace: metallb-system
+        name: speaker
+        api_version: apps/v1
+        patch:
+          - op: add
+            path: /spec/template/spec/nodeSelector
+            value:
+              node-role.kubernetes.io/agent: agent
