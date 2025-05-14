@@ -127,7 +127,7 @@
           spec:
             ingressClassName: nginx
             rules:
-            - host: app.example.local  # Replace with your desired hostname
+            - host: personal-blog.development.home.arpa
               http:
                 paths:
                 - path: /

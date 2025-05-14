@@ -1,5 +1,5 @@
 ---
-- name: GitOps Setup
+- name: Flux GitOps Setup
   hosts: cerberus
   become: true
   vars_files:
