@@ -34,6 +34,6 @@
 
     - name: Install k3s on agent nodes
       shell: |
-        curl -sfL https://get.k3s.io | K3S_URL=https://{{ VIP }}:6443 K3S_TOKEN={{ NODE_TOKEN }} sh -
+        curl -sfL https://get.k3s.io | K3S_URL=https://{{ VIP }}:6443 K3S_TOKEN={{ NODE_TOKEN }} sh - 
         >> {{ log_dir }}/k3s-install-tertiary.log 2>&1
       register: k3s_teriary_install

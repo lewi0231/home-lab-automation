@@ -10,7 +10,7 @@
     - name: Create server cluster on primary node
       shell: |
         curl -sfL https://get.k3s.io | \
-        INSTALL_K3S_EXEC="server --cluster-init --tls-san {{ VIP }} --disable servicelb"  \
+        INSTALL_K3S_EXEC="server --cluster-init --tls-san {{ VIP }} --node-label node=server --disable servicelb"  \
         sh - >> {{ log_dir }}/k3s-install-primary.log 2>&1
       args:
         creates: /var/lib/rancher/k3s/server/node-token
@@ -52,7 +52,7 @@
         curl -sfL https://get.k3s.io | \
         K3S_URL=https://{{ VIP }}:6443 \
         K3S_TOKEN={{ NODE_TOKEN }} \
-        sh -s - server --tls-san {{ VIP }} --disable servicelb \
+        sh -s - server --tls-san {{ VIP }} --node-label node=server --disable servicelb \
         >> {{ log_dir }}/k3s-install-secondary.log 2>&1
       args:
         creates: /var/lib/rancher/k3s/server/token
