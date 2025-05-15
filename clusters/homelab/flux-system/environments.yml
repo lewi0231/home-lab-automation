@@ -6,7 +6,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ../environments/development
+  path: ./clusters/homelab/environments/development
   prune: true
   sourceRef:
     kind: GitRepository
@@ -19,7 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ../environments/production
+  path: ./clusters/homelab/environments/production
   prune: true
   sourceRef:
     kind: GitRepository
