@@ -19,7 +19,8 @@
           - jq
           - containerd
           - iptables
-          - iputils
+          - iputils-arping
+          - iputils-ping
         state: present
 
     - name: Ensure hostname is set correctly
