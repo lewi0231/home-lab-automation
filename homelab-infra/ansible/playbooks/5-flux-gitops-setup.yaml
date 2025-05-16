@@ -3,8 +3,8 @@
   hosts: cerberus
   become: true
   vars_files:
-    - ../vars/k3s-cluster.yml
-    - ../group_vars/all/vault.yml
+    - ../vars/k3s-cluster.yaml
+    - ../group_vars/all/vault.yaml
   tasks:
     - name: Install flux on primary node
       shell: curl -s https://fluxcd.io/install.sh | sudo bash;

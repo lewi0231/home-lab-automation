@@ -5,7 +5,7 @@
   hosts: master
   become: true
   vars_files:
-    - ../vars/k3s-cluster.yml
+    - ../vars/k3s-cluster.yaml
   vars:
     log_dir: /var/log/ansible/k3s-deployment
   tasks:
