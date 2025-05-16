@@ -1,0 +1,13 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: traefik
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  path: ./clusters/homelab/traefik/base
+  prune: false # Set to false because we're only patching, not owning the resources
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  timeout: 2m0s
