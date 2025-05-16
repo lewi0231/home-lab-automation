@@ -43,6 +43,13 @@ As a result, you should now have an external (to cluster) ip address associated 
 
 _NOTE_: A if multiple control nodes are present, I believe that a speaker daemonSet is used, meaning that each node has a speaker - which is ready to advertise the address pool. However, if you want to to limit the 'speaking' to only certain nodes for instance you can by updating the DaemonSet manifest with the nodeSelector.
 
+#### Useful Commands
+
+```
+kubectl logs -n metallb-system -l app=metallb,component=speaker
+arping -I eth0 $VIP # Needs to be run from within same subnet
+```
+
 ### Ansible
 
 Whilst I was learning some of the technologies, I found it was often easier to just destroy and recreate my vms - when I encountered a major issue. After this was done using Terraform I could then reprovision my nodes quickly using ansible.
@@ -61,24 +68,12 @@ Ansible has a number of key concepts (I'm still a novice, btw):
 3. Templates and Vars also allow you to reduce code duplication and hard coded values. Vaults are a special case of variables which allow you to specify a _secret_. For instance, for [this](./homelab-infra/ansible/playbooks/5-flux-gitops-setup.yaml) playbook I used the vault to store my github_token - which was required for flux to connect with my repo (and make changes).
 
    - ```
-
+     ansible-vault create /path/to/vault.yml
      ```
-
-   # Create a vault file
-
-   ansible-vault create /path/to/vault.yml
-
-   # Add secrets to the vault file (e.g., secrets.yml)
-
-   ***
 
    api_key: your_secret_api_key
 
-   # Encrypt the vault file
-
    ansible-vault encrypt /path/to/vault.yml
-
-   # Run the playbook
 
    ansible-playbook --vault-password-file /path/to/password.txt my_playbook.yml
 
