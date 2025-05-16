@@ -19,11 +19,9 @@
           - jq
           - containerd
           - iptables
+          - iputils
         state: present
 
     - name: Ensure hostname is set correctly
       hostname:
         name: "{{ inventory_hostname }}"
-
-    - name: Ping to verify Ansible is working
-      ping:
