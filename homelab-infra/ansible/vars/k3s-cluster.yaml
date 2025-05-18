@@ -1,6 +1,6 @@
 ---
 # K3s Cluster Configuration Variables
-VIP: 10.20.20.99
+VIP: 10.60.60.99
 INTERFACE: eth0
 KVVERSION: v0.9.1
 

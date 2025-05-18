@@ -4,17 +4,19 @@ all:
     master:
       hosts:
         chimera:
-          ansible_host: 10.20.20.25
+          ansible_host: 10.60.60.25
         centaur:
-          ansible_host: 10.20.20.26
+          ansible_host: 10.60.60.26
         cerberus:
-          ansible_host: 10.20.20.27
+          ansible_host: 10.60.60.27
     agent:
       hosts:
         minotaur:
-          ansible_host: 10.20.20.28
+          ansible_host: 10.60.60.28
         basilisk:
-          ansible_host: 10.20.20.29
+          ansible_host: 10.60.60.29
+        certus:
+          ansible_host: 10.70.70.30
   vars:
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
     ansible_user: lewi0231

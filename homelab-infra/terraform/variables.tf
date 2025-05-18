@@ -68,12 +68,30 @@ variable boot_from {
     description = "Boot order / from (e.g., scsi0)"
 }
 
-variable node_names {
+variable internal_node_names {
     type = list(string)
-    description = "Distinct names for the nodes"
+    description = "Distinct names for the internal nodes"
 }
 
-variable mac_addresses {
+variable dmz_node_names {
+    type = list(string)
+    description = "Distinct names for the dmz nodes"
+}
+
+variable internal_mac_addresses {
     type = list(string)
     description = "Distinct mac address for ip mapping - dhcp"
+}
+
+variable dmz_mac_addresses {
+    type = list(string)
+    description = "Distinct mac address for ip mapping - dhcp"
+}
+
+variable vlan_tag {
+    type = object({
+      dmz = number
+      internal = number
+    })
+    description = "Vlan tag for that particular vm"
 }
