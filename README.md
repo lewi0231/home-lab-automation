@@ -69,13 +69,10 @@ Ansible has a number of key concepts (I'm still a novice, btw):
 
    - ```
      ansible-vault create /path/to/vault.yml
+     ansible-vault view /path/to/vault.yml
+     ansible-vault edit /path/to/vault.yml
+     ansible-playbook /path/to/playbook.yaml --ask-vault-pass
      ```
-
-   api_key: your_secret_api_key
-
-   ansible-vault encrypt /path/to/vault.yml
-
-   ansible-playbook --vault-password-file /path/to/password.txt my_playbook.yml
 
    ```
 

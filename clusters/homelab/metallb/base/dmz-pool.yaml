@@ -1,0 +1,8 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: dmz-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.70.70.60-10.70.70.70

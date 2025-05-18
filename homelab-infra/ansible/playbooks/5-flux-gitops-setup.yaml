@@ -17,6 +17,10 @@
       failed_when: false
       changed_when: false
 
+    - name: Debug github token
+      debug:
+        msg: "github_token is {{ github_token }}"
+
     - name: Bootstrap Flux into GitHub repo
       command: >
         flux bootstrap github \
