@@ -5,6 +5,6 @@ metadata:
   namespace: kube-system
   annotations:
     # metallb.universe.tf/address-pool: internal-pool
-    metallb.universe.tf/loadBalancerIPs: 10.60.60.60
+    metallb.universe.tf/loadBalancerIPs: 10.60.60.61
 spec:
   type: LoadBalancer
