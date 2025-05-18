@@ -4,6 +4,7 @@ metadata:
   name: traefik
   namespace: kube-system
   annotations:
-    metallb.universe.tf/address-pool: internal-pool
+    # metallb.universe.tf/address-pool: internal-pool
+    metallb.universe.tf/loadBalancerIPs: 10.60.60.60
 spec:
   type: LoadBalancer
