@@ -4,6 +4,16 @@
 
 My homelab utilises a pfsense router which serves as a dhcp server, dns resolver and firewall, with one of it's interfaces dedicated to a Proxmox Server, which is where all the below fun stuff takes place. I'll pop an infrastructure diagram below, soon.
 
+### Networking
+
+#### Useful Commands
+
+```
+kubectl label node $NODE_NAME key=value
+kubectl label node $NODE_NAME key- # this will remove the label
+kubectl get nodes --show-labels
+```
+
 ### Flux CD
 
 I'm using Flux for two purposes:

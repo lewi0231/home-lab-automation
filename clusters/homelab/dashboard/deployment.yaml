@@ -66,3 +66,5 @@ spec:
             name: homepage
         - name: logs
           emptyDir: {}
+      nodeSelector:
+        network: internal
