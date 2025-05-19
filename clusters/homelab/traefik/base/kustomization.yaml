@@ -10,3 +10,4 @@ patches:
 resources:
   - traefik-dmz-service.yaml
   - traefik-dmz-ingress-class.yaml
+  - deployment.yaml
