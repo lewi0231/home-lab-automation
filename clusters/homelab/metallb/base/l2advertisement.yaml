@@ -6,4 +6,4 @@ metadata:
 spec:
   ipAddressPools:
     - internal-pool
-    # - dmz-pool
+    - dmz-pool
