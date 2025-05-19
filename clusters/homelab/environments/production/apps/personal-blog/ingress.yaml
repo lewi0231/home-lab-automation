@@ -1,17 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: personal-blog-ingress-development
-  namespace: development
+  name: personal-blog-ingress-production
+  namespace: production
 spec:
   rules:
-    - host: personal-blog.development.home.arpa
+    - host: personal-blog.production.home.arpa
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: personal-blog-development
+                name: personal-blog-production
                 port:
                   number: 80

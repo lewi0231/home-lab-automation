@@ -12,6 +12,10 @@ My homelab utilises a pfsense router which serves as a dhcp server, dns resolver
 kubectl label node $NODE_NAME key=value
 kubectl label node $NODE_NAME key- # this will remove the label
 kubectl get nodes --show-labels
+
+kubectl logs -n kube-system deployment/traefik
+kubectl rollout restart deployment/traefik -n kube-system
+kubectl rollout restart deployment controller -n metallb-system # above two are useful if ip address not changing
 ```
 
 ### Flux CD
