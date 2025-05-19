@@ -6,4 +6,4 @@ metadata:
 spec:
   addresses:
     - 10.60.60.60-10.60.60.70
-  autoAssign: false
+  autoAssign: true
