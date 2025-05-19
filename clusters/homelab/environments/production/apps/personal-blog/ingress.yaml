@@ -4,6 +4,7 @@ metadata:
   name: personal-blog-ingress-production
   namespace: production
 spec:
+  ingressClassName: traefik-dmz
   rules:
     - host: personal-blog.production.home.arpa
       http:
