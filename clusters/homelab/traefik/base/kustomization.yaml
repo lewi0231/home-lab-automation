@@ -7,3 +7,5 @@ patches:
       kind: Service
       name: traefik
       namespace: kube-system
+resources:
+  - traefik-dmz-service.yaml
