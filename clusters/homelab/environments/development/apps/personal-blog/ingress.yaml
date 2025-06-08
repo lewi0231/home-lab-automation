@@ -5,7 +5,7 @@ metadata:
   namespace: development
 spec:
   rules:
-    - host: personal-blog.development.home.arpa
+    - host: personal-blog.flowerhead.dev
       http:
         paths:
           - path: /

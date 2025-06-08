@@ -3,5 +3,6 @@ kind: Kustomization
 
 resources:
   - deployment.yaml
-  - ingress.yaml
+  - ingressroute.yaml
   - image-automation.yaml
+  - certificate.yaml

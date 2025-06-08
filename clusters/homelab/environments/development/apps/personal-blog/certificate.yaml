@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: development-tls
+  namespace: development
+spec:
+  secretName: development-tls
+  issuerRef:
+    name: cluster-issuer-production
+    kind: ClusterIssuer
+  dnsNames:
+    - personal-blog.development.flowerhead.dev

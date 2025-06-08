@@ -1,22 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: personal-blog-development
+  name: personal-blog
   namespace: development
+  environment: development
 spec:
   selector:
     matchLabels:
-      app: personal-blog-development
+      app: personal-blog
   replicas: 1
   template:
     metadata:
       labels:
-        app: personal-blog-development
+        app: personal-blog
     spec:
       imagePullSecrets:
         - name: ghrc-credentials
       containers:
-        - name: personal-blog-development
+        - name: personal-blog
           image: ghcr.io/lewi0231/home-lab-automation-personal-blog:latest # {"$imagepolicy": "flux-system:personal-blog-policy"}
           ports:
             - containerPort: 80
@@ -26,7 +27,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: personal-blog-development
+  name: personal-blog
   namespace: development
 spec:
   type: ClusterIP
@@ -34,4 +35,4 @@ spec:
     - port: 80
       targetPort: 3000
   selector:
-    app: personal-blog-development
+    app: personal-blog
