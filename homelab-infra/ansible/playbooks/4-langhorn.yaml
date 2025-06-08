@@ -1,0 +1,35 @@
+---
+- name: Join new storage nodes to K3s cluster and deploy Longhorn
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Join storage nodes to K3s cluster using k3sup
+      ansible.builtin.shell: >
+        k3sup join
+        --ip {{ hostvars[item]['ansible_host'] }}
+        --user {{ USER }}
+        --sudo
+        --k3s-channel stable
+        --server-ip {{ PRIMARY_MASTER }}
+        --k3s-extra-args '--node-label "longhorn=true"'
+      loop: "{{ groups['storage'] }}"
+      register: join_results
+      changed_when: "'Agent node joined successfully!' in join_results.stdout"
+
+    - name: Display join results
+      ansible.builtin.debug:
+        var: join_results
+
+    - name: Install Longhorn
+      ansible.builtin.shell: >
+        kubectl apply -f https://raw.githubusercontent.com/JamesTurland/JimsGarage/main/Kubernetes/Longhorn/longhorn.yaml
+      register: longhorn_apply
+      changed_when: "'created' in longhorn_apply.stdout or 'configured' in longhorn_apply.stdout"
+
+    - name: Wait for Longhorn pods to be ready
+      ansible.builtin.shell: >
+        kubectl wait --for=condition=Ready pods --all --namespace longhorn-system --timeout=300s
+      register: longhorn_wait
+      changed_when: false

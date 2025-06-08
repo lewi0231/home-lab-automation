@@ -1,11 +1,21 @@
 ---
-k3s_version: v1.28.4+k3s1
-k3s_token: "your-secure-token-here" # Should be generated randomly and kept secure
-flannel_iface: "eth0" # Your primary network interface
-apiserver_endpoint: "https://192.168.1.101:6443" # IP of your master node
-
-# Optional: Configure Flux bootstrap
-setup_flux: true
-flux_git_repo: "https://github.com/yourusername/your-flux-repo.git"
-flux_git_branch: "main"
-flux_path: "./clusters/homelab"
+K3S_VERSION: v1.32.5+k3s1
+# K3S_TOKEN: "573583ee63f931dbb1c866de84fe1475a12e7e12f0a05acd75a6694bd1667a7d" # Don't need this with k3sup
+FLANNEL_IFACE: "eth0"
+INTERFACE: "eth0" # Keep consistent
+APISERVER_ENDPOINT: "https://10.60.60.25:6443"
+PRIMARY_MASTER: 10.60.60.25
+USER: "lewi0231"
+VIP: 10.60.60.99
+KVVERSION: v0.9.1
+GITHUB_USER: lewi0231
+GITHUB_REPO: home-lab-automation
+LB_RANGE: "10.60.60.60-10.60.60.80"
+CERT_NAME: id_rsa
+SETUP_FLUX: true
+FLUX_GIT_REPO: "https://github.com/lewi0231/home-lab-automation.git"
+FLUX_GIT_BRANCH: "main"
+FLUX_PATH: "./clusters/homelab"
+# RANCHER_VERSION: 2.7.9
+CERT_MANAGER_VERSION: v1.17.2
+RANCHER_HOSTNAME: rancher.home.arpa

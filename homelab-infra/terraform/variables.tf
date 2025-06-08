@@ -23,14 +23,18 @@ variable "ci_password" {
     description = "Cloud init vm instance password"
 }
 
-variable "disk_size" {
-    type = number
-    description = "The size of the disk (e.g., 20 - G is inferred)"
-}
-
 variable disk_storage {
     type = string
     description = "The type of of disk storage (e.g., local-lvm)"
+}
+
+variable disk_size {
+    type = object({
+      master = number
+      worker = number
+      volume_node = number 
+    })
+    description = "Size of the disk"
 }
 
 variable proxmox_node {
@@ -44,8 +48,12 @@ variable cloud_init_template {
 }
 
 variable memory_count {
-    type = number
-    description = "Memory amount"
+    type = object({
+      master = number
+      worker = number
+      volume_node = number
+    })
+    description = "RAM"
 }
 
 variable core_count {
@@ -68,24 +76,13 @@ variable boot_from {
     description = "Boot order / from (e.g., scsi0)"
 }
 
-variable internal_node_names {
-    type = list(string)
-    description = "Distinct names for the internal nodes"
-}
-
-variable dmz_node_names {
-    type = list(string)
-    description = "Distinct names for the dmz nodes"
-}
-
-variable internal_mac_addresses {
-    type = list(string)
-    description = "Distinct mac address for ip mapping - dhcp"
-}
-
-variable dmz_mac_addresses {
-    type = list(string)
-    description = "Distinct mac address for ip mapping - dhcp"
+variable nodes {
+    type = object({
+      master = list(tuple([ string, string ]))
+      worker = list(tuple([ string, string ]))
+      storage_worker = list(tuple([ string, string ]))
+    })
+    description = "A list of relevant tuples e.g., [hostname, mac address]"
 }
 
 variable vlan_tag {

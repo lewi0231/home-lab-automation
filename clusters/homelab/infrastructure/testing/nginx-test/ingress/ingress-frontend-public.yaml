@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: frontend-public
+  namespace: frontend
+  annotations:
+    kubernetes.io/ingress.class: traefik-public
+spec:
+  entryPoints:
+    - web # Cloudflare sends through http - via tunnel
+
+  routes:
+    - match: Host(`nginx-public.flowerhead.dev`)
+      kind: Rule
+      services:
+        - name: nginx-public
+          port: 80
+  # tls: # handled by cloudflare
+  #   secretName: frontend-staging-tls

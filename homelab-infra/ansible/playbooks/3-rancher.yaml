@@ -1,0 +1,193 @@
+---
+- name: Install Cert Manager using k8s module
+  hosts: localhost
+  tasks:
+    - name: Install cert-manager via kubectl
+      shell: |
+        kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.2/cert-manager.yaml
+    - name: Wait for cert-manager pods
+      shell: |
+        kubectl wait --for=condition=ready pod -l app.kubernetes.io/instance=cert-manager -n cert-manager --timeout=300s
+
+- name: Deploy Rancher
+  hosts: localhost
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Ensure Helm is installed
+      command: helm version
+      register: helm_check
+      failed_when: helm_check.rc != 0
+      changed_when: false
+
+    - name: Add Rancher Helm repository
+      kubernetes.core.helm_repository:
+        name: rancher-stable
+        repo_url: https://releases.rancher.com/server-charts/stable
+
+    - name: Update Helm repositories
+      command: helm repo update
+
+    - name: Create cattle-system namespace
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: cattle-system
+        state: present
+
+    - name: Install Rancher with helm
+      kubernetes.core.helm:
+        name: rancher
+        # chart: rancher-stable/rancher
+        chart_ref: rancher-stable/rancher
+        release_namespace: cattle-system
+        # namespace: cattle-system
+        values:
+          hostname: "{{ RANCHER_HOSTNAME }}"
+          bootstrapPassword: admin
+
+    - name: Wait for Rancher pods
+      shell: |
+        kubectl wait --for=condition=ready pod --all -n cattle-system --timeout=300s
+
+    - name: Expose Rancher via LoadBalancer Service
+      command: kubectl expose deployment rancher --name rancher-lb --port=443 --type=LoadBalancer -n cattle-system
+# - name: Deploy Rancher
+#   hosts: localhost
+#   environment:
+#     KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+#   vars_files:
+#     - ../group_vars/k3s_cluster.yaml
+#   tasks:
+#     - name: Ensure Helm is installed
+#       command: helm version
+#       register: helm_check
+#       failed_when: helm_check.rc != 0
+#       changed_when: false
+
+#     - name: Add Rancher Helm repository
+#       kubernetes.core.helm_repository:
+#         name: rancher-stable
+#         repo_url: https://releases.rancher.com/server-charts/stable
+
+#     - name: Update Helm repositories
+#       command: helm repo update
+
+#     - name: Create cattle-system namespace
+#       k8s:
+#         api_version: v1
+#         kind: Namespace
+#         name: cattle-system
+#         state: present
+
+#     # Check if cert-manager is installed (Rancher dependency)
+#     - name: Check if cert-manager is installed
+#       k8s_info:
+#         api_version: apps/v1
+#         kind: Deployment
+#         name: cert-manager
+#         namespace: cert-manager
+#       register: cert_manager_check
+#       failed_when: false
+
+#     - name: Fail if cert-manager is not installed
+#       fail:
+#         msg: "cert-manager must be installed before Rancher. Please install cert-manager first."
+#       when: cert_manager_check.resources | length == 0
+
+#     - name: Install Rancher with Helm (LoadBalancer setup)
+#       kubernetes.core.helm:
+#         name: rancher
+#         chart: rancher-stable/rancher
+#         namespace: cattle-system
+#         create_namespace: false
+#         values:
+#           # Basic configuration
+#           hostname: "{{ RANCHER_HOSTNAME }}"
+#           bootstrapPassword: "{{ RANCHER_BOOTSTRAP_PASSWORD | default('admin') }}"
+
+#           # TLS configuration - using Rancher's self-signed certs for LoadBalancer
+#           tls: ingress
+
+#           # Resource management
+#           # resources: "{{ rancher_resources }}"
+
+#           # Replica configuration
+#           replicas: 3
+
+#           # LoadBalancer specific settings
+#           service:
+#             type: LoadBalancer
+#             # annotations for cloud providers (uncomment as needed)
+#             # annotations:
+#             #   # AWS
+#             #   service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+#             #   service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+#             #   # Azure
+#             #   service.beta.kubernetes.io/azure-load-balancer-internal: "false"
+#             #   # GCP
+#             #   cloud.google.com/load-balancer-type: "External"
+
+#           # Disable ingress since we're using LoadBalancer
+#           ingress:
+#             enabled: false
+
+#     - name: Wait for Rancher deployment to be ready
+#       k8s_info:
+#         api_version: apps/v1
+#         kind: Deployment
+#         name: rancher
+#         namespace: cattle-system
+#         wait: true
+#         wait_condition:
+#           type: Available
+#           status: "True"
+#         wait_timeout: 600 # Increased timeout for Rancher startup
+
+#     - name: Wait for Rancher pods to be ready
+#       shell: |
+#         kubectl wait --for=condition=ready pod -l app=rancher -n cattle-system --timeout=600s
+#       register: rancher_pods_ready
+#       retries: 3
+#       delay: 30
+
+#     - name: Get Rancher service information
+#       k8s_info:
+#         api_version: v1
+#         kind: Service
+#         name: rancher
+#         namespace: cattle-system
+#       register: rancher_service
+
+#     - name: Wait for LoadBalancer to get external IP
+#       k8s_info:
+#         api_version: v1
+#         kind: Service
+#         name: rancher
+#         namespace: cattle-system
+#         wait: true
+#         wait_condition:
+#           type: LoadBalancer
+#         wait_timeout: 300
+#       register: rancher_lb_service
+#       retries: 5
+#       delay: 30
+
+#     - name: Display Rancher LoadBalancer access information
+#       debug:
+#         msg: |
+#           Rancher has been deployed successfully with LoadBalancer!
+
+#           Service Type: LoadBalancer
+#           External IP: {{ rancher_lb_service.resources[0].status.loadBalancer.ingress[0].ip | default('Pending - check with kubectl get svc -n cattle-system') }}
+#           Port: 443 (HTTPS)
+
+#           Access Rancher at: https://{{ rancher_lb_service.resources[0].status.loadBalancer.ingress[0].ip | default('EXTERNAL-IP') }}
+#           Bootstrap password: {{ RANCHER_BOOTSTRAP_PASSWORD | default('admin') }}
+
+#           Note: If External IP shows as 'Pending', your cluster may not have a LoadBalancer provider configured.
+#           In that case, you can access via NodePort or port-forward:
+#           kubectl port-forward -n cattle-system svc/rancher 8443:443
+#           Then access: https://localhost:8443

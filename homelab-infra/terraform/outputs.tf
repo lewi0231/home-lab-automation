@@ -1,9 +1,14 @@
-output "internal_k3s_nodes" {
+output "master_nodes" {
   description = "Current IP Default"
-  value = proxmox_vm_qemu.internal_k3s_nodes.*.default_ipv4_address
+  value = proxmox_vm_qemu.master_nodes.*.default_ipv4_address
 }
 
-output "dmz_k3s_nodes" {
+output "worker_nodes" {
   description = "Current IP Default"
-  value = proxmox_vm_qemu.dmz_k3s_nodes.*.default_ipv4_address
+  value = proxmox_vm_qemu.worker_nodes.*.default_ipv4_address
 }
+
+# output "volume_nodes" {
+#   description = "Current IP Default"
+#   value = proxmox_vm_qemu.storage_worker.*.default_ipv4_address
+# }

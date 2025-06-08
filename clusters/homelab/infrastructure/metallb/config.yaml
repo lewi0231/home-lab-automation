@@ -1,0 +1,39 @@
+# clusters/homelab/infrastructure/metallb/config.yaml
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: internal-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.60.60.60-10.60.60.70
+
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: dmz-pool
+  namespace: metallb-system
+spec:
+  addresses:
+    - 10.70.70.60-10.70.70.70
+
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: internal-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - internal-pool
+
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: dmz-l2
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - dmz-pool

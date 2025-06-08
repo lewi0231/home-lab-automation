@@ -1,0 +1,197 @@
+---
+- name: Ensure that ~/.kube/config does not exist locally
+  hosts: localhost
+  tags: reset_config
+  tasks:
+    - name: remove config
+      command: rm -rf ~/.kube
+
+# - name: Install policycoreutils on remote machines
+#   hosts: all
+#   tags: package_installs
+#   become: true
+#   vars_files:
+#     - ../group_vars/k3s_cluster.yaml
+#   tasks:
+#     - name: Install policycoreutils package
+#       apt:
+#         name: policycoreutils
+#         state: present
+#         update_cache: yes
+#       environment:
+#         NEEDRESTART_MODE: a
+
+- name: Bootstrap first K3s node
+  hosts: localhost
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tags: k3s_install
+  tasks:
+    - name: Ensure ~/.kube directory exists
+      file:
+        path: "~/.kube"
+        state: directory
+        mode: "0755"
+
+    - name: Bootstrap K3s master node
+      command: >
+        k3sup install
+        --ip {{ PRIMARY_MASTER }}
+        --user {{ USER }}
+        --tls-san {{ VIP }}
+        --cluster
+        --k3s-version {{ K3S_VERSION }}
+        --k3s-extra-args "--disable traefik --disable servicelb --flannel-iface={{ INTERFACE }} --node-ip={{ PRIMARY_MASTER }} --node-taint node-role.kubernetes.io/master=true:NoSchedule"
+        --merge
+        --sudo
+        --local-path ~/.kube/config
+        --ssh-key ~/.ssh/{{ CERT_NAME }}
+        --context k3s-ha
+      environment:
+        NEEDRESTART_MODE: a
+      register: k3sup_result
+      failed_when: k3sup_result.rc != 0
+
+    - name: Display k3sup output
+      debug:
+        var: k3sup_result.stdout
+
+- name: Setup kube-vip for HA
+  hosts: localhost
+  tags: ha_setup
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Check if kubeconfig exists
+      stat:
+        path: "{{ ansible_env.HOME }}/.kube/config"
+      register: kubeconfig_stat
+      failed_when: not kubeconfig_stat.stat.exists
+
+    - name: Download kube-vip RBAC manifest
+      get_url:
+        url: https://kube-vip.io/manifests/rbac.yaml
+        dest: /tmp/kube-vip-rbac.yaml
+        mode: "0644"
+
+    - name: Apply RBAC manifest using kubectl
+      command: >
+        kubectl apply -f /tmp/kube-vip-rbac.yaml
+        --kubeconfig {{ ansible_env.HOME }}/.kube/config
+      register: kubectl_result
+
+    - name: Display RBAC application result
+      debug:
+        var: kubectl_result
+
+- name: Generate kube-vip DaemonSet manifest
+  hosts: chimera
+  tags: ha_setup
+  become: true
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Check if kube-vip manifest already exists
+      stat:
+        path: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+      register: kube_vip_manifest
+
+    - name: Pull kube-vip image
+      shell: |
+        sudo ctr image pull ghcr.io/kube-vip/kube-vip:{{ KVVERSION }}
+      args:
+        executable: /bin/bash
+      when: not kube_vip_manifest.stat.exists
+
+    - name: Generate kube-vip DaemonSet manifest
+      shell: |
+        ctr run --rm --net-host ghcr.io/kube-vip/kube-vip:{{ KVVERSION }} vip /kube-vip manifest daemonset \
+          --interface {{ INTERFACE }} \
+          --address {{ VIP }} \
+          --controlplane \
+          --arp \
+          --leaderElection \
+          --inCluster \
+          --taint > /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+      args:
+        executable: /bin/bash
+      when: not kube_vip_manifest.stat.exists
+
+    - name: Verify kube-vip manifest was created
+      stat:
+        path: /var/lib/rancher/k3s/server/manifests/kube-vip.yaml
+      register: manifest_created
+
+    - name: Display manifest creation status
+      debug:
+        msg: "Kube-vip manifest created: {{ manifest_created.stat.exists }}"
+
+- name: Add Master Nodes to K3s Cluster
+  hosts: localhost
+  tags: k3s_install
+  gather_facts: false
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Join additional master nodes
+      command: >
+        k3sup join
+        --ip {{ hostvars[item]['ansible_host'] }}
+        --user {{ USER }}
+        --sudo
+        --k3s-version {{ K3S_VERSION }}
+        --server
+        --server-ip {{ PRIMARY_MASTER }}
+        --ssh-key ~/.ssh/{{ CERT_NAME }}
+        --k3s-extra-args "--disable traefik --disable servicelb --flannel-iface={{ INTERFACE }} --node-ip={{ hostvars[item]['ansible_host'] }} --node-taint node-role.kubernetes.io/master=true:NoSchedule"
+        --server-user {{ USER }}
+      loop: "{{ groups['master'] }}"
+      when: hostvars[item]['ansible_host'] != PRIMARY_MASTER
+      register: join_master_results
+
+    - name: Display join results
+      debug:
+        msg: "{{ item.item }} joined successfully"
+      loop: "{{ join_master_results.results }}"
+      when: item is not skipped
+
+- name: Add Worker Nodes to K3s Cluster
+  hosts: localhost
+  tags: k3s_install
+  gather_facts: false
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Join Worker Nodes
+      command: >
+        k3sup join
+        --ip {{ hostvars[item]['ansible_host'] }}
+        --user {{ USER }}
+        --sudo
+        --k3s-version {{ K3S_VERSION }}
+        --server-ip {{ PRIMARY_MASTER }}
+        --ssh-key ~/.ssh/{{ CERT_NAME }}
+        --k3s-extra-args "--node-label worker=true --node-ip={{ hostvars[item]['ansible_host'] }}"
+      loop: "{{ groups['agent'] }}"
+      register: join_worker_results
+
+    - name: Check for any failed joins
+      fail:
+        msg: "Some worker nodes failed to join the cluster"
+      when: join_worker_results.results | selectattr('rc', 'ne', 0) | list | length > 0
+
+    - name: Display Worker Join Results
+      debug:
+        msg: "{{ item.item }} ({{ hostvars[item.item]['ansible_host'] }}): {{ 'SUCCESS' if item.rc == 0 else 'FAILED' }}"
+      loop: "{{ join_worker_results.results }}"
+# - name: Install kube-vip as network LoadBalancer - Install the kube-vip Cloud Provider
+#   hosts: localhost
+#   tasks:
+#     - name: Cloud Controller Manifest
+#       command: >
+#         kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+#       register: kube_cloud_provider
+
+#     - name: Print the results.
+#       debug:
+#         msg: "Cloud Provider created: {{ kube_cloud_provider }}"

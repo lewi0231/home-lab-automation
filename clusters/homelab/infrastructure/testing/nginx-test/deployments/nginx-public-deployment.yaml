@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-public
+  namespace: frontend
+  labels:
+    app: nginx-public
+spec:
+  selector:
+    matchLabels:
+      app: nginx-public
+  replicas: 1
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: nginx-public
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-public
+  namespace: frontend
+  labels:
+    app: nginx-public
+spec:
+  ports:
+    - port: 80
+      name: http
+      targetPort: 80
+  selector:
+    app: nginx-public

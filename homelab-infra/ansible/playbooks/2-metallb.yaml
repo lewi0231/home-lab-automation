@@ -1,0 +1,126 @@
+- name: Install MetalLB
+  hosts: localhost
+  tags: metallb_install
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Apply manifest
+      command: >
+        kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
+      register: metallb_result
+
+    - name: Print the results.
+      debug:
+        msg: "MetalLB installed: \n{{ metallb_result }}"
+
+    - name: Wait for webhook-service endpoints to be available
+      k8s_info:
+        api_version: v1
+        kind: Endpoints
+        namespace: metallb-system
+        name: metallb-webhook-service
+      register: webhook_endpoints
+      until: webhook_endpoints.resources[0].subsets is defined and webhook_endpoints.resources[0].subsets | length > 0
+      retries: 10
+      delay: 5
+
+    - name: Wait for MetalLB controller pod to be ready
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: metallb-system
+        label_selectors:
+          - app=metallb
+          - component=controller
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 300 # Timeout in seconds
+        wait_sleep: 5 # Interval between checks in seconds
+      register: controller_pods
+
+    - name: Apply IPAddressPool
+      k8s:
+        state: present
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: IPAddressPool
+          metadata:
+            name: first-pool
+            namespace: metallb-system
+          spec:
+            addresses:
+              - "{{ LB_RANGE }}"
+      register: ip_address_pool
+
+    - name: Resulting ip address pool result
+      debug:
+        msg: "MetalLB Address Pool applied: \n{{ ip_address_pool }}"
+
+    - name: Apply the l2advertisement
+      k8s:
+        state: present
+        definition:
+          apiVersion: metallb.io/v1beta1
+          kind: L2Advertisement
+          metadata:
+            name: l2advertisement
+            namespace: metallb-system
+          spec:
+            ipAddressPools:
+              - first-pool
+      register: l2advertisement
+
+    - name: Resulting l2 advertisement result
+      debug:
+        msg: "MetalLB L2 Advertisement applied: \n{{ l2advertisement }}"
+
+- name: Test deployment of Nginx
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Deploy Nginx
+      k8s:
+        state: present
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: nginx-1
+            namespace: default
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                app: nginx
+            template:
+              metadata:
+                labels:
+                  app: nginx
+              spec:
+                containers:
+                  - name: nginx
+                    image: nginx:latest
+                    ports:
+                      - containerPort: 80
+
+    - name: Expose Nginx Deployment via LoadBalancer Service
+      k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: nginx-1
+            namespace: default
+          spec:
+            selector:
+              app: nginx
+            ports:
+              - protocol: TCP
+                port: 80
+                targetPort: 80
+            type: LoadBalancer

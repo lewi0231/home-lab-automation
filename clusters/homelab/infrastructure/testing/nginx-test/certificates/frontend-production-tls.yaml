@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: frontend-production-tls
+  namespace: frontend
+spec:
+  secretName: frontend-production-tls
+  issuerRef:
+    name: cluster-issuer-production
+    kind: ClusterIssuer
+  dnsNames:
+    - nginx-private.flowerhead.dev
+    - nginx-public.flowerhead.dev

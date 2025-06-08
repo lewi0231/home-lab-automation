@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: frontend-staging-tls
+  namespace: frontend
+spec:
+  secretName: frontend-staging-tls
+  issuerRef:
+    name: cluster-issuer-staging
+    kind: ClusterIssuer
+  dnsNames:
+    - nginx-private.flowerhead.dev
+    - nginx-public.flowerhead.dev

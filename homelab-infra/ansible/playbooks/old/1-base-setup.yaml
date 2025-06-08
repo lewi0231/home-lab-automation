@@ -21,6 +21,7 @@
           - iptables
           - iputils-arping
           - iputils-ping
+          - host
         state: present
 
     - name: Ensure hostname is set correctly
