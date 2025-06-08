@@ -98,3 +98,42 @@ kubectl create namespace databases
 
 - You'll need to ensure that in your public traefik load balancer it needs to forgo redirections from port 80. This is because Cloudflare is taking care of security (TLS) etc - and we don't need to use certificates on our end.
 - If you want to access the public site locally - without going through cloudflare, you'll want to resolve the hostname to your private Traefik load balancer and add the hostname to the match list in routes (inside of your ingressroute).
+
+### Sealed Secrets
+
+This is a way to store secrets in an encrypted format. This is useful because it allows you to store secrets in a git repo and not have to worry about them being exposed.
+
+1. Install the Sealed Secrets controller:
+
+```
+helm repo add sealed-secrets https://bitnami-labs.github.io/sealed-secrets
+helm repo update
+helm install sealed-secrets-controller sealed-secrets/sealed-secrets --namespace sealed-secrets --create-namespace
+```
+
+2. Confirm that the controller is running:
+
+```
+kubectl get pods -n sealed-secrets
+
+```
+
+3. Install kubeseal:
+
+```
+brew install kubeseal
+```
+
+4. Confirm it has access to the sealed secrets controller:
+
+```
+kubeseal --fetch-cert --controller-name=sealed-secrets-controller --controller-namespace=sealed-secrets
+```
+
+5. Create a sealed secret:
+
+```
+kubeseal --controller-name sealed-secrets-controller --controller-namespace sealed-secrets --format yaml < secret.yaml > sealed-secret.yaml
+```
+
+6. Apply the sealed secret and delete the original secret.
