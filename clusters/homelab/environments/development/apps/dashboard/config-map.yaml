@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: development
+data:
+  settings.yaml: |
+    title: Flowerhead Development Dashboard
+    theme: dark
+    color: slate
+    headerStyle: clean
+    layout:
+      - Cluster:
+          style: row
+          columns: 3
+      - Services:
+          style: row
+          columns: 3
+
+  services.yaml: |
+    - Cluster:
+        # - Kubernetes Dashboard:
+        #     href: https://kubernetes-dashboard.local  # Adjust URL
+        #     description: K3s cluster management
+        #     icon: kubernetes.png
+        # - Grafana:
+        #     href: https://grafana.local  # Adjust URL  
+        #     description: Monitoring and metrics
+        #     icon: grafana.png
+        # - ArgoCD:
+        #     href: https://argocd.local  # Adjust URL
+        #     description: GitOps deployment
+        #     icon: argocd.png
+    - Applications:
+        - Personal-blog:
+            href: https://personal-blog.development.flowerhead.dev
+            description: Staged version of blog (local only)
+
+  widgets.yaml: |
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "cluster"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+    - datetime:
+        text_size: xl
+        format:
+          timeStyle: short
+          dateStyle: short
+          hourCycle: h23
+
+  bookmarks.yaml: |
+    - Homelab:
+        - GitHub:
+            - href: https://github.com/lewi0231
+              icon: github.png
+        - Documentation:
+            - K3s Docs:
+                - href: https://docs.k3s.io
+                  icon: kubernetes.png
+            - Flux Docs:
+                - href: https://fluxcd.io/docs
+                  icon: flux-cd.png
+
+  docker.yaml: |
+    # Docker integration settings (if needed)
+
+  kubernetes.yaml: |
+    mode: cluster

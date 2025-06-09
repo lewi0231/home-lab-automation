@@ -1,0 +1,68 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dashboard
+  namespace: development
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: homepage
+      version: ">=1.0.0"
+      sourceRef:
+        kind: HelmRepository
+        name: dashboard
+        namespace: development
+      interval: 1h
+  values:
+    # Basic configuration
+    image:
+      repository: ghcr.io/gethomepage/homepage
+      tag: latest
+
+    # Service configuration
+    service:
+      main:
+        ports:
+          http:
+            port: 3000
+            targetPort: 3000
+
+    # Disable built-in ingress since we're using IngressRoute
+    ingress:
+      main:
+        enabled: false
+
+    # Persistence for config
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: homepage-config
+        subPath:
+          - path: bookmarks.yaml
+            mountPath: /app/config/bookmarks.yaml
+          - path: docker.yaml
+            mountPath: /app/config/docker.yaml
+          - path: kubernetes.yaml
+            mountPath: /app/config/kubernetes.yaml
+          - path: services.yaml
+            mountPath: /app/config/services.yaml
+          - path: settings.yaml
+            mountPath: /app/config/settings.yaml
+          - path: widgets.yaml
+            mountPath: /app/config/widgets.yaml
+
+    # Resources
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+    # Service account for Kubernetes integration
+    serviceAccount:
+      create: false
+      name: dashboard
