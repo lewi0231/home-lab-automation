@@ -3,7 +3,7 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
   name: personal-blog-repository-development
-  namespace: flux-system
+  namespace: development
 spec:
   image: ghcr.io/lewi0231/home-lab-personal-blog
   interval: 1m0s
@@ -14,7 +14,7 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
 metadata:
   name: personal-blog-policy-development
-  namespace: flux-system
+  namespace: development
 spec:
   imageRepositoryRef:
     name: personal-blog-repository-development
@@ -29,12 +29,13 @@ apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageUpdateAutomation
 metadata:
   name: personal-blog-update-development
-  namespace: flux-system
+  namespace: development
 spec:
   interval: 1m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   git:
     checkout:
       ref:
