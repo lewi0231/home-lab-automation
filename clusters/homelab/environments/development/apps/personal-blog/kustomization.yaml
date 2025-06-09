@@ -5,4 +5,3 @@ resources:
   - deployment.yaml
   - ingressroute.yaml
   - image-automation.yaml
-  - certificate.yaml
