@@ -10,4 +10,4 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - personal-blog.development.flowerhead.dev
-    - dashboard.development.flowerhead.dev
+    - homepage.development.flowerhead.dev

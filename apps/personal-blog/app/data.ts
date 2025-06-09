@@ -67,11 +67,18 @@ export const WORK_EXPERIENCE: WorkExperience[] = [
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    title: 'HomeLab: Getting up to speed!',
+    title: 'This is probably a dumb idea!',
     description:
       'As an aspiring Network Engineer I wanted to get a HomeLab up and going using Kubernetes, Proxmox, VPN, Firewall +',
-    link: '/blog/exploring-the-intersection-of-design-ai-and-design-engineering',
+    link: '/blog/introduction',
     uid: 'blog-1',
+  },
+  {
+    title: 'Homelab fun times',
+    description:
+      'As an aspiring Network Engineer I wanted to get a HomeLab up and going using Kubernetes, Proxmox, VPN, Firewall +',
+    link: '/blog/home-lab-wonder',
+    uid: 'blog-2',
   },
 ]
 

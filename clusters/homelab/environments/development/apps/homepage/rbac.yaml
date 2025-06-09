@@ -1,15 +1,9 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: dashboard
-  namespace: development
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: dashboard
+  name: homepage
   labels:
-    app.kubernetes.io/name: dashboard
+    app.kubernetes.io/name: homepage
 rules:
   - apiGroups:
       - ""
@@ -36,6 +30,14 @@ rules:
       - get
       - list
   - apiGroups:
+      - gateway.networking.k8s.io
+    resources:
+      - httproutes
+      - gateways
+    verbs:
+      - get
+      - list
+  - apiGroups:
       - metrics.k8s.io
     resources:
       - nodes
@@ -47,12 +49,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: dashboard
+  name: homepage
+  labels:
+    app.kubernetes.io/name: homepage
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: dashboard
+  name: homepage
 subjects:
   - kind: ServiceAccount
-    name: dashboard
+    name: homepage
     namespace: development
