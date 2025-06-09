@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - apps/personal-blog
+  - ghcr-credentials-sealed.yaml

@@ -9,5 +9,5 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: development
+    name: flux-system
   targetNamespace: development
