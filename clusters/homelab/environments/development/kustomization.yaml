@@ -7,4 +7,4 @@ resources:
   - apps/homepage
   - ghcr-credentials-sealed.yaml
   - certificate.yaml
-  - development-repository.yaml
+  # - development-repository.yaml

@@ -44,7 +44,7 @@ spec:
       author:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
-    messageTemplate: "Update personal-blog image to latest version"
+      messageTemplate: "Update personal-blog image to latest version"
     push:
       branch: main
   update:
