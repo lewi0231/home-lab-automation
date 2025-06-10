@@ -8,4 +8,4 @@ resources:
   - ghcr-credentials-sealed.yaml
   - certificate.yaml
   - development-repository.yaml
-  - repo-sealed-secret.yaml
+  - git-credentials-sealed.yaml
