@@ -1,45 +1,63 @@
 # HomeLab Automation Project
 
+A comprehensive Kubernetes homelab setup using K3s, Flux CD, MetalLB, and Ansible for infrastructure automation.
+
+## Table of Contents
+
+- [Physical Infrastructure](#physical-infrastructure)
+- [Networking](#networking)
+- [Flux CD](#flux-cd)
+- [MetalLB](#metallb)
+- [Ansible](#ansible)
+- [Kube-VIP](#kube-vip)
+- [Node Management](#node-management)
+- [Monitoring](#monitoring)
+- [Troubleshooting](#troubleshooting)
+
 ## Physical Infrastructure
 
-My homelab utilises a pfsense router which serves as a dhcp server, dns resolver and firewall, with one of it's interfaces dedicated to a Proxmox Server, which is where all the below fun stuff takes place. I'll pop an infrastructure diagram below, soon.
+My homelab utilizes a pfSense router that serves as a DHCP server, DNS resolver, and firewall, with one of its interfaces dedicated to a Proxmox server where all the Kubernetes infrastructure runs.
 
 ![](homelab.jpg)
 
-### Networking
+## Networking
 
-#### Useful Commands
+### Useful Commands
 
-```
+```bash
+# Node labeling
 kubectl label node $NODE_NAME key=value
-kubectl label node $NODE_NAME key- # this will remove the label
+kubectl label node $NODE_NAME key-  # Remove a label
 kubectl get nodes --show-labels
 
+# Traefik troubleshooting
 kubectl logs -n kube-system deployment/traefik
 kubectl rollout restart deployment/traefik -n kube-system
-kubectl rollout restart deployment controller -n metallb-system # above two are useful if ip address not changing
+kubectl rollout restart deployment controller -n metallb-system  # Useful if IP address isn't changing
 ```
 
-### Flux CD
+## Flux CD
 
-I'm using Flux for two purposes:
+I use Flux CD for two primary purposes:
 
-1. Have it monitor any manifest changes inside of my repository and subsequently update my k3s cluster.
-2. The other is to monitor my github packages and apply relevant new image upon creation (built via github actions + Dockerfile)
+1. **GitOps Automation**: Monitor manifest changes in my repository and automatically update the K3s cluster
+2. **Image Automation**: Monitor GitHub packages and apply new images upon creation (built via GitHub Actions + Dockerfile)
 
-#### Installation:
+### Installation
+
+#### Prerequisites
 
 1. Create a GitHub personal access token
-2. Install Flux:
+2. Install Flux CLI:
 
-```
+```bash
 curl -s https://fluxcd.io/install.sh | sudo bash
 export GITHUB_TOKEN=$TOKEN
 ```
 
-3. Bootstrap Flux with GitHub:
+#### Bootstrap Installation
 
-````
+```bash
 flux bootstrap github \
     --owner=$GITHUB_USER \
     --repository=home-lab \
@@ -47,140 +65,191 @@ flux bootstrap github \
     --path=clusters/homelab \
     --components-extra=image-reflector-controller,image-automation-controller \
     --personal
-    ```
-**Note**: the extra components above are so that I am able to pull my built github image from the repo.
+```
 
-4. Configure GitHub Registry Authentication:
-```kubectl create secret docker-registry ghcr-credentials \
+**Note**: The extra components enable pulling built GitHub images from the repository.
+
+#### GitHub Registry Authentication
+
+```bash
+kubectl create secret docker-registry ghcr-credentials \
     --namespace=development \
     --docker-server=ghcr.io \
     --docker-username=$GITHUB_USER \
-    --docker-password=$GITHUB_TOKEN```
-**NOTE**: Make sure that you export the envs before running.
-
-#### Super useful flux commands (troubleshooting)
-
-````
-
-kubectl logs -n flux-system deployment/kustomize-controller # deployment here refers to the kubernetes resource (deployments manage pods - so this is really pod logs)
-flux get source git flux-system # Will show the last commit - which you can compare against your git logs
-flux reconcile kustomization metallb --with-source # force reconcile if it hasn't picked up the changes - shouldn't need this though.
-kubectl delete kustomization metallb-system -n flux-system # apparently you can delete and recreate if you really run into issues.
-
+    --docker-password=$GITHUB_TOKEN
 ```
 
-#### Other Flux Related Info
+**Important**: Ensure environment variables are exported before running.
 
-- There are two types of kustomizations: 1. Used to specify the location of a 'repo' (e.g., your files related to metallb) - this is usually located in the flux-system folder. 2. the one that specifes your resources (e.g., metallb/base -> ip-address-pool.yaml)
-- I didn't end up needing it but the way to add a node label to a particularly node (vm) is to run something like the following: `kubectl label node hostname key=value` - I thought that i may need to limit the 'speaker' advertisements to certain nodes, but this wasn't necessary.
+### Troubleshooting Commands
 
-### MetalLB
+```bash
+# Check Flux controller logs
+kubectl logs -n flux-system deployment/kustomize-controller
 
-In a cloud environment when load balancers are utilised an external IP is automatically allocated, however this isn't the case when using kubernetes locally. MetalLB essentially provides your load balancer with an external IP (external to your cluster that is).
+# Verify Git repository status
+flux get source git flux-system  # Shows last commit - compare with git logs
 
-#### Setup
+# Force reconciliation
+flux reconcile kustomization metallb --with-source  # Force reconcile if changes aren't picked up
 
-As I'm using a GitOps approach, I wanted to be able to push up my changes (manifests) and have Flux CD automatically apply them locally.
+# Emergency reset (use with caution)
+kubectl delete kustomization metallb-system -n flux-system  # Delete and recreate if needed
+```
 
-1. Although I installed the metallb directly on my primary server node in future I would place this inside of my metallb kustomization -> see resources -> commented out link.
-2. Create a Kustomization inside of flux-system which identifes the location of metallb files withing your repo (e.g., clusters/homelab/metallb/base)
-3. In the location specified create your ip-address-pool and l2advertisement (unless you want to go with BGP) and create a Kustomization that idenfies your resources (e.g., ip-address-pool.yaml)
+### Flux Concepts
 
-If you plan on setting it up as I've done, I think you're better of setting up Flux CD first, then it all feels quite seemless.
+- **Two types of Kustomizations**:
 
-As a result, you should now have an external (to cluster) ip address associated with any load balancer services (e.g., Traefik)
+  1. **Repository Kustomizations**: Specify the location of repository files (e.g., MetalLB files) - typically located in the flux-system folder
+  2. **Resource Kustomizations**: Specify actual resources (e.g., metallb/base → ip-address-pool.yaml)
 
-_NOTE_: A if multiple control nodes are present, I believe that a speaker daemonSet is used, meaning that each node has a speaker - which is ready to advertise the address pool. However, if you want to to limit the 'speaking' to only certain nodes for instance you can by updating the DaemonSet manifest with the nodeSelector.
+- **Node Labeling**: Add labels to specific nodes with `kubectl label node hostname key=value` - useful for limiting MetalLB speaker advertisements to certain nodes
+
+## MetalLB
+
+In cloud environments, external IPs are automatically allocated for load balancers. MetalLB provides this functionality for local Kubernetes clusters by assigning external IPs to load balancer services.
+
+### Setup
+
+Following a GitOps approach, I push manifest changes and let Flux CD automatically apply them locally.
+
+#### Installation Steps
+
+1. **Install MetalLB** (initially installed directly on primary server node, but should be placed in MetalLB kustomization for future deployments)
+2. **Create Kustomization** in flux-system to identify MetalLB file locations (e.g., `clusters/homelab/metallb/base`)
+3. **Create Resources** in the specified location:
+   - IP address pool
+   - L2 advertisement (or BGP if preferred)
+   - Kustomization that identifies your resources
+
+**Recommendation**: Set up Flux CD first for a seamless experience.
+
+#### Result
+
+After setup, load balancer services (e.g., Traefik) will have external IP addresses associated with them.
+
+**Note**: With multiple control nodes, a speaker DaemonSet is used where each node has a speaker ready to advertise the address pool. You can limit which nodes "speak" by updating the DaemonSet manifest with nodeSelector.
+
+### Useful Commands
+
+```bash
+# Check MetalLB speaker logs
+kubectl logs -n metallb-system -l app=metallb,component=speaker
+
+# Test VIP connectivity (run from same subnet)
+arping -I eth0 $VIP
+```
+
+## Ansible
+
+During my learning process, I found it easier to destroy and recreate VMs when encountering major issues. After using Terraform for infrastructure, I could quickly reprovision nodes using Ansible.
+
+**Best Practice**: Manual setup first, then automate with Ansible. This solidifies understanding and provides quick iteration for troubleshooting.
+
+### Installation
+
+```bash
+# macOS installation
+brew install ansible
+brew install ansible-lint  # For playbook linting
+
+# Verify installation
+ansible --version
+```
+
+### Key Concepts
+
+Ansible has several key concepts (I'm still learning):
+
+1. **Inventory**: Required for Ansible to connect to hosts (see [hosts.yaml](./homelab-infra/ansible/inventory/hosts.yaml))
+
+   - [Ansible Inventory Documentation](https://docs.ansible.com/ansible/latest/getting_started/get_started_inventory.html)
+
+2. **Plays and Playbooks**: Ansible modules (similar to Linux commands) used declaratively in playbooks to specify parameters and sequential tasks (see [1-base-setup.yaml](./homelab-infra/ansible/playbooks/1-base-setup.yaml))
+
+3. **Templates and Variables**: Reduce code duplication and hardcoded values
+   - **Vaults**: Special variables for secrets (e.g., GitHub tokens for Flux)
+   - [Example playbook using vault](./homelab-infra/ansible/playbooks/5-flux-gitops-setup.yaml)
+
+#### Vault Commands
+
+```bash
+ansible-vault create /path/to/vault.yml
+ansible-vault view /path/to/vault.yml
+ansible-vault edit /path/to/vault.yml
+ansible-playbook /path/to/playbook.yaml --ask-vault-pass
+```
 
 #### Useful Commands
 
+```bash
+# Run playbook with verbosity
+ansible-playbook -vvv your_playbook.yml  # Verbosity levels 1-3
 ```
 
-kubectl logs -n metallb-system -l app=metallb,component=speaker
-arping -I eth0 $VIP # Needs to be run from within same subnet
+## Kube-VIP
 
-````
+I modeled best practices with the goal of hosting external sites. The concept is that control plane nodes (3 server nodes in my case) provide redundancy for agents. If one server node goes down, another will be used by the agents. A Virtual IP is created for agents to connect to their master.
 
-### Ansible
+## Node Management
 
-Whilst I was learning some of the technologies, I found it was often easier to just destroy and recreate my vms - when I encountered a major issue. After this was done using Terraform I could then reprovision my nodes quickly using ansible.
+### Process for Replacing a Node
 
-I did learn that this was more useful to do this after manually going through the process. This served as a way to solidify my understanding (both ansible and the relevant technology) and also provide a quick way to iterate over issues (should a reprovision be required).
+```bash
+# First, add a new node, then perform the following:
 
-Ansible can be installed easily installed on macOS with brew: `brew install ansible`, I also installed `brew install ansible-lint` for playbooks. Check that it has installed correctly with `ansible --version`
+# On master node - get node token
+sudo cat /var/lib/rancher/k3s/server/node-token
 
-#### Key points
+# On new node - join cluster
+curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER-IP>:6443 K3S_TOKEN=<NODE-TOKEN> sh -
 
-Ansible has a number of key concepts (I'm still a novice, btw):
-
-1. Inventory: You require an inventory so that ansible knows how to connect with your with your hosts (see [here](./homelab-infra/ansible/inventory/hosts.yaml))
-   - This resource is good for showing you how to test your connectivity to your hosts and describing how to create your hosts.yaml or ini file: [resource](https://docs.ansible.com/ansible/latest/getting_started/get_started_inventory.html)
-2. Plays and Playbooks: Ansible has numerous _modules_ (which are often similar to linux commands, kind of) which can be used inside of your playbooks, to declaratively allow you to specify certain parameters and tasks that should be performed sequentially. See [here](./homelab-infra/ansible/playbooks/1-base-setup.yaml).
-3. Templates and Vars also allow you to reduce code duplication and hard coded values. Vaults are a special case of variables which allow you to specify a _secret_. For instance, for [this](./homelab-infra/ansible/playbooks/5-flux-gitops-setup.yaml) playbook I used the vault to store my github_token - which was required for flux to connect with my repo (and make changes).
-
-   - ```
-     ansible-vault create /path/to/vault.yml
-     ansible-vault view /path/to/vault.yml
-     ansible-vault edit /path/to/vault.yml
-     ansible-playbook /path/to/playbook.yaml --ask-vault-pass
-     ```
-
-````
-
-```
-
-#### Useful Ansible commands
-
-```
-
-ansible-playbook -vvv your_playbook.yml # verbosity - 1-3
-
-```
-
-### Kube-VIP
-
-For my use case, I really was modelling what I believe is best practice and with a view to hosting my own sites externally. I believe the idea is that the Control Plane nodes (in my case 3 server nodes) provide redundancies for the agents. So, if one of the server nodes goes down another one will be used (by the agents). In terms of VIP this means that a Virtual IP is created and is used by the agents to connect to their _Master_.
-
-### My Curiosities (Understanding + Confidence)
-
-- In Flux, what exactly are patches and what is their relationship with the related manifests?
-- What command allows me to view - verify - that kube-vip election leader change is taking place.
-
-## Process for replacing a node
-
-```
-
-# commands for adding a node first then do the below
-
-sudo cat /var/lib/rancher/k3s/server/node-token # on master
-curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER-IP>:6443 K3S_TOKEN=<NODE-TOKEN> sh - # on new node
-kubectl drain <vm-node-name> --ignore-daemonsets --delete-local-data # old node
+# Drain and remove old node
+kubectl drain <vm-node-name> --ignore-daemonsets --delete-local-data
 kubectl delete node <vm-node-name>
-
 ```
 
 ## Monitoring
 
 ### Kubernetes Dashboard
 
-Intallation instructions are available [here](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+Installation instructions are available [here](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/).
 
-This link was only somewhat useful however. Additional steps that i needed were, after port forwarding:
+The official documentation was partially helpful. Additional steps required after port forwarding:
 
-1. Creating an admin-user ServiceAccount:
-   `kubectl create serviceaccount admin-user -n kubernetes-dashboard`
-2. Bind to cluster-admin role
+1. **Create admin-user ServiceAccount**:
 
-```
+   ```bash
+   kubectl create serviceaccount admin-user -n kubernetes-dashboard
+   ```
 
-kubectl create clusterrolebinding admin-user \
- --clusterrole=cluster-admin \
- --serviceaccount=kubernetes-dashboard:admin-user
+2. **Bind to cluster-admin role**:
 
-```
+   ```bash
+   kubectl create clusterrolebinding admin-user \
+    --clusterrole=cluster-admin \
+    --serviceaccount=kubernetes-dashboard:admin-user
+   ```
 
-3. Generate a Token for admin-user
-   `kubectl -n kubernetes-dashboard create token admin-user` - Don't do this in production!
+3. **Generate admin token**:
+   ```bash
+   kubectl -n kubernetes-dashboard create token admin-user
+   ```
+   **Warning**: Don't use this in production!
 
-**Note**: Instead of port-forwarding you can use `kubectl proxy` instead and navigating to `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/`
-```
+**Alternative**: Instead of port-forwarding, use `kubectl proxy` and navigate to:
+`http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/`
+
+## Troubleshooting
+
+### My Questions (Understanding + Confidence)
+
+- In Flux, what exactly are patches and what is their relationship with related manifests?
+- What command allows me to view and verify that kube-vip election leader changes are taking place?
+
+### Common Issues
+
+- **IP Address Not Changing**: Restart Traefik and MetalLB controller deployments
+- **Flux Not Syncing**: Check kustomize-controller logs and force reconciliation
+- **Node Joining Issues**: Verify node tokens and network connectivity
