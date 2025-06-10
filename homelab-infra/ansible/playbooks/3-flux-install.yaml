@@ -1,0 +1,210 @@
+---
+- name: Install Flux CD
+  hosts: localhost
+  tags: flux_install
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Check if Flux is already installed
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Namespace
+        name: flux-system
+      register: flux_namespace
+      ignore_errors: true
+
+    - name: Display Flux installation status
+      debug:
+        msg: "Flux namespace exists: {{ flux_namespace.resources | length > 0 }}"
+
+    - name: Install Flux CLI if not present
+      command: curl -s https://fluxcd.io/install.sh | sudo bash
+      when: flux_namespace.resources | length == 0
+      register: flux_cli_install
+      changed_when: flux_cli_install.rc == 0
+
+    - name: Display Flux CLI installation result
+      debug:
+        msg: "Flux CLI installed: {{ flux_cli_install.rc == 0 }}"
+      when: flux_namespace.resources | length == 0
+
+    - name: Apply Flux components manifest
+      command: >
+        kubectl apply -f clusters/homelab/flux-system/flux-system/gotk-components.yaml
+      when: flux_namespace.resources | length == 0
+      register: flux_components_result
+
+    - name: Display Flux components installation result
+      debug:
+        msg: "Flux components installed: {{ flux_components_result.rc == 0 }}"
+      when: flux_namespace.resources | length == 0
+
+    - name: Wait for Flux system namespace to be created
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Namespace
+        name: flux-system
+        wait: true
+        wait_timeout: 60
+      when: flux_namespace.resources | length == 0
+
+    - name: Wait for Flux controller pods to be ready
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Pod
+        namespace: flux-system
+        label_selectors:
+          - app.kubernetes.io/part-of=flux
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 300
+        wait_sleep: 5
+      when: flux_namespace.resources | length == 0
+      register: flux_pods
+
+    - name: Display Flux pods status
+      debug:
+        msg: "Flux pods ready: {{ flux_pods.resources | length }}"
+      when: flux_namespace.resources | length == 0
+
+- name: Configure Flux Git Repository
+  hosts: localhost
+  tags: flux_configure
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+    - ../group_vars/all/vault.yaml
+  tasks:
+    - name: Create GitHub personal access token secret
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: flux-system
+            namespace: flux-system
+          type: Opaque
+          stringData:
+            username: "{{ GITHUB_USER }}"
+            password: "{{ github_token }}"
+      register: flux_secret
+
+    - name: Display secret creation result
+      debug:
+        msg: "Flux secret created: {{ flux_secret.result.metadata.name }}"
+
+    - name: Apply Flux GitRepository and Kustomization
+      command: >
+        kubectl apply -f clusters/homelab/flux-system/flux-system/gotk-sync.yaml
+      register: flux_sync_result
+
+    - name: Display Flux sync configuration result
+      debug:
+        msg: "Flux sync configured: {{ flux_sync_result.rc == 0 }}"
+
+    - name: Wait for Flux GitRepository to be ready
+      kubernetes.core.k8s_info:
+        api_version: source.toolkit.fluxcd.io/v1
+        kind: GitRepository
+        namespace: flux-system
+        name: flux-system
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 120
+        wait_sleep: 5
+      register: flux_git_repo
+
+    - name: Display GitRepository status
+      debug:
+        msg: "Flux GitRepository ready: {{ flux_git_repo.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | map(attribute='status') | first }}"
+
+    - name: Wait for Flux Kustomization to be ready
+      kubernetes.core.k8s_info:
+        api_version: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        namespace: flux-system
+        name: flux-system
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 180
+        wait_sleep: 5
+      register: flux_kustomization
+
+    - name: Display Kustomization status
+      debug:
+        msg: "Flux Kustomization ready: {{ flux_kustomization.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | map(attribute='status') | first }}"
+
+- name: Apply Development Environment
+  hosts: localhost
+  tags: flux_development
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Apply development environment Kustomization
+      command: >
+        kubectl apply -f clusters/homelab/flux-system/flux-system/development.yaml
+      register: development_kustomization
+
+    - name: Display development environment result
+      debug:
+        msg: "Development environment configured: {{ development_kustomization.rc == 0 }}"
+
+    - name: Wait for development Kustomization to be ready
+      kubernetes.core.k8s_info:
+        api_version: kustomize.toolkit.fluxcd.io/v1
+        kind: Kustomization
+        namespace: flux-system
+        name: development
+        wait: true
+        wait_condition:
+          type: Ready
+          status: "True"
+        wait_timeout: 180
+        wait_sleep: 5
+      register: dev_kustomization
+
+    - name: Display development Kustomization status
+      debug:
+        msg: "Development Kustomization ready: {{ dev_kustomization.resources[0].status.conditions | selectattr('type', 'equalto', 'Ready') | map(attribute='status') | first }}"
+
+- name: Verify Flux Installation
+  hosts: localhost
+  tags: flux_verify
+  environment:
+    KUBECONFIG: "{{ ansible_env.HOME }}/.kube/config"
+  tasks:
+    - name: Get Flux status
+      command: flux check
+      register: flux_check_result
+
+    - name: Display Flux check result
+      debug:
+        msg: "Flux check output: {{ flux_check_result.stdout_lines }}"
+
+    - name: Get Flux sources
+      command: flux get sources git
+      register: flux_sources
+
+    - name: Display Flux sources
+      debug:
+        msg: "Flux sources: {{ flux_sources.stdout_lines }}"
+
+    - name: Get Flux kustomizations
+      command: flux get kustomizations
+      register: flux_kustomizations
+
+    - name: Display Flux kustomizations
+      debug:
+        msg: "Flux kustomizations: {{ flux_kustomizations.stdout_lines }}"

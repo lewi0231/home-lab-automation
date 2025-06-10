@@ -4,6 +4,8 @@
 
 My homelab utilises a pfsense router which serves as a dhcp server, dns resolver and firewall, with one of it's interfaces dedicated to a Proxmox Server, which is where all the below fun stuff takes place. I'll pop an infrastructure diagram below, soon.
 
+![](homelab.jpg)
+
 ### Networking
 
 #### Useful Commands
@@ -25,13 +27,46 @@ I'm using Flux for two purposes:
 1. Have it monitor any manifest changes inside of my repository and subsequently update my k3s cluster.
 2. The other is to monitor my github packages and apply relevant new image upon creation (built via github actions + Dockerfile)
 
-#### Super useful flux commands (troubleshooting)
+#### Installation:
+
+1. Create a GitHub personal access token
+2. Install Flux:
 
 ```
+curl -s https://fluxcd.io/install.sh | sudo bash
+export GITHUB_TOKEN=$TOKEN
+```
+
+3. Bootstrap Flux with GitHub:
+
+````
+flux bootstrap github \
+    --owner=$GITHUB_USER \
+    --repository=home-lab \
+    --branch=main \
+    --path=clusters/homelab \
+    --components-extra=image-reflector-controller,image-automation-controller \
+    --personal
+    ```
+**Note**: the extra components above are so that I am able to pull my built github image from the repo.
+
+4. Configure GitHub Registry Authentication:
+```kubectl create secret docker-registry ghcr-credentials \
+    --namespace=development \
+    --docker-server=ghcr.io \
+    --docker-username=$GITHUB_USER \
+    --docker-password=$GITHUB_TOKEN```
+**NOTE**: Make sure that you export the envs before running.
+
+#### Super useful flux commands (troubleshooting)
+
+````
+
 kubectl logs -n flux-system deployment/kustomize-controller # deployment here refers to the kubernetes resource (deployments manage pods - so this is really pod logs)
 flux get source git flux-system # Will show the last commit - which you can compare against your git logs
 flux reconcile kustomization metallb --with-source # force reconcile if it hasn't picked up the changes - shouldn't need this though.
 kubectl delete kustomization metallb-system -n flux-system # apparently you can delete and recreate if you really run into issues.
+
 ```
 
 #### Other Flux Related Info
@@ -60,9 +95,11 @@ _NOTE_: A if multiple control nodes are present, I believe that a speaker daemon
 #### Useful Commands
 
 ```
+
 kubectl logs -n metallb-system -l app=metallb,component=speaker
 arping -I eth0 $VIP # Needs to be run from within same subnet
-```
+
+````
 
 ### Ansible
 
@@ -88,14 +125,16 @@ Ansible has a number of key concepts (I'm still a novice, btw):
      ansible-playbook /path/to/playbook.yaml --ask-vault-pass
      ```
 
-   ```
+````
 
-   ```
+```
 
 #### Useful Ansible commands
 
 ```
+
 ansible-playbook -vvv your_playbook.yml # verbosity - 1-3
+
 ```
 
 ### Kube-VIP
@@ -106,3 +145,42 @@ For my use case, I really was modelling what I believe is best practice and with
 
 - In Flux, what exactly are patches and what is their relationship with the related manifests?
 - What command allows me to view - verify - that kube-vip election leader change is taking place.
+
+## Process for replacing a node
+
+```
+
+# commands for adding a node first then do the below
+
+sudo cat /var/lib/rancher/k3s/server/node-token # on master
+curl -sfL https://get.k3s.io | K3S_URL=https://<MASTER-IP>:6443 K3S_TOKEN=<NODE-TOKEN> sh - # on new node
+kubectl drain <vm-node-name> --ignore-daemonsets --delete-local-data # old node
+kubectl delete node <vm-node-name>
+
+```
+
+## Monitoring
+
+### Kubernetes Dashboard
+
+Intallation instructions are available [here](https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/)
+
+This link was only somewhat useful however. Additional steps that i needed were, after port forwarding:
+
+1. Creating an admin-user ServiceAccount:
+   `kubectl create serviceaccount admin-user -n kubernetes-dashboard`
+2. Bind to cluster-admin role
+
+```
+
+kubectl create clusterrolebinding admin-user \
+ --clusterrole=cluster-admin \
+ --serviceaccount=kubernetes-dashboard:admin-user
+
+```
+
+3. Generate a Token for admin-user
+   `kubectl -n kubernetes-dashboard create token admin-user` - Don't do this in production!
+
+**Note**: Instead of port-forwarding you can use `kubectl proxy` instead and navigating to `http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/`
+```
