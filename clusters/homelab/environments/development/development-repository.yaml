@@ -1,0 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: development
+  namespace: development
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/lewi0231/home-lab-automation
+  secretRef:
+    name: ghcr-credentials

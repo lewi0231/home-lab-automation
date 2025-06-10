@@ -34,8 +34,8 @@ spec:
   interval: 1m0s
   sourceRef:
     kind: GitRepository
-    name: flux-system
-    namespace: flux-system
+    name: development
+    namespace: development
   git:
     checkout:
       ref:
@@ -44,7 +44,7 @@ spec:
       author:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
-      messageTemplate: "Update personal-blog image"
+    messageTemplate: "Update personal-blog image to latest version"
     push:
       branch: main
   update:
