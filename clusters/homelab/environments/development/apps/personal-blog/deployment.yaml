@@ -17,7 +17,7 @@ spec:
         - name: ghcr-credentials
       containers:
         - name: personal-blog
-          image: ghcr.io/lewi0231/home-lab-automation-personal-blog:v1.0.12 # {"$imagepolicy": "development:personal-blog-policy-development"}
+          image: ghcr.io/lewi0231/home-lab-automation-personal-blog:v1.0.6 # {"$imagepolicy": "development:personal-blog-policy-development"}
           ports:
             - containerPort: 80
 ---
