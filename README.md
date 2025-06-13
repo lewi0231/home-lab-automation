@@ -79,6 +79,15 @@ kubectl create secret docker-registry ghcr-credentials \
     --docker-password=$GITHUB_TOKEN
 ```
 
+**NOTE**: if you're wanting to create a generic secret for the repo which isn't used for the docker-registry you can do so with something like this:
+
+```
+kubectl create secret generic git-credentials \
+    --namespace=production \
+    --from-literal=username=$GITHUB_USER \
+    --from-literal=password=$GITHUB_TOKEN --dry-run-client -o yaml
+```
+
 **Important**: Ensure environment variables are exported before running.
 
 ### Troubleshooting Commands
