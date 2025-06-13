@@ -1,8 +1,10 @@
 "use client";
 
 import { type Worker as WorkerType } from "@/types/worker";
+import { LucideTrash } from "lucide-react";
 import { useState } from "react";
 import DisplayWorker from "./display-worker";
+import { Button } from "./ui/button";
 import Worker from "./worker";
 
 function Workers({ defaultRate }: { defaultRate: number }) {
@@ -57,6 +59,21 @@ function Workers({ defaultRate }: { defaultRate: number }) {
             );
           })
         : ""}
+      {workers?.length > 0 ? (
+        <div className="mt-4 flex justify-end">
+          <Button
+            variant="secondary"
+            className="cursor-pointer"
+            onClick={() => {
+              setWorkers([]);
+            }}
+          >
+            <LucideTrash />
+          </Button>
+        </div>
+      ) : (
+        ""
+      )}
 
       <Worker id={currentIndex} onAddWorker={onAddWorker} />
     </div>

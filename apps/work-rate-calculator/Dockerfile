@@ -27,7 +27,7 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 # Set to production environment
-ENV NODE_ENV=staging 
+ENV NODE_ENV=development 
 
 # Install pnpm in the runner stage
 RUN npm install -g pnpm

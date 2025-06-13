@@ -10,7 +10,7 @@ export default function Page() {
   console.log("Rendering Page");
 
   return (
-    <div className="w-1/2 p-10 m-auto max-w-[700px] min-w-[600px]">
+    <div className="w-3/4 sm:w-2/3 lg:w-1/2 py-2 sm:py-10 m-auto sm:max-w-[700px] min-w-[300px]">
       <div>
         <div className="text-left m-auto py-10 space-y-4">
           <h1 className="text-4xl">Work Rate Calculator</h1>
