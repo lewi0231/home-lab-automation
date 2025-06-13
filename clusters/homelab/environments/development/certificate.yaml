@@ -11,3 +11,4 @@ spec:
   dnsNames:
     - personal-blog.development.flowerhead.dev
     - dashboard.development.flowerhead.dev
+    - work-rate-calculator.development.flowerhead.dev
