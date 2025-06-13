@@ -13,6 +13,9 @@ COPY package.json pnpm-lock.yaml* ./
 # Install dependencies using pnpm
 RUN pnpm install --frozen-lockfile
 
+# Approve build scripts for trusted packages
+RUN pnpm approve-builds @tailwindcss/oxide sharp unrs-resolver
+
 # Copy the rest of the application code
 COPY . .
 
