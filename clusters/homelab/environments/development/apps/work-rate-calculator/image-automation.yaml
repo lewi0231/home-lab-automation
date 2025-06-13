@@ -1,0 +1,52 @@
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: work-rate-calculator
+  namespace: development
+spec:
+  image: ghcr.io/lewi0231/home-lab-automation-work-rate-calculator
+  interval: 1m0s
+  secretRef:
+    name: ghcr-credentials
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: work-rate-calculator
+  namespace: development
+spec:
+  imageRepositoryRef:
+    name: work-rate-calculator
+  policy:
+    # For SHA-based tags:
+    # alphabetical:
+    #   order: desc
+    semver:
+      range: ">=0.0.0"
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: work-rate-calculator
+  namespace: development
+spec:
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: development
+    namespace: development
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: "Update personal-blog image to latest version"
+    push:
+      branch: main
+  update:
+    path: ./clusters/homelab/environments/development/apps/personal-blog
+    strategy: Setters
