@@ -1,0 +1,40 @@
+<Cover
+  src="../../public/computer-arty.jpg"
+  alt="Image from the movie Alien - from cosmos.com"
+  caption="cosmos.com"
+/>
+
+# Scrape FB Marketplace, Analyse w TinyLLama and Notify
+
+My thinking for a while is to receive notifications about items that I'm interesting in. For instance, if I could search specific terms and get notificed of the recent matches on a daily basis, I could then review them at my leisure, potentially grabbing myself a bargain.
+
+## Seems simple, right?
+
+On the surface this seems relatively straight forward. However, there are a number of issues which make this problem more difficult.
+
+- Facebook doesn't like bots
+- It's not easy to receive FB notifications for more complex queries
+- There is the problem of easily scraping the information for each interesting listing.
+
+**So, I see there being two main parts to this problem**:
+
+- The scraping side of it
+- And, the summary side of it. Note, this is where TinyLLama comes in.
+
+let's tackle the scraping first.
+
+## Scraping
+
+Okay, I'm going to pretend I am interested in getting a bargain car - something needs a bit of work that I can easily fix and flip.
+
+1. ### How do I search?
+
+Below is an example of the url:
+
+`https://www.facebook.com/marketplace/category/vehicles?query=project%20car&maxPrice=5000&minYear=2000&exact=false`
+
+We can easily automate complex searches using this kind of format, we can iterate through a list of search terms.
+
+2. ### Proxy?
+
+Before we thinking about scraping the information from FB, it will be useful to have a way to proxy our IP. For instance having a pool of some kind.

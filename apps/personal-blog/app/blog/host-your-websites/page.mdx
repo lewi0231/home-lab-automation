@@ -6,9 +6,34 @@
 
 # How to host your own website
 
-One of the benefits of having your home lab is that you can host your own websites. For some reason to me I find this way more inspiring - probably because I know that I have to learn stuff to make this happen.
+One of the benefits of having a home lab is that it's possible to host your own websites. For some reason to me I find this way more inspiring - probably because I know that I have to learn stuff to make this happen.
+
+## Why would you want to do such a thing?!
+
+A believe there are a few potent reasons:
+
+1. You're engaging in hands on learning.
+2. It's cheaper, especially if you plan to host a few things.
+
+## Kubernetes
+
+I've been running a k3s cluster for a little while now on my orange pi 5 node and proxmox vm nodes.
 
 **NOTE**: If you don't have a home lab then as long as you have an old pc, raspberry pi or something (preferrably low in power) you can get this up and running.
+
+If you want to follow on, and don't have any free hardware - may I suggest setting up a basic vm somewhere.
+
+### The first thing we're going to need to do is install k3s. _k3s is a distribution of kubernetes, known for being lightweight and slightly stripped back_: perfect for a home lab.
+
+Head over [here](https://docs.k3s.io/quick-start) for quick k3s install instructions. I'll add a simple script here at a later point.
+
+## Get a IP to access your cluster
+
+Out of the box k3s comes with Traefik already installed. Traefik keeps an eye on any ingress routes available and directs traffic into the cluster accordingly.
+
+In a local situation MetalLB is popular for this. Whereas in a cloud environment you're automatically assigned a public ip here.
+
+### Setup MetalLB inside of your cluster.
 
 My name is Paul and I'm a bit of a tech failure. You probably think that it sounds a bit self-deprictaing for me to say, but I don't mind.
 

@@ -27,6 +27,7 @@ jobs:
       matrix:
         app:
           - personal-blog
+          - work-rate-calculator
 
     permissions:
       contents: read
