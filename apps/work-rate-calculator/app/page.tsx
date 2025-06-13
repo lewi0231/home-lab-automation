@@ -14,16 +14,17 @@ export default function Page() {
       <div>
         <div className="text-left m-auto py-10 space-y-4">
           <h1 className="text-4xl">Work Rate Calculator</h1>
-          <p>
-            The Work Rate Calculator is a user-friendly tool designed to help
-            individuals and teams assess productivity and efficiency.
+          <p className="text-sm">
+            The Work Rate Calculator balances relative percentages (between
+            workers) based on their rate of work, taken as a percentage of the
+            expected rate.
           </p>
         </div>
       </div>
       <div className="">
-        <div className="flex justify-between">
-          <Label className="" htmlFor="workers">
-            Default rate
+        <div className="flex justify-between mb-2 w-1/2">
+          <Label className="text-lg" htmlFor="workers">
+            Default rate:
           </Label>
           <Input
             type="number"
@@ -35,12 +36,12 @@ export default function Page() {
             id="workers"
           />
         </div>
-        <p className="text-sm opacity-76">
-          Default rate is the standard rate per unit (e.g., a trained worker can
-          do so many units per hour)
+        <p className="text-sm opacity-76 w-1/2">
+          Default rate is the expected rate (that a worker 'should' work at (per
+          hr/day/week) - all things being equal)
         </p>
       </div>
-      <hr className="mt-4"></hr>
+      <hr className="mt-10"></hr>
       <Workers defaultRate={rate} />
     </div>
   );

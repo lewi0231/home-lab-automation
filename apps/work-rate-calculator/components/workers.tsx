@@ -34,14 +34,16 @@ function Workers({ defaultRate }: { defaultRate: number }) {
   return (
     <div>
       {currentIndex > 0 ? (
-        <div className="flex justify-around my-2 pt-6 m-auto font-semibold text-sm">
-          <h2 className="">Name</h2>
-          <h2 className="">Default rate (per unit)</h2>
-          <h2 className="">Delete</h2>
+        <div className="grid grid-cols-4 ga-4 my-4 pt-6 m-auto font-semibold text-sm">
+          <h2 className="text-left">Name</h2>
+          <h2 className="text-right">% of Default</h2>
+          <h2 className="text-right">Actual %</h2>
+          <h2 className="text-right">Delete</h2>
         </div>
       ) : (
         ""
       )}
+
       {workers?.length > 0
         ? calculatePercentages(workers, defaultRate).map((worker, index) => {
             console.log(worker.name, index);

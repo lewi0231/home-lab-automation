@@ -14,16 +14,16 @@ function Worker({ onAddWorker, id }: Props) {
 
   return (
     <div>
-      <div className="flex justify-around my-4 gap-4 m-auto items-center">
+      <div className="grid grid-cols-4 my-4 gap-4 m-auto items-center">
         <Input
-          className="shrink-0 w-32"
+          className="shrink-0 col-span-2"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., John"
         />
         <Input
           placeholder="65"
-          className="w-20 text-right"
+          className=" text-right"
           type="number"
           value={rate}
           min={1}
@@ -42,6 +42,17 @@ function Worker({ onAddWorker, id }: Props) {
           Add Worker
         </Button>
       </div>
+
+      <ul className="ml-4">
+        <li className="text-xs opacity-76 w-3/4 list-decimal">
+          Add a worker, where '% of default' is the % of the desired rate
+          achieved and 'actual %' is the relative %.
+        </li>
+        <li className="text-xs opacity-76 w-3/4 list-decimal">
+          The sum of each worker's actual ~ 100 (if decimials are off, it may
+          not perfectly balance to 100% - but it'll be very close)
+        </li>
+      </ul>
     </div>
   );
 }

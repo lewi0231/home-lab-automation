@@ -11,19 +11,21 @@ type Props = {
 function DisplayWorker({ index, worker, onRemoveWorker }: Props) {
   console.log(worker);
   return (
-    <div className="flex justify-around m-auto text-sm">
-      <p className="w-20 text-left">{worker.name}</p>
+    <div className="grid grid-cols-4 text-sm my-2">
+      <p className="text-left">{worker.name}</p>
 
-      <p className="w-20 text-center">{worker.rate}</p>
-      <p className="w-20 text-center">{worker?.percentage ?? 0}</p>
-      <Button
-        className="cursor-pointer "
-        size="sm"
-        variant="secondary"
-        onClick={() => onRemoveWorker(index)}
-      >
-        <Minus className="" />
-      </Button>
+      <p className="text-right">{worker.rate}</p>
+      <p className=" text-right">{worker?.percentage ?? 0}</p>
+      <div className="text-right">
+        <Button
+          className="cursor-pointer "
+          size="sm"
+          variant="secondary"
+          onClick={() => onRemoveWorker(index)}
+        >
+          <Minus className="" />
+        </Button>
+      </div>
     </div>
   );
 }
