@@ -37,8 +37,8 @@ export default function Page() {
           />
         </div>
         <p className="text-sm opacity-76 w-1/2">
-          Default rate is the expected rate (that a worker 'should' work at (per
-          hr/day/week) - all things being equal)
+          Default rate is the expected rate (that a worker &apos;should&apos;
+          work at (per hr/day/week) - all things being equal)
         </p>
       </div>
       <hr className="mt-10"></hr>
