@@ -4,8 +4,8 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to leverage Docker caching
-COPY package.json package-lock.json* ./
+# Copy package.json and pnpm-lock.json first to leverage Docker caching
+COPY package.json pnpm-lock.yaml* ./
 
 # Install dependencies
 RUN npm ci
