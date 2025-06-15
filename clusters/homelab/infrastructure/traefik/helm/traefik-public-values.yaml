@@ -22,8 +22,8 @@ ports:
     #     to: websecure
     #     scheme: https
     #     permanent: true
-  # websecure:
-  #   port: 443
+  websecure:
+    port: 443
   #   tls:
   #     enabled: true
 

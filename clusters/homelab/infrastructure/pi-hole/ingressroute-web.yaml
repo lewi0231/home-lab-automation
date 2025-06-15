@@ -1,0 +1,27 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: pihole
+  namespace: pihole
+  annotations:
+    kubernetes.io/ingress.class: traefik-private
+spec:
+  entryPoints:
+    - websecure
+
+  routes:
+    - match: Host(`pihole.flowerhead.dev`)
+      kind: Rule
+      # middlewares:
+      #   - name: middleware
+      services:
+        - name: pihole-web
+          port: 80
+
+    # - match: Host(`personal-blog.production.flowerhead.dev`)
+    #   kind: Rule
+    #   services:
+    #     - name: personal-blog
+    #       port: 80
+  tls:
+    secretName: pihole-tls

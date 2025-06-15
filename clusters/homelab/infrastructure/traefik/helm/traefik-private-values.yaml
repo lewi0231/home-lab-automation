@@ -5,6 +5,8 @@ globalArguments:
 additionalArguments:
   - "--serversTransport.insecureSkipverify=true"
   - "--log.level=DEBUG"
+  - "--entryPoints.dns-tcp.address=:53"
+  - "--entryPoints.dns-udp.address=:53/udp"
 
 deployment:
   enabled: true
@@ -26,6 +28,20 @@ ports:
     port: 443
     tls:
       enabled: true
+  dns-tcp:
+    port: 53
+    expose:
+      default: true
+    exposedPort: 53
+    protocol: TCP
+    reusePort: true
+  dns-udp:
+    port: 53
+    expose:
+      default: true
+    exposedPort: 53
+    protocol: UDP
+    resusePort: true
 
 ingressRoute:
   dashboard:
@@ -46,9 +62,23 @@ rbac:
 service:
   enabled: true
   type: LoadBalancer
-  annotations: {}
+  annotations:
+    {}
+    # metallb.io/ip-allocated-from-pool: first-pool
   labels: {}
   spec:
     loadBalancerIP: 10.60.60.65 # Must be within Metallb range
   loadBalancerSourceRanges: []
   externalIPs: []
+# additionalServices:
+#   dns-udp:
+#     type: LoadBalancer
+#     annotations: {}
+#     labels: {}
+#     spec:
+#       loadBalancerIP: 10.60.60.66 # Different IP for UDP service
+#       ports:
+#         - name: dns-udp
+#           port: 53
+#           protocol: UDP
+#           targetPort: 53

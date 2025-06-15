@@ -25,10 +25,21 @@ data:
         - Personal Blog:
             href: https://personal-blog.development.flowerhead.dev/
             description: My staged blog in the cluster
-    # - Monitoring:
-    #     - Grafana
-    #         href: http://monitoring.home.arpa
-    #         description: Monitor stuff!
+        - Work Rate Calculator
+            href: https://work-rate-calculator.development.flowerhead.dev
+            description: My staged Work Rate Calculator
+    - Monitoring:
+        - Traefik-Private
+            href: https://traefik-private.development.flowerhead.dev
+            description: Traefik (Internal) Dashboard
+    - Services:
+        - Pi Hole
+            href: https://pihole.flowerhead.dev/admin
+            description: Pi Hole - which is my dns router.
+        - Pfsense
+            href: http://pfsense.flowerhead.dev
+            description: My Router and DHCP server
+
   widgets.yaml: |
     - kubernetes:
         cluster:

@@ -1,0 +1,14 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRouteUDP
+metadata:
+  name: pihole-dns-udp
+  namespace: pihole
+  annotations:
+    kubernetes.io/ingress.class: traefik-private
+spec:
+  entryPoints:
+    - dns-udp
+  routes:
+    - services:
+        - name: pihole-dns-udp
+          port: 53

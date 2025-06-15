@@ -1,0 +1,22 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: traefik-public-dashboard
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: traefik-public
+spec:
+  entryPoints:
+    - websecure
+
+  routes:
+    - match: Host(`traefik-public.flowerhead.dev`)
+      kind: Rule
+      middlewares:
+        - name: traefik-public-dashboard-basicauth
+          namespace: monitoring
+      services:
+        - name: api@internal
+          kind: TraefikService
+  tls:
+    secretName: monitoring-tls
