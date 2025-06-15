@@ -25,18 +25,23 @@ data:
         - Personal Blog:
             href: https://personal-blog.development.flowerhead.dev/
             description: My staged blog in the cluster
-        - Work Rate Calculator
+        - Work Rate Calculator:
             href: https://work-rate-calculator.development.flowerhead.dev
             description: My staged Work Rate Calculator
     - Monitoring:
-        - Traefik-Private
-            href: https://traefik-private.development.flowerhead.dev
+        - Traefik-Private:
+            href: https://traefik-private.flowerhead.dev
             description: Traefik (Internal) Dashboard
+        - Traefik-Public:
+            href: https://traefik-public.flowerhead.dev
+            description: Traefik (External) Dashboard
+
+
     - Services:
-        - Pi Hole
+        - Pi Hole:
             href: https://pihole.flowerhead.dev/admin
             description: Pi Hole - which is my dns router.
-        - Pfsense
+        - Pfsense:
             href: http://pfsense.flowerhead.dev
             description: My Router and DHCP server
 

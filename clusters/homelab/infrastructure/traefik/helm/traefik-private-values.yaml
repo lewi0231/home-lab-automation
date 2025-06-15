@@ -41,7 +41,7 @@ ports:
       default: true
     exposedPort: 53
     protocol: UDP
-    resusePort: true
+    reusePort: true
 
 ingressRoute:
   dashboard:
@@ -71,9 +71,10 @@ service:
   loadBalancerSourceRanges: []
   externalIPs: []
 # additionalServices:
-#   dns-udp:
+#   - name: traefik-private-udp
 #     type: LoadBalancer
-#     annotations: {}
+#     annotations:
+#       metallb.io/ip-allocated-from-pool: first-pool
 #     labels: {}
 #     spec:
 #       loadBalancerIP: 10.60.60.66 # Different IP for UDP service
@@ -81,4 +82,7 @@ service:
 #         - name: dns-udp
 #           port: 53
 #           protocol: UDP
-#           targetPort: 53
+#           targetPort: dns-udp
+#       selector:
+#         app.kubernetes.io/instance: traefik-private-traefik-private
+#         app.kubernetes.io/name: traefik
