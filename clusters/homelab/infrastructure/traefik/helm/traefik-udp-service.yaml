@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-private-udp
+  namespace: traefik-private
+  annotations:
+    metallb.io/ip-allocated-from-pool: first-pool
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 10.60.60.66
+  ports:
+    - name: dns-udp
+      port: 53
+      targetPort: dns-udp
+      protocol: UDP
+  selector:
+    app.kubernetes.io/instance: traefik-private-traefik-private
+    app.kubernetes.io/name: traefik
