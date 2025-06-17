@@ -2,44 +2,67 @@
 
 import { type Worker as WorkerType } from "@/types/worker";
 import { LucideTrash } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DisplayWorker from "./display-worker";
 import { Button } from "./ui/button";
 import Worker from "./worker";
 
-function Workers({ defaultRate }: { defaultRate: number }) {
+function Workers({
+  defaultRate,
+  shiftLength,
+}: {
+  defaultRate: number;
+  shiftLength: number;
+}) {
   const [workers, setWorkers] = useState<Worker[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  console.log("Rendering Workers");
+  const handleUpdateWorker = (index: number, updates: Partial<Worker>) => {
+    const workerShiftLength =
+      updates?.shiftLength !== undefined
+        ? Math.min(updates.shiftLength, shiftLength)
+        : updates.shiftLength;
+
+    setWorkers((prev) =>
+      prev.map((worker, i) =>
+        i === index
+          ? { ...worker, ...updates, shiftLength: workerShiftLength }
+          : worker
+      )
+    );
+  };
 
   const onAddWorker = (id: number, { name, rate }: WorkerType) => {
     setWorkers((prev) => {
-      return [...prev, { name, rate }];
+      return [...prev, { name, rate, shiftLength }];
     });
-    setCurrentIndex((prev) => prev + 1);
-    console.debug("currentIndex is now", currentIndex);
   };
 
   const onRemoveWorker = (id: number) => {
-    if (id >= currentIndex) {
-      console.error("There was a problem", id);
+    if (id < 0 || id >= workers?.length) {
+      console.error("Invalid worker index:", id);
       return;
     }
 
     setWorkers((prev) => {
       return prev.filter((worker, index) => index !== id);
     });
-    setCurrentIndex((prev) => prev - 1);
   };
+
+  useEffect(() => {
+    setWorkers((prev) => {
+      return prev.map((worker) => ({ ...worker, shiftLength }));
+    });
+  }, [shiftLength]);
 
   return (
     <div>
-      {currentIndex > 0 ? (
-        <div className="grid grid-cols-4 ga-4 my-4 pt-6 m-auto font-semibold text-sm">
+      {workers?.length > 0 ? (
+        <div className="grid grid-cols-5 ga-4 my-4 pt-6 m-auto font-semibold text-sm">
           <h2 className="text-left">Name</h2>
-          <h2 className="text-right">% of Default</h2>
-          <h2 className="text-right">Actual %</h2>
+          <h2 className="text-right">Shift Length</h2>
+
+          <h2 className="text-right">% of Expected</h2>
+          <h2 className="text-right">Relative %</h2>
           <h2 className="text-right">Delete</h2>
         </div>
       ) : (
@@ -47,17 +70,20 @@ function Workers({ defaultRate }: { defaultRate: number }) {
       )}
 
       {workers?.length > 0
-        ? calculatePercentages(workers, defaultRate).map((worker, index) => {
-            console.log(worker.name, index);
-            return (
-              <DisplayWorker
-                key={index + worker.name}
-                index={index}
-                onRemoveWorker={onRemoveWorker}
-                worker={worker}
-              />
-            );
-          })
+        ? calculatePercentages(workers, defaultRate, shiftLength).map(
+            (worker, index) => {
+              console.log(worker.name, index);
+              return (
+                <DisplayWorker
+                  key={index + worker.name}
+                  index={index}
+                  onRemoveWorker={onRemoveWorker}
+                  worker={worker}
+                  onUpdateWorker={handleUpdateWorker}
+                />
+              );
+            }
+          )
         : ""}
       {workers?.length > 0 ? (
         <div className="mt-4 flex justify-end">
@@ -75,28 +101,45 @@ function Workers({ defaultRate }: { defaultRate: number }) {
         ""
       )}
 
-      <Worker id={currentIndex} onAddWorker={onAddWorker} />
+      <Worker id={workers?.length ?? 0} onAddWorker={onAddWorker} />
     </div>
   );
 }
 
-const calculatePercentages = (workers: Worker[], defaultRate: number) => {
-  let total = 0;
+const calculatePercentages = (
+  workers: Worker[],
+  defaultRate: number,
+  defaultShiftLength: number
+) => {
+  let totalActualContributions = 0;
   const amendedWorkers = [...workers];
+
   workers.forEach((worker, index) => {
-    const actualPerUnit = (worker.rate / 100) * defaultRate;
+    const ratePerHour = (worker.rate / 100) * defaultRate;
+    const expectedContribution = ratePerHour * defaultShiftLength;
+    const actualContribution = ratePerHour * worker.shiftLength;
+
     amendedWorkers[index] = {
       ...worker,
-      actualRate: actualPerUnit,
+      actualRate: ratePerHour,
+      expectedContribution,
+      actualContribution,
     };
-    total += actualPerUnit;
+    totalActualContributions += actualContribution;
   });
-  console.debug("total, default", total, defaultRate);
 
   amendedWorkers.forEach((worker, index) => {
+    const percentage =
+      totalActualContributions > 0
+        ? roundToDecimal(
+            (worker.actualContribution / totalActualContributions) * 100,
+            2
+          )
+        : 0;
+
     amendedWorkers[index] = {
       ...worker,
-      percentage: roundToDecimal((worker.actualRate / total) * 100, 2),
+      percentage,
     };
   });
   return amendedWorkers;

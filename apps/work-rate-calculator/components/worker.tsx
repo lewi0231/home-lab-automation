@@ -123,12 +123,8 @@ function Worker({ onAddWorker, id }: Props) {
 
       <ul className="ml-4 mt-2">
         <li className="text-xs opacity-76 w-3/4 list-decimal">
-          Add a worker, where &apos;% of default&apos; is the % of the desired
-          rate achieved and &apos;actual %&apos; is the relative %.
-        </li>
-        <li className="text-xs opacity-76 w-3/4 list-decimal">
-          The sum of each worker&apos;s actual ~ 100 (if decimials are off, it
-          may not perfectly balance to 100% - but it&apos;ll be very close)
+          Add a worker, where the number represents what rate they achieved
+          relative to the expected rate. Expressed as a percentage.
         </li>
       </ul>
     </div>

@@ -3,4 +3,7 @@ export type Worker = {
   rate: number;
   percentage?: number;
   actualRate?: number;
+  shiftLength?: number;
+  actualContribution?: number;
+  expectedContribution?: number;
 };
