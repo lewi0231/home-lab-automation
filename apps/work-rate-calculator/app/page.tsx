@@ -106,7 +106,7 @@ export default function Page() {
         <div className="text-sm flex gap-4">
           <p className="text-xs opacity-80 w-1/2 leading-tight tracking-tight pr-8">
             The expected rate is the rate each worker should be aiming to
-            achieve. This won't affect percentages, but is for your own
+            achieve. This won&apost affect percentages, but is for your own
             reference.
           </p>
 
