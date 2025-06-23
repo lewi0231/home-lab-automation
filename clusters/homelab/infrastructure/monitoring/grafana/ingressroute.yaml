@@ -1,0 +1,19 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: grafana
+  namespace: monitoring
+  annotations:
+    kubernetes.io/ingress.class: traefik-private
+spec:
+  entryPoints:
+    - websecure
+
+  routes:
+    - match: Host(`grafana.flowerhead.dev`)
+      kind: Rule
+      services:
+        - name: grafana
+          port: 80
+  tls:
+    secretName: monitoring-tls

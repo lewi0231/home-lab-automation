@@ -4,6 +4,7 @@ resource "proxmox_vm_qemu" "master_nodes" {
     name        = var.nodes.master[count.index][0]
     target_node = var.proxmox_node
     clone       = var.cloud_init_template
+    onboot = true
     os_type = "cloud-init"
     # cicustom = "user=local:snippets/cloud-init.yaml" # would use this if you're running custom config from proxmox
     agent = 1 
@@ -64,8 +65,9 @@ resource "proxmox_vm_qemu" "master_nodes" {
 }
 
 resource "proxmox_vm_qemu" "worker_nodes" {
-    count = 2
+    count = 3
     name        = var.nodes.worker[count.index][0]
+    # name        = var.nodes.worker[2][0]
     target_node = var.proxmox_node
     clone       = var.cloud_init_template
     os_type = "cloud-init"
@@ -73,6 +75,7 @@ resource "proxmox_vm_qemu" "worker_nodes" {
     agent = 1 
     cores = var.core_count
     sockets = 1
+    onboot = true
     vcpus = 0
     cpu_type = var.cpu_type
     memory = var.memory_count.worker
@@ -117,6 +120,7 @@ resource "proxmox_vm_qemu" "worker_nodes" {
         bridge = "vmbr0"
         tag = var.vlan_tag.internal 
         macaddr = var.nodes.worker[count.index][1]
+        # macaddr = var.nodes.worker[2][1]
         firewall = true
     }
     ciupgrade = true

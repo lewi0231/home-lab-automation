@@ -27,6 +27,10 @@
     "lint": "next lint",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
+    "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:build": "docker build -t work-rate-calculator .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t work-rate-calculator:dev ."
   }
 }

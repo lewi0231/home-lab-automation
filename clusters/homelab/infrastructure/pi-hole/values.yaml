@@ -223,7 +223,7 @@ resources:
 # -- `spec.PersitentVolumeClaim` configuration
 persistentVolumeClaim:
   # -- set to true to use pvc
-  enabled: false
+  enabled: true
 
   # -- specify an existing `PersistentVolumeClaim` to use
   # existingClaim: ""
@@ -235,7 +235,7 @@ persistentVolumeClaim:
     - ReadWriteOnce
 
   # -- volume claim size
-  size: "500Mi"
+  size: "2Gi"
 
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning
@@ -243,7 +243,7 @@ persistentVolumeClaim:
   ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
   ##   GKE, AWS & OpenStack)
   ##
-  # storageClass: "-"
+  storageClass: "longhorn"
 
   ## If subPath is set mount a sub folder of a volume instead of the root of the volume.
   ## This is especially handy for volume plugins that don't natively support sub mounting (like glusterfs).
@@ -260,13 +260,27 @@ tolerations: []
 # priorityClassName: ""
 
 # Reference: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
-topologySpreadConstraints: []
-# - maxSkew: <integer>
-#   topologyKey: <string>
-#   whenUnsatisfiable: <string>
-#   labelSelector: <object>
+topologySpreadConstraints:
+  - maxSkew: 1
+    topologyKey: kubernetes.io/hostname
+    whenUnsatisfiable: DoNotSchedule
+    labelSelector:
+      matchLabels:
+        app: pihole
+        release: pihole
 
-affinity: {}
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - pihole
+          topologyKey: kubernetes.io/hostname
 
 # -- Administrator password when not using an existing secret (see below)
 adminPassword: "admin"
@@ -390,9 +404,16 @@ dnsmasq:
   # - address=/bar.foo/192.168.178.11
 
   # -- Dnsmasq reads the /etc/hosts file to resolve ips. You can add additional entries if you like
-  additionalHostsEntries: []
-  # - 192.168.0.3     host4
-  # - 192.168.0.4     host5
+  additionalHostsEntries:
+    - 10.60.60.25   chimera.node
+    - 10.60.60.26   centaur.node
+    - 10.60.60.27   cerberus.node
+    - 10.60.60.28   minotaur.node
+    - 10.60.60.29   basilisk.node
+    - 10.60.60.30   griffin.node
+    - 10.60.60.31   faun.node
+    - 10.60.60.32   phoenix.node
+    - 10.50.50.67   printer.device
 
   # -- Static DHCP config
   staticDhcpEntries: []
@@ -401,6 +422,9 @@ dnsmasq:
 
   # -- Other options
   customSettings:
+    # Conditional forwarding for flowerhead.dev domain to your DHCP server
+    # - server=/flowerhead.dev/10.40.40.1
+    # - server=/flowerhead.dev/10.60.60.1
   # otherSettings: |
   #   rebind-domain-ok=/plex.direct/
 
@@ -609,7 +633,7 @@ podDnsConfig:
 # -- configure a Pod Disruption Budget
 podDisruptionBudget:
   # -- set to true to enable creating the PDB
-  enabled: false
+  enabled: true
   # -- minimum number of pods Kubernetes should try to have running at all times
   minAvailable: 1
   # -- maximum number of pods Kubernetes will allow to be unavailable. Cannot set both `minAvailable` and `maxAvailable`

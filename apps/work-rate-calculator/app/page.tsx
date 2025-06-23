@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Workers from "@/components/workers";
+import { config } from "@/lib/config";
 import { formatToTwoDecimals } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
@@ -13,7 +14,11 @@ const ADD_SUBTRACT_VALUE = 0.25;
 export default function Page() {
   const [rate, setRate] = useState(10);
   const [shiftLength, setShiftLength] = useState("2.00");
-  console.log("Rendering Page");
+
+  // Only log in development or when explicitly enabled
+  if (config.features.consoleLogs) {
+    console.log("Rendering Page");
+  }
 
   const onIncrement = () => {
     const numberValue = parseFloat(shiftLength);
@@ -47,6 +52,11 @@ export default function Page() {
             workers) based on their rate of work, taken as a percentage of the
             expected rate.
           </p>
+          {config.features.debugMode && (
+            <p className="text-xs text-gray-500">
+              Environment: {config.env} | URL: {config.appUrl}
+            </p>
+          )}
         </div>
       </div>
       <div className="">

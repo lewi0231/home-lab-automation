@@ -11,3 +11,4 @@ spec:
   dnsNames:
     - traefik-private.flowerhead.dev
     - traefik-public.flowerhead.dev
+    - grafana.flowerhead.dev
