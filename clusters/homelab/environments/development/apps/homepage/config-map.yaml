@@ -20,7 +20,7 @@ data:
         - Github:
             - abbr: GH
               href: https://github.com/lewi0231
-        - Cloudflare
+        - Cloudflare:
             - abbr: CL
               href: https://cloudflare.io
   services.yaml: |
