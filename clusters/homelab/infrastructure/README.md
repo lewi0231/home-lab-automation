@@ -292,7 +292,7 @@ To obtain the automatically generated password, run this:
 
 Apparently this is the url - `grafana.monitoring.svc.cluster.local` - however i haven't yet set up the ability to access this. My thinking is that i'll create an ingress to access it.
 
-### Promtail
+### Alloy
 
 ### Loki
 
@@ -300,3 +300,50 @@ Again you can following the helm install info here:
 `https://artifacthub.io/packages/helm/grafana/loki`
 
 **IMPORTANT**: You'll need to run it as a SingleBinary (with replicas = 1, ensure read, write and backend are all set to 0 - as it's single binary, also replication_factor should also be 1, useTestSchema = True, and Storage.type = filesystem and storageClass = longhorn (if that is what i'm using))
+
+### Prometheus
+
+Head [here](https://artifacthub.io/packages/helm/prometheus-community/prometheus) for install instructions and default values.
+
+#### After Installation Info
+
+`
+The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
+prometheus-server.monitoring.svc.cluster.local
+
+Get the Prometheus server URL by running these commands in the same shell:
+export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace monitoring port-forward $POD_NAME 9090
+
+The Prometheus alertmanager can be accessed via port 9093 on the following DNS name from within your cluster:
+prometheus-alertmanager.monitoring.svc.cluster.local
+
+Get the Alertmanager URL by running these commands in the same shell:
+export POD_NAME=$(kubectl get pods --namespace monitoring -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace monitoring port-forward $POD_NAME 9093
+#################################################################################
+
+###### WARNING: Pod Security Policy has been disabled by default since
+
+###### it deprecated after k8s 1.25+. use
+
+###### (index .Values "prometheus-node-exporter" "rbac"
+
+###### . "pspEnabled") with (index .Values
+
+###### "prometheus-node-exporter" "rbac" "pspAnnotations")
+
+###### in case you still need it.
+
+#################################################################################
+
+The Prometheus PushGateway can be accessed via port 9091 on the following DNS name from within your cluster:
+prometheus-prometheus-pushgateway.monitoring.svc.cluster.local
+
+Get the PushGateway URL by running these commands in the same shell:
+export POD_NAME=$(kubectl get pods --namespace monitoring -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace monitoring port-forward $POD_NAME 9091
+
+For more information on running Prometheus, visit:
+https://prometheus.io/
+`

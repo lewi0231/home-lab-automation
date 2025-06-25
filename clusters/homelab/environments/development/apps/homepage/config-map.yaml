@@ -20,6 +20,9 @@ data:
         - Github:
             - abbr: GH
               href: https://github.com/lewi0231
+        - Cloudflare
+            - abbr: CL
+              href: https://cloudflare.io
   services.yaml: |
     - Web Apps:
         - Personal Blog:
@@ -35,7 +38,12 @@ data:
         - Traefik-Public:
             href: https://traefik-public.flowerhead.dev
             description: Traefik (External) Dashboard
-
+        - Grafana Logs:
+            href: https://grafana.flowerhead.dev/d/5c9297f3-6b35-45d4-b627-e7cf2b7a726a/system-logs?orgId=1&from=now-30m&to=now&timezone=browser
+            description: Kubernetes System Logs
+        - Grafana Metrics:
+            href: https://grafana.flowerhead.dev/d/kubernetes-overview/kubernetes-overview?orgId=1&from=now-30m&to=now&timezone=browser&refresh=30s
+            description Kubernetes Overview
 
     - Services:
         - Pi Hole:
