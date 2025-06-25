@@ -16,5 +16,7 @@
       "path": "../../../homelab-infra"
     }
   ],
-  "settings": {}
+  "settings": {
+    "workbench.activityBar.orientation": "vertical"
+  }
 }
