@@ -22,7 +22,7 @@ data:
               href: https://github.com/lewi0231
         - Cloudflare:
             - abbr: CL
-              href: https://cloudflare.io
+              href: https://cloudflare.com
   services.yaml: |
     - Web Apps:
         - Personal Blog:
@@ -43,7 +43,7 @@ data:
             description: Kubernetes System Logs
         - Grafana Metrics:
             href: https://grafana.flowerhead.dev/d/kubernetes-overview/kubernetes-overview?orgId=1&from=now-30m&to=now&timezone=browser&refresh=30s
-            description Kubernetes Overview
+            description: Kubernetes Overview
 
     - Services:
         - Pi Hole:
