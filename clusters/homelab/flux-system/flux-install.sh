@@ -30,6 +30,7 @@ echo "Successfully applied flux-system manifests."
 read -p "Enter your repo username:" username
 read -p "Enter your repo token:" token
 read -p "Enter your repo name:" repo
+read -p "Enter the path to your ssh key:" ssh_key_path
 
 if [[ -z "$token" || -z "$username" || -z "$repo"]]; then
     echo "❌ Input cannot be empty. Exiting..."
@@ -38,11 +39,10 @@ fi
  
 echo "Creating flux-system GitRepository Secret..."
 
-if ! flux create secret git flux-system \
-    --url="https://github.com/$username/$repo.git" \ 
-    --username="$username" \
-    --password="$token" \
-    -n flux-system; then
+if ! kubectl create secret generic flux-system \
+    --namespace=flux-system \
+    --from-file=identity="$ssh_key_path" \
+    --from-literal=known_hosts="$(ssh-keyscan github.com)"; then
     echo "❌ Failed to create the secret."
     exit 1
 fi
@@ -59,4 +59,6 @@ echo """
         - flux get sources git -n flux-system
         - flux get pods -n flux-system
         - flux reconcile source git flux-system
+
+    NOTE: Remember to add your public key to your repo (repo -> settings -> deploy key)
 """
