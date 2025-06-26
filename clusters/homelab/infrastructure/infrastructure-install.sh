@@ -22,13 +22,16 @@ kubectl apply -f ./cert-manager/cluster-issuers/production.yaml -n cert-manager
 kubectl apply -f ./cert-manager/secrets/sealed-cf-token-secret.yaml -n cert-manager
 
 
-# 2. MetalLB 
+# 3. MetalLB 
 # TODO - relocate metallb install here
 
-# 3. Traefik (public and private)
+# 4. Traefik (public and private)
 kubectl create namespace traefik-private
 kubectl apply -f ./traefik/internal/traefik-private-manifest.yaml -n traefik-private 
 
 helm upgrade --install traefik-public traefik/traefik \
     --namespace traefik-public --create-namespace \
     -f ./traefik/external/values.yaml
+
+# 5. Cloudflare tunnel
+ssh lewi0231@chimera
