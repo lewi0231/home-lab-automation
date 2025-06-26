@@ -11,7 +11,7 @@ spec:
     branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@github.com/lewi0231/home-lab-automation
+  url: https://github.com/lewi0231/home-lab-automation
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization

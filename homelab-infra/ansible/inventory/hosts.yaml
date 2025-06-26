@@ -7,22 +7,22 @@ all:
           ansible_host: 10.60.60.25
         # centaur:
         #   ansible_host: 10.60.60.26
-        # cerberus:
-        #   ansible_host: 10.60.60.27
     agent:
       hosts:
         minotaur:
           ansible_host: 10.60.60.28
         basilisk:
           ansible_host: 10.60.60.29
-    # storage:
-    #   hosts:
-    #     faun:
-    #       ansible_host: 10.60.60.31
-    #     griffin:
-    #       ansible_host: 10.60.60.30
-    #     pheonix:
-    #       ansible_host: 10.60.60.32
+        griffin:
+          ansible_host: 10.60.60.30
+    storage:
+      hosts:
+        faun:
+          ansible_host: 10.60.60.31
+        phoenix:
+          ansible_host: 10.60.60.32
+        cerberus:
+          ansible_host: 10.60.60.27
   vars:
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
     ansible_user: lewi0231

@@ -6,20 +6,20 @@
     - name: remove config
       command: rm -rf ~/.kube
 
-# - name: Install policycoreutils on remote machines
-#   hosts: all
-#   tags: package_installs
-#   become: true
-#   vars_files:
-#     - ../group_vars/k3s_cluster.yaml
-#   tasks:
-#     - name: Install policycoreutils package
-#       apt:
-#         name: policycoreutils
-#         state: present
-#         update_cache: yes
-#       environment:
-#         NEEDRESTART_MODE: a
+- name: Install open-iscsi on remote machines
+  hosts: all
+  tags: package_installs
+  become: true
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Install open-iscsi package
+      apt:
+        name: open-iscsi
+        state: present
+        update_cache: yes
+      environment:
+        NEEDRESTART_MODE: a
 
 - name: Bootstrap first K3s node
   hosts: localhost
@@ -171,7 +171,7 @@
         --k3s-version {{ K3S_VERSION }}
         --server-ip {{ PRIMARY_MASTER }}
         --ssh-key ~/.ssh/{{ CERT_NAME }}
-        --k3s-extra-args "--node-label worker=true --node-ip={{ hostvars[item]['ansible_host'] }}"
+        --k3s-extra-args "--node-ip={{ hostvars[item]['ansible_host'] }}"
       loop: "{{ groups['agent'] }}"
       register: join_worker_results
 
@@ -184,14 +184,33 @@
       debug:
         msg: "{{ item.item }} ({{ hostvars[item.item]['ansible_host'] }}): {{ 'SUCCESS' if item.rc == 0 else 'FAILED' }}"
       loop: "{{ join_worker_results.results }}"
-# - name: Install kube-vip as network LoadBalancer - Install the kube-vip Cloud Provider
-#   hosts: localhost
-#   tasks:
-#     - name: Cloud Controller Manifest
-#       command: >
-#         kubectl apply -f https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
-#       register: kube_cloud_provider
 
-#     - name: Print the results.
-#       debug:
-#         msg: "Cloud Provider created: {{ kube_cloud_provider }}"
+- name: Add Storage Nodes to K3s Cluster
+  hosts: localhost
+  tags: k3s_install
+  gather_facts: false
+  vars_files:
+    - ../group_vars/k3s_cluster.yaml
+  tasks:
+    - name: Join Storage Nodes
+      command: >
+        k3sup join
+        --ip {{ hostvars[item]['ansible_host'] }}
+        --user {{ USER }}
+        --sudo
+        --k3s-version {{ K3S_VERSION }}
+        --server-ip {{ PRIMARY_MASTER }}
+        --ssh-key ~/.ssh/{{ CERT_NAME }}
+        --k3s-extra-args "--node-ip={{ hostvars[item]['ansible_host'] }} --node-label storage=true --node-label longhorn.io/create-default-disk=true --node-taint dedicated=longhorn-storage:NoSchedule"
+      loop: "{{ groups['storage'] }}"
+      register: join_storage_results
+
+    - name: Check for any failed joins
+      fail:
+        msg: "Some storage nodes failed to join the cluster"
+      when: join_storage_results.results | selectattr('rc', 'ne', 0) | list | length > 0
+
+    - name: Display Worker Join Results
+      debug:
+        msg: "{{ item.item }} ({{ hostvars[item.item]['ansible_host'] }}): {{ 'SUCCESS' if item.rc == 0 else 'FAILED' }}"
+      loop: "{{ join_storage_results.results }}"

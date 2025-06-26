@@ -32,7 +32,7 @@ variable disk_size {
     type = object({
       master = number
       worker = number
-      volume_node = number 
+      storage = number 
     })
     description = "Size of the disk"
 }
@@ -51,7 +51,7 @@ variable memory_count {
     type = object({
       master = number
       worker = number
-      volume_node = number
+      storage = number
     })
     description = "RAM"
 }
@@ -80,7 +80,7 @@ variable nodes {
     type = object({
       master = list(tuple([ string, string ]))
       worker = list(tuple([ string, string ]))
-      storage_worker = list(tuple([ string, string ]))
+      storage = list(tuple([ string, string ]))
     })
     description = "A list of relevant tuples e.g., [hostname, mac address]"
 }

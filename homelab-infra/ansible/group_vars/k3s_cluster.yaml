@@ -15,7 +15,7 @@ CERT_NAME: id_rsa
 SETUP_FLUX: true
 FLUX_GIT_REPO: "https://github.com/lewi0231/home-lab-automation.git"
 FLUX_GIT_BRANCH: "main"
-FLUX_PATH: "./clusters/homelab"
+FLUX_PATH: "./clusters/homelab/"
 # RANCHER_VERSION: 2.7.9
 CERT_MANAGER_VERSION: v1.17.2
 RANCHER_HOSTNAME: rancher.home.arpa

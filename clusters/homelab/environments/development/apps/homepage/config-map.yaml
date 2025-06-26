@@ -24,38 +24,34 @@ data:
             - abbr: CL
               href: https://cloudflare.com
   services.yaml: |
-    - name: Personal Blog
-      href: https://personal-blog.development.flowerhead.dev/
-      description: My staged blog in the cluster
-      group: Web Apps
-    - name: Work Rate Calculator
-      href: https://work-rate-calculator.development.flowerhead.dev
-      description: My staged Work Rate Calculator
-      group: Web Apps
-    - name: Traefik-Private
-      href: https://traefik-private.flowerhead.dev
-      description: Traefik (Internal) Dashboard
-      group: Monitoring
-    - name: Traefik-Public
-      href: https://traefik-public.flowerhead.dev
-      description: Traefik (External) Dashboard
-      group: Monitoring
-    - name: Grafana Logs
-      href: https://grafana.flowerhead.dev/d/5c9297f3-6b35-45d4-b627-e7cf2b7a726a/system-logs?orgId=1&from=now-30m&to=now&timezone=browser
-      description: Kubernetes System Logs
-      group: Monitoring
-    - name: Grafana Metrics
-      href: https://grafana.flowerhead.dev/d/kubernetes-overview/kubernetes-overview?orgId=1&from=now-30m&to=now&timezone=browser&refresh=30s
-      description: Kubernetes Overview
-      group: Monitoring
-    - name: Pi Hole
-      href: https://pihole.flowerhead.dev/admin
-      description: Pi Hole - which is my dns router.
-      group: Services
-    - name: Pfsense
-      href: http://pfsense.flowerhead.dev
-      description: My Router and DHCP server
-      group: Services
+    - Web Apps:
+        - Personal Blog:
+            href: https://personal-blog.development.flowerhead.dev/
+            description: My staged blog in the cluster
+        - Work Rate Calculator:
+            href: https://work-rate-calculator.development.flowerhead.dev
+            description: My staged Work Rate Calculator
+    - Monitoring:
+        - Traefik-Private:
+            href: https://traefik-private.flowerhead.dev
+            description: Traefik (Internal) Dashboard
+        - Traefik-Public:
+            href: https://traefik-public.flowerhead.dev
+            description: Traefik (External) Dashboard
+        - Grafana Logs:
+            href: https://grafana.flowerhead.dev/d/5c9297f3-6b35-45d4-b627-e7cf2b7a726a/system-logs?orgId=1&from=now-30m&to=now&timezone=browser
+            description: Kubernetes System Logs
+        - Grafana Metrics:
+            href: https://grafana.flowerhead.dev/d/kubernetes-overview/kubernetes-overview?orgId=1&from=now-30m&to=now&timezone=browser&refresh=30s
+            description: Kubernetes Overview
+
+    - Services:
+        - Pi Hole:
+            href: https://pihole.flowerhead.dev/admin
+            description: Pi Hole - which is my dns router.
+        - Pfsense:
+            href: http://pfsense.flowerhead.dev
+            description: My Router and DHCP server
 
   widgets.yaml: |
     - kubernetes:

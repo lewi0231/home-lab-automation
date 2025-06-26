@@ -32,7 +32,7 @@
 
     - name: Apply Flux components manifest
       command: >
-        kubectl apply -f clusters/homelab/flux-system
+        kubectl apply -f clusters/homelab/flux-system/flux-system/gotk-components.yaml
       when: flux_namespace.resources | length == 0
       register: flux_components_result
 
