@@ -25,8 +25,11 @@ install_cloudflared() {
     local host=$1
     echo "Installing cloudflared on $host..."
     
-    ssh "$host" "curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null && \
-    echo \"deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared \$(lsb_release -cs) main\" | sudo tee /etc/apt/sources.list.d/cloudflared.list && \
+    ssh "$host" "set -e; \
+    curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | \
+    sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null && \
+    echo \"deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared \$(lsb_release -cs) main\" | \
+    sudo tee /etc/apt/sources.list.d/cloudflared.list && \
     sudo apt update && sudo apt install -y cloudflared"
 }
 
@@ -44,11 +47,12 @@ echo "=============================="
 # Get master node hostname
 while true; do
     read -p "Enter the master node hostname (e.g., master1): " MASTER_NODE
-    if validate_input "$MASTER_NODE"; then
-        if check_ssh "$MASTER_NODE"; then
+    read -p "Enter the username to remote machine: " USERNAME
+    if validate_input "$MASTER_NODE" && validate_input "$USERNAME"; then
+        if check_ssh "$USERNAME@$MASTER_NODE"; then
             break
         else
-            echo "Error: Cannot connect to $MASTER_NODE via SSH. Please check the hostname and SSH access."
+            echo "Error: Cannot connect to $USERNAME@$MASTER_NODE via SSH. Please check the hostname and SSH access."
         fi
     fi
 done
@@ -81,12 +85,12 @@ done
 
 # Install cloudflared on master node
 echo "Setting up cloudflared on $MASTER_NODE..."
-install_cloudflared "$MASTER_NODE"
+install_cloudflared "$USERNAME@$MASTER_NODE"
 
 # Login to Cloudflare
 echo "Please login to Cloudflare..."
 echo "A browser window will open for authentication. Please complete the login process."
-ssh "$MASTER_NODE" "cloudflared tunnel login"
+ssh "$USERNAME@$MASTER_NODE" "cloudflared tunnel login"
 
 # Verify login was successful
 echo "Verifying Cloudflare login..."
@@ -94,7 +98,7 @@ MAX_RETRIES=3
 RETRY_COUNT=0
 
 while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-    if verify_cloudflare_login "$MASTER_NODE"; then
+    if verify_cloudflare_login "$USERNAME@$MASTER_NODE"; then
         echo "Cloudflare login successful!"
         break
     else
@@ -111,16 +115,18 @@ done
 
 # Create tunnel
 echo "Creating tunnel: $TUNNEL_NAME..."
-TUNNEL_CREDENTIALS=$(ssh "$MASTER_NODE" "cloudflared tunnel create $TUNNEL_NAME | grep -o '/root/.cloudflared/[0-9a-f-]*.json'")
+TUNNEL_CREDENTIALS=$(ssh "$USERNAME@$MASTER_NODE" "cloudflared tunnel create $TUNNEL_NAME | grep -o '.cloudflared/[0-9a-f-]*.json'")
 
 if [ -z "$TUNNEL_CREDENTIALS" ]; then
     echo "Error: Failed to create tunnel"
     exit 1
 fi
 
+echo "Tunnel credentials file: $TUNNEL_CREDENTIALS"
+
 # Create Kubernetes secret
 echo "Creating Kubernetes secret for tunnel credentials..."
-ssh "$MASTER_NODE" "kubectl create secret generic tunnel-credentials --from-file=credentials.json=$TUNNEL_CREDENTIALS"
+ssh "$USERNAME@$MASTER_NODE" "sudo kubectl create secret generic tunnel-credentials --from-file=credentials.json='$TUNNEL_CREDENTIALS'"
 
 # Apply deployment
 echo "Applying cloudflared deployment..."
@@ -128,7 +134,7 @@ kubectl apply -f "$DEPLOYMENT_PATH"
 
 # Configure DNS route
 echo "Configuring DNS route..."
-ssh "$MASTER_NODE" "cloudflared tunnel route dns $TUNNEL_NAME $DOMAIN_NAME"
+ssh "$USERNAME@$MASTER_NODE" "cloudflared tunnel route dns $TUNNEL_NAME $DOMAIN_NAME"
 
 echo "=========================================="
 echo "Cloudflare tunnel setup completed!"

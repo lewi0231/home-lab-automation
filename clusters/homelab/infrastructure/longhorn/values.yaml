@@ -3,9 +3,14 @@
 # Declare variables to be passed into your templates.
 global:
   # -- Toleration for nodes allowed to run user-deployed components such as Longhorn Manager, Longhorn UI, and Longhorn Driver Deployer.
-  tolerations: []
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "longhorn-storage"
+      effect: "NoSchedule"
   # -- Node selector for nodes allowed to run user-deployed components such as Longhorn Manager, Longhorn UI, and Longhorn Driver Deployer.
-  nodeSelector: {}
+  nodeSelector:
+    storage: "true"
   cattle:
     # -- Default system registry.
     systemDefaultRegistry: ""
@@ -106,7 +111,7 @@ image:
       # -- Tag for the OAuth Proxy image. Specify OCP/OKD version 4.1 or later (including version 4.15, which is available at quay.io/openshift/origin-oauth-proxy:4.15). This setting applies only to OpenShift users.
       tag: ""
   # -- Image pull policy that applies to all user-deployed Longhorn components, such as Longhorn Manager, Longhorn driver, and Longhorn UI.
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 service:
   ui:
     # -- Service type for Longhorn UI. (Options: "ClusterIP", "NodePort", "LoadBalancer", "Rancher-Proxy")
@@ -378,18 +383,15 @@ longhornManager:
   # -- PriorityClass for Longhorn Manager.
   priorityClass: *defaultPriorityClassNameRef
   # -- Toleration for Longhorn Manager on nodes allowed to run Longhorn components.
-  tolerations: []
-  ## If you want to set tolerations for Longhorn Manager DaemonSet, delete the `[]` in the line above
-  ## and uncomment this example block
-  # - key: "key"
-  #   operator: "Equal"
-  #   value: "value"
-  #   effect: "NoSchedule"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "longhorn-storage"
+      effect: "NoSchedule"
+
   # -- Node selector for Longhorn Manager. Specify the nodes allowed to run Longhorn Manager.
-  nodeSelector: {}
-  ## If you want to set node selector for Longhorn Manager DaemonSet, delete the `{}` in the line above
-  ## and uncomment this example block
-  #  label-key1: "label-value1"
+  nodeSelector:
+    storage: "true"
   #  label-key2: "label-value2"
   # -- Annotation for the Longhorn Manager service.
   serviceAnnotations: {}
@@ -404,19 +406,14 @@ longhornDriver:
   # -- PriorityClass for Longhorn Driver.
   priorityClass: *defaultPriorityClassNameRef
   # -- Toleration for Longhorn Driver on nodes allowed to run Longhorn components.
-  tolerations: []
-  ## If you want to set tolerations for Longhorn Driver Deployer Deployment, delete the `[]` in the line above
-  ## and uncomment this example block
-  # - key: "key"
-  #   operator: "Equal"
-  #   value: "value"
-  #   effect: "NoSchedule"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "longhorn-storage"
+      effect: "NoSchedule"
   # -- Node selector for Longhorn Driver. Specify the nodes allowed to run Longhorn Driver.
-  nodeSelector: {}
-  ## If you want to set node selector for Longhorn Driver Deployer Deployment, delete the `{}` in the line above
-  ## and uncomment this example block
-  #  label-key1: "label-value1"
-  #  label-key2: "label-value2"
+  nodeSelector:
+    storage: "true"
 longhornUI:
   # -- Replica count for Longhorn UI.
   replicas: 2
@@ -436,15 +433,16 @@ longhornUI:
                     - longhorn-ui
             topologyKey: kubernetes.io/hostname
   # -- Toleration for Longhorn UI on nodes allowed to run Longhorn components.
-  tolerations: []
-  ## If you want to set tolerations for Longhorn UI Deployment, delete the `[]` in the line above
-  ## and uncomment this example block
-  # - key: "key"
-  #   operator: "Equal"
-  #   value: "value"
-  #   effect: "NoSchedule"
+  tolerations:
+    ## If you want to set tolerations for Longhorn UI Deployment, delete the `[]` in the line above
+    ## and uncomment this example block
+    - key: "dedicated"
+      operator: "Equal"
+      value: "longhorn-storage"
+      effect: "NoSchedule"
   # -- Node selector for Longhorn UI. Specify the nodes allowed to run Longhorn UI.
-  nodeSelector: {}
+  nodeSelector:
+    storage: "true"
   ## If you want to set node selector for Longhorn UI Deployment, delete the `{}` in the line above
   ## and uncomment this example block
   #  label-key1: "label-value1"
@@ -514,7 +512,7 @@ metrics:
     interval: ""
     # -- Timeout after which Prometheus considers the scrape to be failed.
     scrapeTimeout: ""
-    # -- Configures the relabeling rules to apply the target’s metadata labels. See the [Prometheus Operator
+    # -- Configures the relabeling rules to apply the target's metadata labels. See the [Prometheus Operator
     # documentation](https://prometheus-operator.dev/docs/api-reference/api/#monitoring.coreos.com/v1.Endpoint) for
     # formatting details.
     relabelings: []
