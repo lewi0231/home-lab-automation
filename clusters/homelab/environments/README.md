@@ -49,3 +49,7 @@ To add a new application to an environment:
 
 - **Development**: personal-blog
 - **Production**: personal-blog, dashboard
+
+# Production and Development
+
+Both require independent git-credentials and ghcr-credentials - the latter needs to be ssh. Better off just creating these manually.

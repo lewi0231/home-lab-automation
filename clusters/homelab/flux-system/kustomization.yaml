@@ -4,6 +4,7 @@ resources:
   - gotk-components.yaml
   - gotk-sync.yaml
   - development.yaml
+  - production.yaml
 
 patches:
   # Reduce resource limits for all Flux controllers

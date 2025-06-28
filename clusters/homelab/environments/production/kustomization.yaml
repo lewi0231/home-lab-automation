@@ -6,5 +6,5 @@ resources:
   # - apps/personal-blog
   - apps/work-rate-calculator
   - production-repository
-  - git-credential-sealed.yaml
+  # - git-credential-sealed.yaml # manually created secret
   # - certificate.yaml # I don't actually need this
