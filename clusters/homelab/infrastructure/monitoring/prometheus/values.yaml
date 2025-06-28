@@ -1,0 +1,12 @@
+server:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  retention: "7d"
+  ## Prometheus' data retention size. Supported units: B, KB, MB, GB, TB, PB, EB.
+  ##
+  retentionSize: "2GB"

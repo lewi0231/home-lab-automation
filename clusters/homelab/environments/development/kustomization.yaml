@@ -6,7 +6,5 @@ resources:
   - apps/personal-blog
   - apps/homepage
   - apps/work-rate-calculator
-  # - ghcr-credentials-sealed.yaml
   - certificate.yaml
   - development-repository.yaml
-  # - git-credentials-sealed.yaml
