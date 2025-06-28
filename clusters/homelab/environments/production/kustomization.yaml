@@ -3,8 +3,5 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  # - apps/personal-blog
   - apps/work-rate-calculator
-  - production-repository
-  # - git-credential-sealed.yaml # manually created secret
-  # - certificate.yaml # I don't actually need this
+  - production-repository.yaml

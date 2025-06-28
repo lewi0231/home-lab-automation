@@ -32,7 +32,7 @@ patches:
   - patch: |
       - op: replace
         path: /spec/interval
-        value: 15m0s   # Change from 10m0s to 15m0s
+        value: 10m0s
     target:
       kind: Kustomization
       name: flux-system
