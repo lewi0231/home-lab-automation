@@ -17,7 +17,7 @@ spec:
         - name: ghcr-credentials
       containers:
         - name: work-rate-calculator
-          image: ghcr.io/lewi0231/home-lab-automation-work-rate-calculator:v1.0.18 # {"$imagepolicy": "production:work-rate-calculator"}
+          image: ghcr.io/lewi0231/home-lab-automation-work-rate-calculator:v1.0.19 # {"$imagepolicy": "production:work-rate-calculator"}
           ports:
             - containerPort: 3000
 ---
