@@ -1,0 +1,410 @@
+<Cover
+  src="../../public/computer-arty.jpg"
+  alt="Image from the movie Alien - from cosmos.com"
+  caption="cosmos.com"
+/>
+
+# Homelab Backup Strategy: From VM Snapshots to Application Data
+
+When I first set up my homelab, I was so focused on getting Kubernetes running that I completely overlooked backups. It wasn't until I had a stable cluster with monitoring, applications, and months of configuration work that I realized: "What happens if my Optiplex 7050 dies?"
+
+This article is about developing a backup strategy that actually works for a Proxmox + K3s homelab setup, based on real-world considerations and practical implementation.
+
+## The Backup Reality Check
+
+My setup looks like this:
+
+```
+Proxmox Host (Optiplex 7050)
+├── VM: chimera (K3s master)
+├── VM: minotaur (K3s storage node)
+├── VM: griffin (K3s worker)
+├── VM: faun (K3s worker)
+└── Local Storage: 512GB SSD
+```
+
+The problem? Everything was on one physical machine with no backup strategy. If the Optiplex failed, I'd lose:
+
+- **Kubernetes cluster state**
+- **Monitoring data** (Prometheus, Loki)
+- **Application configurations**
+- **Months of setup work**
+
+## Understanding Backup Types
+
+### 1. VM Snapshots vs VM Backups
+
+I initially confused these two concepts:
+
+**VM Snapshots:**
+
+```bash
+# Quick, point-in-time copy
+# Stored locally on Proxmox
+# Fast to create and restore
+# Not portable between hosts
+# Risk: If Proxmox host fails, snapshots are lost
+```
+
+**VM Backups:**
+
+```bash
+# Full VM backup to external storage
+# Portable between Proxmox hosts
+# Slower to create and restore
+# Survives host failure
+# Can be automated and scheduled
+```
+
+### 2. Application-Level Backups
+
+This is where it gets interesting for Kubernetes:
+
+**Configuration Backups (GitOps):**
+
+```bash
+# Your Git repository with manifests
+# Already version controlled
+# Easy to audit and rollback
+# Doesn't include runtime data
+# Examples: Flux configurations, Helm values
+```
+
+**Data Backups:**
+
+```bash
+# Application-specific data
+# Runtime state and user data
+# Examples: Prometheus metrics, Loki logs, databases
+```
+
+## My Backup Strategy Evolution
+
+### Phase 1: No Backups (The Scary Reality)
+
+For months, I ran without any backup strategy. My "backup plan" was:
+
+- Hope the Optiplex doesn't fail
+- Rebuild everything from scratch if it does
+
+**Why this was problematic:**
+
+- Single point of failure
+- No data protection
+- Months of work at risk
+- No disaster recovery plan
+
+### Phase 2: Proxmox VM Backups (The Practical Solution)
+
+I decided to start with Proxmox's built-in backup system:
+
+**Setup Process:**
+
+1. **Add Network Storage to Proxmox:**
+
+   ```
+   Datacenter → Storage → Add → SMB/CIFS
+   Server: 192.168.1.x (my router's IP)
+   Username: backup-user
+   Password: backup-password
+   Share: /backups
+   ```
+
+2. **Create Backup Job:**
+
+   ```
+   Datacenter → Backup → Add
+   ID: k3s-cluster-backup
+   Storage: network-backups
+   Schedule: Weekly (Sunday 2 AM)
+   Selection mode: Include selected VMs
+   VMs: chimera, minotaur, griffin, faun
+   ```
+
+3. **Test the Backup:**
+
+   ```bash
+   # Run backup manually first
+   Datacenter → Backup → k3s-cluster-backup → Run Now
+
+   # Check backup status
+   Datacenter → Backup → k3s-cluster-backup → View Logs
+   ```
+
+### Phase 3: Application Data Backups
+
+While VM backups protect against hardware failure, they don't handle application-specific data corruption. I added application-level backups:
+
+**Monitoring Data Backup:**
+
+```bash
+#!/bin/bash
+# backup-monitoring.sh
+DATE=$(date +%Y%m%d_%H%M%S)
+BACKUP_DIR="/backup/monitoring-data"
+SOURCE_DIR="/var/lib/rancher/k3s/storage"
+
+# Create backup
+sudo rsync -av --delete $SOURCE_DIR/ $BACKUP_DIR/$DATE/
+
+# Keep only last 7 days
+find $BACKUP_DIR -maxdepth 1 -type d -mtime +7 -exec rm -rf {} \;
+```
+
+**Git Repository Backup:**
+
+```bash
+# My Git repository is already backed up via GitHub
+# But I also keep a local copy
+git clone https://github.com/username/homelab.git /backup/git-repos/homelab
+```
+
+## Backup Storage Options I Considered
+
+### Option 1: Network Storage (Chosen)
+
+**Setup:** SMB share on my router
+**Pros:**
+
+- ✅ Separate from Proxmox host
+- ✅ Network accessible
+- ✅ Can use existing router
+- ✅ Automated backups
+
+**Cons:**
+
+- ❌ Network dependency
+- ❌ Slower than local storage
+- ❌ Limited by router storage
+
+### Option 2: External USB Drive
+
+**Setup:** USB drive connected to Proxmox host
+**Pros:**
+
+- ✅ Simple setup
+- ✅ Portable
+- ✅ No network dependency
+- ✅ Cheap
+
+**Cons:**
+
+- ❌ Manual intervention needed
+- ❌ Risk of forgetting to connect drive
+- ❌ Limited by drive size
+
+### Option 3: Cloud Storage
+
+**Setup:** Google Drive/AWS S3 via rclone
+**Pros:**
+
+- ✅ Off-site storage
+- ✅ No hardware needed
+- ✅ Scalable
+
+**Cons:**
+
+- ❌ Complex setup
+- ❌ Internet dependency
+- ❌ Can be expensive for large backups
+- ❌ Slower upload/download
+
+## My Final Backup Strategy
+
+### Tier 1: Critical Data (Daily)
+
+```bash
+# Application data that changes frequently
+# Monitoring data, databases, user data
+```
+
+### Tier 2: Configuration (Git-based)
+
+```bash
+# Infrastructure as Code
+# Flux configurations, Helm values, manifests
+# Already version controlled and backed up
+```
+
+### Tier 3: VM Backups (Weekly)
+
+```bash
+# Full VM backups for disaster recovery
+# Proxmox automated backup job
+```
+
+## Backup Schedule and Retention
+
+### Daily Backups
+
+- **Application data**: rsync to network storage
+- **Git repository**: Already version controlled
+- **Monitoring data**: Incremental backups
+
+### Weekly Backups
+
+- **VM backups**: Full Proxmox VM backups
+- **Configuration verification**: Test restore process
+- **Backup integrity check**: Verify backups are valid
+
+### Monthly Tasks
+
+- **Test restore**: Actually restore from backup
+- **Clean up old backups**: Remove backups older than retention period
+- **Update backup documentation**: Keep procedures current
+
+## Restore Scenarios and Procedures
+
+### Scenario 1: Single Node Failure
+
+```bash
+# 1. Identify failed node
+kubectl get nodes
+
+# 2. Restore specific VM from Proxmox backup
+# Proxmox web UI → Datacenter → Backup → Restore
+
+# 3. K3s will automatically rebalance workloads
+kubectl get pods --all-namespaces
+```
+
+### Scenario 2: Complete Cluster Failure
+
+```bash
+# 1. Restore all VMs from Proxmox backups
+# Proxmox web UI → Restore all K3s VMs
+
+# 2. Flux will recreate applications from Git
+kubectl get pods --all-namespaces
+
+# 3. Restore application data if needed
+rsync -av /backup/monitoring-data/latest/ /var/lib/rancher/k3s/storage/
+```
+
+### Scenario 3: Data Corruption
+
+```bash
+# 1. Identify corrupted data
+kubectl describe pod <pod-name>
+
+# 2. Restore specific application data
+kubectl delete pvc <corrupted-pvc>
+kubectl apply -f <restored-pvc-backup>
+
+# 3. Verify data integrity
+kubectl exec -it <pod-name> -- <verification-command>
+```
+
+## Backup Size Considerations
+
+### Typical Backup Sizes
+
+- **K3s nodes**: 2-5GB each (depending on OS and data)
+- **Total cluster**: 15-35GB
+- **Weekly backups**: 15-35GB per week
+- **Monthly retention**: 60-140GB
+
+### Storage Requirements
+
+- **1 month retention**: 100-200GB
+- **3 months retention**: 300-600GB
+- **6 months retention**: 600GB-1.2TB
+
+## Monitoring Your Backups
+
+### Backup Health Checks
+
+```bash
+# Check backup job status in Proxmox
+# Datacenter → Backup → View Logs
+
+# Verify backup files exist
+ls -la /backup/vm-backups/
+ls -la /backup/monitoring-data/
+
+# Check backup sizes
+du -sh /backup/*
+
+# Test backup integrity
+# (Proxmox can verify backup integrity)
+```
+
+### Backup Alerts
+
+```bash
+# Set up monitoring for backup failures
+# Alert if backup job fails
+# Alert if backup storage is full
+# Alert if backups are too old
+```
+
+## Lessons Learned
+
+### 1. Start Simple
+
+Don't over-engineer your backup strategy. Start with Proxmox VM backups and add complexity as needed.
+
+### 2. Test Your Backups
+
+A backup that hasn't been tested is just a hope. Regularly test your restore procedures.
+
+### 3. Document Everything
+
+Write down your backup procedures, restore procedures, and contact information for recovery.
+
+### 4. Consider the Recovery Time
+
+How long can you afford to be down? This determines your backup strategy.
+
+### 5. Backup Your Backups
+
+Don't put all your backup eggs in one basket. Consider multiple backup locations.
+
+## Getting Started Checklist
+
+### Week 1: Basic VM Backups
+
+- [ ] Set up network storage in Proxmox
+- [ ] Create backup job for all K3s VMs
+- [ ] Test backup creation
+- [ ] Document backup procedures
+
+### Week 2: Application Data Backups
+
+- [ ] Identify critical application data
+- [ ] Set up application-level backup scripts
+- [ ] Test application data restore
+- [ ] Schedule automated backups
+
+### Week 3: Testing and Monitoring
+
+- [ ] Test full cluster restore
+- [ ] Set up backup monitoring
+- [ ] Create disaster recovery documentation
+- [ ] Train yourself on restore procedures
+
+### Week 4: Optimization
+
+- [ ] Review backup performance
+- [ ] Optimize backup schedules
+- [ ] Consider additional backup locations
+- [ ] Update backup procedures
+
+## The Bottom Line
+
+A good backup strategy doesn't have to be complex, but it does have to be reliable. For my homelab, the combination of Proxmox VM backups and application-level data backups provides the right balance of simplicity and protection.
+
+The key is starting with something that works and improving it over time. Don't let perfect be the enemy of good when it comes to backups. A simple backup that you actually use is better than a complex backup that you never test.
+
+Remember: backups are like insurance. You hope you never need them, but you're glad you have them when disaster strikes.
+
+---
+
+_This article is based on real backup strategy development for a Proxmox + K3s homelab setup._
+
+**Questions for you to consider:**
+
+- What's your current backup strategy for your homelab?
+- How often do you test your backup restore procedures?
+- What's the most critical data in your homelab that needs protection?
+- Have you ever had to restore from backup? What did you learn?

@@ -59,18 +59,40 @@ export const WORK_EXPERIENCE: WorkExperience[] = [
 
 export const BLOG_POSTS: BlogPost[] = [
   {
-    title: 'This is probably a dumb idea!',
+    title: 'Homelab Backup Strategy: From VM Snapshots to Application Data',
     description:
-      'As an aspiring Network Engineer I wanted to get a HomeLab up and going using Kubernetes, Proxmox, VPN, Firewall +',
-    link: '/blog/introduction',
-    uid: 'blog-1',
+      'A comprehensive guide to developing a backup strategy for Proxmox + K3s homelab setups, covering VM backups, application data, and practical implementation.',
+    link: '/blog/homelab-backup-strategy',
+    uid: 'homelab-backup-strategy',
   },
   {
-    title: 'Homelab fun times',
+    title: 'Homelab Resource Optimization: Making the Most of Limited Hardware',
     description:
-      'As an aspiring Network Engineer I wanted to get a HomeLab up and going using Kubernetes, Proxmox, VPN, Firewall +',
-    link: '/blog/home-lab-wonder',
-    uid: 'blog-2',
+      'How to optimize Kubernetes resource usage on limited hardware, including reducing cluster size, optimizing Flux controllers, and tuning monitoring stacks.',
+    link: '/blog/kubernetes-resource-optimization',
+    uid: 'kubernetes-resource-optimization',
+  },
+  {
+    title:
+      'Kubernetes Storage: Understanding PVs, PVCs, and When to Use StatefulSets vs Deployments',
+    description:
+      'A deep dive into Kubernetes storage concepts, troubleshooting persistent volume issues, and understanding when to use StatefulSets vs Deployments.',
+    link: '/blog/kubernetes-storage-explained',
+    uid: 'kubernetes-storage-explained',
+  },
+  {
+    title: 'Why I Ditched Longhorn for Local-Path in My Homelab',
+    description:
+      'The story of migrating from Longhorn distributed storage to local-path provisioner in a resource-constrained homelab environment.',
+    link: '/blog/ditching-longhorn-for-local-path',
+    uid: 'ditching-longhorn-for-local-path',
+  },
+  {
+    title: 'How to host your own website',
+    description:
+      'A complete guide to hosting websites using Kubernetes, MetalLB, Traefik, and Cloudflare Tunnel for secure, self-hosted web applications.',
+    link: '/blog/host-your-websites',
+    uid: 'host-your-websites',
   },
 ]
 

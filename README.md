@@ -262,3 +262,21 @@ The official documentation was partially helpful. Additional steps required afte
 - **IP Address Not Changing**: Restart Traefik and MetalLB controller deployments
 - **Flux Not Syncing**: Check kustomize-controller logs and force reconciliation
 - **Node Joining Issues**: Verify node tokens and network connectivity
+
+## Backups
+
+At this point in time I am running a single Proxmox Server on an Optiplex Micro (7050) with 16GB RAM. Soon I will have an additional Orange Pi 5 Max integrated as an additional node.
+
+Therefore at the moment I'm planning on utilising Proxmox Backup Feature, which is really very good.
+
+### Creating Backup Job in Proxmox
+
+1. Click on DataCenter and navigate to Backups.
+2. Add Backup
+3. Select the VMs I'm looking to backup, use Retention, Schedule and Storage as appropriate.
+
+### Storage location
+
+I don't currently have NAS, so I plan on simply attaching an external drive to my router and using that for now.
+
+In the future I would like to use SMB to save to NAS.
