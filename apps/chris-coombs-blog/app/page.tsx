@@ -8,7 +8,7 @@ import {
   MorphingDialogContent,
   MorphingDialogTrigger,
 } from '@/components/ui/morphing-dialog'
-import { Mail, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { BLOG_POSTS, EMAIL, SOCIAL_LINKS } from './data'
@@ -124,6 +124,17 @@ export default function Personal() {
       initial="hidden"
       animate="visible"
     >
+      <motion.section
+        variants={VARIANTS_SECTION}
+        transition={TRANSITION_SECTION}
+      >
+        <div className="flex-1">
+          <p className="text-zinc-600 dark:text-zinc-400">
+            Documenting my journey towards Network Engineering.
+          </p>
+        </div>
+      </motion.section>
+
       {/* <motion.section
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
@@ -166,7 +177,7 @@ export default function Personal() {
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
       >
-        <h3 className="mb-3 text-2xl font-medium tracking-wide">Blog</h3>
+        <h3 className="mb-3 text-lg font-medium">Blog</h3>
         <div className="flex flex-col space-y-0">
           <AnimatedBackground
             enableHover
@@ -185,7 +196,7 @@ export default function Personal() {
                 data-id={post.uid}
               >
                 <div className="flex flex-col space-y-1">
-                  <h4 className="font-normal tracking-tight dark:text-zinc-100">
+                  <h4 className="font-normal dark:text-zinc-100">
                     {post.title}
                   </h4>
                   <p className="text-zinc-500 dark:text-zinc-400">
@@ -231,11 +242,11 @@ export default function Personal() {
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
       >
-        <h3 className="mb-5 text-2xl font-medium tracking-wide">Connect</h3>
+        <h3 className="mb-5 text-lg font-medium">Connect</h3>
         <p className="mb-5 text-zinc-600 dark:text-zinc-400">
           Feel free to contact me at{' '}
-          <a className="inline-flex px-2 align-middle" href={`mailto:${EMAIL}`}>
-            <Mail />
+          <a className="underline dark:text-zinc-300" href={`mailto:${EMAIL}`}>
+            {EMAIL}
           </a>
         </p>
         <div className="flex items-center justify-start space-x-3">

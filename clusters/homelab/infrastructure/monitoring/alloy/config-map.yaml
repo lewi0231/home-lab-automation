@@ -50,6 +50,24 @@ data:
     }
 
     loki.process "pod_logs" {
+      # Filter out empty or malformed log entries
+      stage.match {
+        selector = "{}"
+        stage.regex {
+          expression = "^\\s*$"
+        }
+        stage.drop {}
+      }
+      
+      # Filter out entries that might cause structured metadata issues
+      stage.match {
+        selector = "{}"
+        stage.regex {
+          expression = "^\\s*$|^null$|^undefined$"
+        }
+        stage.drop {}
+      }
+      
       stage.match {
         selector = "{namespace=\"production\"}"
         stage.regex {

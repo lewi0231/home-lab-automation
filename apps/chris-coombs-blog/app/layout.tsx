@@ -1,10 +1,9 @@
-import { Separator } from '@/components/ui/separator'
 import type { Metadata, Viewport } from 'next'
-import { ThemeProvider } from 'next-themes'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { Footer } from './footer'
 import './globals.css'
 import { Header } from './header'
+import { Footer } from './footer'
+import { ThemeProvider } from 'next-themes'
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -13,8 +12,9 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
-  title: 'Paul Richard Lewis - Personal Blog',
-  description: 'A record of my tinkering for myself and others.',
+  title: 'Nim - Personal website template',
+  description:
+    'Nim is a free and open-source personal website template built with Next.js 15, React 19 and Motion-Primitives.',
 }
 
 const geist = Geist({
@@ -46,7 +46,6 @@ export default function RootLayout({
           <div className="flex min-h-screen w-full flex-col font-[family-name:var(--font-inter-tight)]">
             <div className="relative mx-auto w-full max-w-screen-sm flex-1 px-4 pt-20">
               <Header />
-              <Separator className="mb-8" />
               {children}
               <Footer />
             </div>
