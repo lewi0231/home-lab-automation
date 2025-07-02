@@ -212,13 +212,12 @@ probes:
 # -- resources, such as Minikube. If you do want to specify resources, uncomment the following
 # -- lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources:
-  {}
-  # limits:
-  #  cpu: 100m
-  #  memory: 128Mi
-  # requests:
-  #  cpu: 100m
-  #  memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
 
 # -- `spec.PersitentVolumeClaim` configuration
 persistentVolumeClaim:
@@ -235,7 +234,7 @@ persistentVolumeClaim:
     - ReadWriteOnce
 
   # -- volume claim size
-  size: "2Gi"
+  size: "5Gi"
 
   ## If defined, storageClassName: <storageClass>
   ## If set to "-", storageClassName: "", which disables dynamic provisioning

@@ -380,12 +380,12 @@ server:
 
   # -- Resource limits and requests for the authentik server
   resources:
-    {}
-    # requests:
-    #   cpu: 100m
-    #   memory: 512Mi
-    # limits:
-    #   memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 100m
+      memory: 256Mi
 
   # authentik server container ports
   containerPorts:
@@ -1085,11 +1085,11 @@ postgresql:
     extendedConfiguration: |
       max_connections = 500
     resourcesPreset: "none"
-    # persistence:
-    #   enabled: true
-    #   storageClass:
-    #   accessModes:
-    #     - ReadWriteOnce
+    persistence:
+      enabled: true
+      storageClass: local-path
+      accessModes:
+        - ReadWriteOnce
   readReplicas:
     resourcesPreset: "none"
   backup:
