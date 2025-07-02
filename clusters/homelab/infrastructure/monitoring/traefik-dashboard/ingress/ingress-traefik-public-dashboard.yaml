@@ -13,7 +13,7 @@ spec:
     - match: Host(`traefik-public.flowerhead.dev`)
       kind: Rule
       middlewares:
-        - name: traefik-public-dashboard-basicauth
+        - name: traefik-dashboard-basicauth
           namespace: monitoring
       services:
         - name: api@internal

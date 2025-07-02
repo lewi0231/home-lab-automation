@@ -249,35 +249,25 @@ kubectl get sealedsecrets -A
 3. Implement proper network policies
 4. Configure automated certificate renewal monitoring
 
-## Longhorn Storage
+## Traefik Dashboard
 
-**WHY?:** I found that if i wanted to have replicas on different nodes (e.g., pihole) I would need something other than the default setup in k3s - which is node-local storage. Longhorn is commonly used for this among other things.
+If you're wanting to create a secret for your dashboard you'll need to do the following - this is referenced in the ingressroute middleware.
 
-### Prerequisites
+**Important:** The secret must contain a single `users` field, not separate `username` and `password` fields. The value should be in the format `username:hashedpassword`, where `hashedpassword` is generated using a tool like `htpasswd` or `openssl` (bcrypt or MD5 are supported by Traefik).
 
-View the full prerequisites [here](https://artifacthub.io/packages/helm/longhorn/longhorn). For myself, I am using Ubuntu 24.04 so most of the default programs are installed with the exception of iscsi (which is for file sharing over the network). For that i ran the following on each node (ideally i'll have this preinstalled on each node):
+Example (using htpasswd):
 
 ```
-sudo apt install open-iscsi
-sudo systemctl enable iscsid
-sudo systemctl start iscsid
+htpasswd -nb admin yourpassword
 ```
 
-1. Create namespace
-   `kubectl create namespace longhorn-system`
-2. Add repo `helm repo add longhorn https://charts.longhorn.io & helm repo update`
-3. Install (without values initially): `helm install longhorn longhorn/longhorn --version 1.9.0 -n longhorn-system`
-4. Because I didn't specify any values I wasn't able to export the values file, but you can normally do this with `helm get values longhorn -n longhorn-system -o yaml`
-5. Can obtain the storage class with `kubectl get storageclass -n longhorn-system`
+Then create the secret:
 
-## Pi Hole (DNS)
+```
+kubectl create secret generic traefik-dashboard-auth --namespace monitoring --from-literal=users="admin:$apr1$YxDVI.U9$m3CoUe5SkOipPD68FRUSP1"
+```
 
-I decided that I would try my hand at setting up my own dns with pi hole. However, I wanted to ensure, given it's importance that it was fault tolerent: meaning that I wanted the replicas to be deployed on separate nodes. This meant that I required longhorn, which I had already installed earlier.
-
-1. I ran the command `kubectl get storageclass -n longhorn-system` which revealed longhorn (default)
-2. I then added this to my pi hole values file under `persistantVolumeClaim.storageClass = longhorn`
-3. I had to remove and reinstall pi hole as this is setting is immutable.
-4. Ended up setting replicas = 1 as apparently pi hole replicas cannot share information (e.g., logs) so opted to just use a backup external dns.
+This secret will be referenced by the Traefik dashboard middleware for basic authentication. If you need to regenerate the secret for a new cluster, repeat the above steps.
 
 ## Monitoring
 

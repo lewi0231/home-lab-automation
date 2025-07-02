@@ -1019,13 +1019,7 @@ loki:
       drop:
         - ALL
     readOnlyRootFilesystem: true
-  distributor:
-    # Add validation to handle malformed structured metadata
-    extraArgs:
-      - "-distributor.ingestion-rate-limit=15000"
-      - "-distributor.ingestion-burst-size=20000"
-      - "-distributor.max-line-size=2MB"
-      - "-distributor.max-line-size-truncate=false"
+  distributor: {}
   enableServiceLinks: true
   extraMemberlistConfig: {}
   frontend:
@@ -1050,12 +1044,7 @@ loki:
     reject_old_samples_max_age: 168h
     split_queries_by_interval: 15m
     volume_enabled: true
-    # Add validation to handle malformed structured metadata
-    max_structured_metadata_size: 2048
-    max_structured_metadata_entries: 100
-    # Reject empty or malformed entries
-    reject_old_samples: true
-    reject_old_samples_max_age: 168h
+
   memberlistConfig: {}
   memcached:
     chunk_cache:
