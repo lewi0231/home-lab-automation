@@ -1,10 +1,11 @@
-<Cover
-  src="/computer-arty.jpg"
-  alt="Image from the movie Alien - from cosmos.com"
-  caption="cosmos.com"
-/>
+---
+title: 'Homelab Backup Strategy: From VM Snapshots to Application Data'
+date: '2024-06-26'
+description: 'Developing a comprehensive backup strategy for Proxmox + K3s homelab setups'
+---
 
-# Homelab Backup Strategy: From VM Snapshots to Application Data
+<Cover src="/storage.png" alt="AI Inspired Art Based on Article Description" />
+{/* TODO - generate art pic for this */}
 
 When I first set up my homelab, I was so focused on getting Kubernetes running that I completely overlooked backups. It wasn't until I had a stable cluster with monitoring, applications, and months of configuration work that I realized: "What happens if my Optiplex 7050 dies?"
 
@@ -237,19 +238,20 @@ mkfs.ext4 /dev/sda1
 mount /dev/sda1 /mnt/usbbackup
 ```
 
-I also updated `/etc/fstab` to mount the drive as ext4 at boot:
+I also updated <InlineCode>/etc/fstab</InlineCode> to mount the drive as ext4 at boot:
 
 ```
 /dev/sda1  /mnt/usbbackup  ext4  defaults  0  0
 ```
 
-> **Tip:** If you edit `/etc/fstab`, run `systemctl daemon-reload` to ensure systemd picks up the changes.
+> **Tip:** If you edit <InlineCode>/etc/fstab</InlineCode>, run <InlineCode>systemctl daemon-reload</InlineCode> to ensure systemd picks up the changes.
 
 **4. What is vfat?**
 
-- `vfat` is the Linux driver for FAT filesystems (including FAT32 and FAT16) that support long filenames.
-- When mounting a FAT32 drive, you use `vfat` as the filesystem type in Linux.
-- For ext4, use `ext4` in `/etc/fstab` and mount commands.
+- <InlineCode>vfat</InlineCode> is the Linux driver for FAT filesystems
+  (including FAT32 and FAT16) that support long filenames.
+- When mounting a FAT32 drive, you use <InlineCode>vfat</InlineCode> as the filesystem type in Linux.
+- For ext4, use <InlineCode>ext4</InlineCode> in <InlineCode>/etc/fstab</InlineCode> and mount commands.
 
 **5. Running the Backups**
 
@@ -260,7 +262,7 @@ After switching to ext4, Proxmox backups ran smoothly—even for large VMs. The 
 - **Always check filesystem limits** before using a drive for large files.
 - **FAT32 is not suitable** for VM backups due to the 4GB file size cap.
 - **ext4 is ideal** for Linux/Proxmox backup drives (unless you need cross-platform compatibility).
-- **Update `/etc/fstab`** after reformatting, and reload systemd if prompted.
+- **Update <InlineCode>/etc/fstab</InlineCode>** after reformatting, and reload systemd if prompted.
 - **Test your backup and restore process** after making changes.
 
 **Summary:**

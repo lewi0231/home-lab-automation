@@ -32,9 +32,16 @@ export const PROJECTS: Project[] = [
     name: 'Trailwisdom Travel Blog',
     description: 'Used Nexjs, Tailwind + Sanity.io',
     link: 'https://trailwisdom.xyz/',
+    video: '/trailwisdom.mov',
+    id: 'project1',
+  },
+  {
+    name: 'Trailwisdom Travel Blog',
+    description: 'Used Nexjs, Tailwind + Sanity.io',
+    link: 'https://trailwisdom.xyz/',
     video:
       'https://res.cloudinary.com/read-cv/video/upload/t_v_b/v1/1/profileItems/W2azTw5BVbMXfj7F53G92hMVIn32/newProfileItem/d898be8a-7037-4c71-af0c-8997239b050d.mp4?_a=DATAdtAAZAA0',
-    id: 'project1',
+    id: 'project2',
   },
 ]
 
@@ -100,6 +107,10 @@ export const SOCIAL_LINKS: SocialLink[] = [
   {
     label: 'Github',
     link: 'https://github.com/lewi0231',
+  },
+  {
+    label: 'Email',
+    link: 'mailto:flowerhead.dev@gmail.com',
   },
   // {
   //   label: 'Twitter',

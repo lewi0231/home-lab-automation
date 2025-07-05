@@ -1,12 +1,12 @@
-<Cover
-  src="../../public/computer-arty.jpg"
-  alt="Image from the movie Alien - from cosmos.com"
-  caption="cosmos.com"
-/>
+---
+title: 'Kubernetes Storage Explained: From PVCs to Storage Classes'
+date: '2024-06-05'
+description: 'Understanding Kubernetes storage concepts and implementation for homelab setups'
+---
 
-# Kubernetes Storage: Understanding PVs, PVCs, and When to Use StatefulSets vs Deployments
+<Cover src="/storage.png" alt="Image from the movie Alien - from cosmos.com" />
 
-When I first started with Kubernetes, storage was one of those concepts that seemed simple until it wasn't. I'd read about PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs), but the real-world implications didn't click until I hit a specific problem: my Prometheus pod was stuck in `ContainerCreating` for hours.
+When I first started with Kubernetes, storage was one of those concepts that seemed simple until it wasn't. I'd read about PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs), but the real-world implications didn't click until I hit a specific problem: my Prometheus pod was stuck in <InlineCode>ContainerCreating</InlineCode> for hours.
 
 This article is about that troubleshooting journey and the fundamental concepts I learned along the way.
 
@@ -15,18 +15,19 @@ This article is about that troubleshooting journey and the fundamental concepts 
 I was setting up monitoring in my homelab cluster when I noticed this:
 
 ```bash
-kubectl get pods -n monitoring | grep prometheus-server
-my-prometheus-server-7cd5f94b67-lnhvd   0/2     ContainerCreating   0   36m
+kubectl get pods -n monitoring | grep prometheus-server \nmy-prometheus-server-7cd5f94b67-lnhvd 0/2 ContainerCreating 0 36m
 ```
 
 The pod had been stuck for 36 minutes. When I dug deeper:
 
 ```bash
-kubectl describe pod my-prometheus-server-7cd5f94b67-lnhvd -n monitoring | tail -10
-Events:
-  Type     Reason              Age   From                     Message
-  ----     ------              ----  ----                     -------
-  Warning  FailedAttachVolume  10s   attachdetach-controller  AttachVolume.Attach failed for volume "pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c" : rpc error: code = Aborted desc = volume pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c is not ready for workloads
+kubectl describe pod my-prometheus-server-7cd5f94b67-lnhvd -n
+  monitoring | tail -10 \n\nEvents: Type Reason Age From Message
+  \n---- ------ ---- ---- -------
+  Warning FailedAttachVolume 10s attachdetach-controller
+  AttachVolume.Attach failed for volume
+  "pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c" : rpc error: code = Aborted desc =
+  volume pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c is not ready for workloads
 ```
 
 The error was clear: the pod couldn't attach to its volume. But why?
@@ -92,7 +93,7 @@ When you create a PVC, Kubernetes uses the storage class to:
 
 > **Where do PVCs come from?**
 >
-> - **Manual creation:** You can create a PVC yourself by writing a YAML manifest and applying it with `kubectl apply -f my-pvc.yaml`. This is common for simple apps, testing, or when you want full control over the storage claim.
+> - **Manual creation:** You can create a PVC yourself by writing a YAML manifest and applying it with <InlineCode>kubectl apply -f my-pvc.yaml</InlineCode>. This is common for simple apps, testing, or when you want full control over the storage claim.
 > - **Resource-managed creation:** More often, PVCs are created automatically by resources like Helm charts, StatefulSets, or Deployments. For example, when you install Prometheus or Loki via Helm, the chart will usually define a PVC in its templates, and Kubernetes will create it for you. This is the most common pattern for production workloads, as it keeps storage configuration tied to the app.
 > - **Why choose one or the other?** If you want to share a volume between multiple pods or manage storage independently of your app, you might create a PVC manually. If you want storage to be managed as part of your app's lifecycle, let the resource (Helm, StatefulSet, etc.) handle it.
 
@@ -275,27 +276,28 @@ As I worked through these issues, I kept asking myself:
    - Historical data is valuable
    - Without persistence, you lose metrics on pod restart
 
-2. **What's the difference between `ReadWriteOnce` and `ReadWriteMany`?**
+2. **What's the difference between <InlineCode>ReadWriteOnce</InlineCode> and <InlineCode>ReadWriteMany</InlineCode>?**
 
-   - `ReadWriteOnce`: One pod can write, multiple can read
-   - `ReadWriteMany`: Multiple pods can read and write
-   - Most storage classes only support `ReadWriteOnce`
+   - <InlineCode>ReadWriteOnce</InlineCode>: One pod can write, multiple can
+     read
+   - <InlineCode>ReadWriteMany</InlineCode>: Multiple pods can read and write
+   - Most storage classes only support <InlineCode>ReadWriteOnce</InlineCode>
 
-3. **When should I use `emptyDir` vs PVC?**
+3. **When should I use <InlineCode>emptyDir</InlineCode> vs PVC?**
 
-   - `emptyDir`: Temporary storage, lost on pod restart
+   - <InlineCode>emptyDir</InlineCode>: Temporary storage, lost on pod restart
    - PVC: Persistent storage, survives pod restarts
-   - Use `emptyDir` for cache, temp files
+   - Use <InlineCode>emptyDir</InlineCode> for cache, temp files
    - Use PVC for important data
 
 4. **What happens if my storage node goes down?**
 
-   - With `local-path`: Data on that node is lost
+   - With <InlineCode>local-path</InlineCode>: Data on that node is lost
    - With distributed storage: Data might be available on other nodes
    - Always have backups!
 
 5. **How do I know which storage class to use?**
-   - Check what's available: `kubectl get storageclass`
+   - Check what's available: <InlineCode>kubectl get storageclass</InlineCode>
    - Consider your use case (performance, redundancy, cost)
    - Start simple, optimize later
 

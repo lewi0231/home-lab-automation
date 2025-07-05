@@ -1,6 +1,12 @@
+---
+title: 'Why I Ditched Longhorn for Local-Path in My Homelab'
+date: '2025-06-2'
+description: 'My Longhorn trials and tribulations and path to Local-Path'
+---
+
 <Cover src="/storage.png" alt="AI generated image" />
 
-# Why I Ditched Longhorn for Local-Path in My Homelab
+{/* <BlogDate date="2025-06-02" /> */}
 
 I'm running Proxmox on a Dell Optiplex 7050 Micro (16GB RAM, 512GB SSD)—a classic homelab box. Like many, I dove into Kubernetes out of curiosity and a love for tinkering. But in the process, I tried setups that just don't fit the realities of a modest homelab.
 
@@ -20,7 +26,7 @@ The theory was sound: distributed storage with redundancy. In practice? My Optip
 
 Within days, I started seeing issues:
 
-```bash
+```# bash
 kubectl get nodes
 # Nodes showing NotReady
 # Pods stuck in ContainerCreating
@@ -31,25 +37,25 @@ The problems were cascading:
 
 1. **Resource Pressure**: Longhorn components competing for limited RAM
 
-   - _How we saw it_: Nodes frequently went `NotReady`, and `kubectl describe node <node>` showed `MemoryPressure` and `KubeletHasInsufficientMemory`.
-   - _What to check_: Use `kubectl top nodes` to see memory and CPU usage. Look for high usage or nodes with little free memory.
+   - **How we saw it**: Nodes frequently went <InlineCode>NotReady</InlineCode>, and _kubectl describe node \<node\>_ showed _MemoryPressure_ and _KubeletHasInsufficientMemory_.
+   - **What to check**: Use _kubectl top nodes_ to see memory and CPU usage. Look for high usage or nodes with little free memory.
 
 2. **Volume Replica Mismatch**: All volumes created with 3 replicas, but nodes kept failing
 
-   - _How we saw it_: `kubectl get volumes -n longhorn-system` showed volumes in `faulted`, `detached`, or `degraded` states. The `AGE` and `STATE` columns didn't match expectations, and volumes couldn't attach.
-   - _What to check_: Inspect Longhorn UI or use `kubectl describe volume <volume-name> -n longhorn-system` for error messages about missing replicas or failed scheduling.
+   - **How we saw it**: <InlineCode>kubectl get volumes -n longhorn-system</InlineCode> showed volumes in <InlineCode>faulted</InlineCode>, <InlineCode>detached</InlineCode>, or <InlineCode>degraded</InlineCode> states. The <InlineCode>AGE</InlineCode> and <InlineCode>STATE</InlineCode> columns didn't match expectations, and volumes couldn't attach.
+   - _What to check_: Inspect Longhorn UI or use <InlineCode>kubectl describe volume \<volume-name\> -n longhorn-system</InlineCode> for error messages about missing replicas or failed scheduling.
 
 3. **Pod Scheduling Conflicts**: Stuck PVCs preventing new pods from starting
-   - _How we saw it_: Pods stuck in `ContainerCreating` or `Pending` state. `kubectl describe pod <pod-name>` revealed events like `FailedAttachVolume` or PVCs stuck in `Terminating`.
-   - _What to check_: Use `kubectl get pvc -A` to find PVCs in `Pending` or `Terminating`. Check pod events for volume attachment errors.
+   - _How we saw it_: Pods stuck in <InlineCode>ContainerCreating</InlineCode> or <InlineCode>Pending</InlineCode> state. <InlineCode>kubectl describe pod \<pod-name\></InlineCode> revealed events like <InlineCode>FailedAttachVolume</InlineCode> or PVCs stuck in <InlineCode>Terminating</InlineCode>.
+   - _What to check_: Use <InlineCode>kubectl get pvc -A</InlineCode> to find PVCs in <InlineCode>Pending</InlineCode> or <InlineCode>Terminating</InlineCode>. Check pod events for volume attachment errors.
 
-If you run into similar issues, start by checking node status (`kubectl get nodes`), resource usage (`kubectl top nodes`), and the state of your volumes and PVCs. The combination of these commands will usually point you to the root cause.
+If you run into similar issues, start by checking node status (<InlineCode>kubectl get nodes</InlineCode>), resource usage (<InlineCode>kubectl top nodes</InlineCode>), and the state of your volumes and PVCs. The combination of these commands will usually point you to the root cause.
 
 ## The Breaking Point
 
 After realising that 3 replicas were not really an option for my limited homelab, I knew that I had too many nodes running and that the recommended 3 node longhorn setup wasn't going to be an option. So, I reduced my cluster from 7 to 4 nodes (1 master, 1 storage, 2 workers). Suddenly, all my volumes were in a "faulted" state:
 
-```bash
+```# bash
 kubectl get volumes -n longhorn-system
 NAME                                       STATE       ROBUSTNESS   SCHEDULED   SIZE          NODE       AGE
 pvc-5b997bb9-904d-4f4f-b5bd-98bb5cc41b9e   detached    unknown                  10737418240              24h
@@ -61,7 +67,7 @@ Every volume was created with 3 replicas, but I only had 1 storage node. Longhor
 
 ## The Solution: Local-Path Provisioner
 
-K3s comes with a built-in storage solution that I'd been ignoring: `local-path` provisioner. It's simple, lightweight, and perfect for homelab use. I learn best through trial and error, but in hindsight I would have gone straight to the local-path setup.
+K3s comes with a built-in storage solution that I'd been ignoring: <InlineCode>local-path</InlineCode> provisioner. It's simple, lightweight, and perfect for homelab use. I learn best through trial and error, but in hindsight I would have gone straight to the local-path setup.
 
 One of the big realizations after switching to local-path was that I no longer needed a dedicated storage node. Since local-path just uses the disk of whatever node the pod lands on, it made sense to convert my "storage" node into a regular worker node. This let me make better use of my limited resources, as any node could now run workloads and provide storage for its own pods.
 
@@ -76,47 +82,50 @@ One of the big realizations after switching to local-path was that I no longer n
 
 1. **Uninstall Longhorn** (this was... interesting):
 
-```bash
+```# bash
 # Set deletion confirmation flag
 kubectl -n longhorn-system patch settings.longhorn.io deleting-confirmation-flag --type='merge' -p='{"value":"true"}'
 ```
 
-This command is required because Longhorn won't let you uninstall it unless you explicitly confirm you want to delete all your data and resources. Setting this flag to `true` tells Longhorn "yes, I really want to remove everything, even if it means losing data."
+This command is required because Longhorn won't let you uninstall it unless you explicitly confirm you want to delete all your data and resources. Setting this flag to <InlineCode>true</InlineCode> tells Longhorn "yes, I really want to remove everything, even if it means losing data."
 
-```bash
+```# bash
 # Uninstall (this failed, so we force deleted)
 kubectl delete namespace longhorn-system --force --grace-period=0
 
 # Clean up CRDs
-kubectl delete crd backingimagedatasources.longhorn.io backingimagemanagers.longhorn.io # ... (all Longhorn CRDs)
+
+kubectl delete crd backingimagedatasources.longhorn.io backingimagemanagers.longhorn.io # ... (all Longhorn CRDs)`
+
 ```
 
 2. **Update Application Configurations**:
 
-```yaml
+```# yaml
 # Loki configuration
 singleBinary:
   persistence:
     storageClass: local-path # Changed from "longhorn"
 
 # Pi-hole configuration
+
 persistence:
-  storageClass: 'local-path' # Changed from "longhorn"
+storageClass: 'local-path' # Changed from "longhorn"
 ```
 
 3. **Fix Prometheus** (it was deployed as a Deployment instead of StatefulSet):
 
-```yaml
+```# yaml
 server:
-  persistentVolume:
-    enabled: false # For now, using ephemeral storage
+persistentVolume:
+  enabled: false # For now, using ephemeral storage
 ```
 
 ## The Results
 
 After the migration, my cluster became stable:
 
-```bash
+```# bash
 kubectl get pods -n monitoring
 NAME                                                    READY   STATUS    RESTARTS   AGE
 my-prometheus-server-7d89679c87-dvskt                   2/2     Running   0          88s

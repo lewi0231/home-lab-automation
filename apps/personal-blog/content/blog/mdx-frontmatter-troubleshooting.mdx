@@ -1,0 +1,175 @@
+---
+title: 'MDX Frontmatter Troubleshooting: From Display Issues to Dynamic Routes'
+date: '2024-07-03'
+description: 'A practical guide to fixing MDX frontmatter display issues in Next.js and implementing proper dynamic blog routes'
+---
+
+# MDX Frontmatter Troubleshooting: From Display Issues to Dynamic Routes
+
+When I set out to add dates and copy code buttons to my Next.js blog, I encountered a common but frustrating issue: frontmatter was displaying at the top of my blog posts instead of being parsed as metadata. This article documents the troubleshooting journey and the solution that follows Next.js best practices.
+
+## The Problem
+
+My initial setup used MDX files directly in the app directory:
+
+```
+app/blog/
+├── ditching-longhorn-for-local-path/
+│   └── page.mdx
+├── homelab-backup-strategy/
+│   └── page.mdx
+└── ...
+```
+
+Each _page.mdx_ contained frontmatter:
+
+```mdx
+---
+title: 'My Blog Post'
+date: '2024-07-03'
+description: 'A description'
+---
+
+# My Blog Post
+
+Content here...
+```
+
+**The issue:** The frontmatter was rendering at the top of the blog post instead of being parsed as metadata.
+
+## Why This Happens
+
+According to the [Next.js MDX documentation](https://nextjs.org/docs/app/guides/mdx), _@next/mdx_ does **not** support frontmatter by default. When you place MDX files directly in the app directory, Next.js treats them as pages and renders them as-is, including any frontmatter.
+
+The documentation states:
+
+> Frontmatter is a YAML like key/value pairing that can be used to store data about a page. <InlineCode>@next/mdx</InlineCode> does **not** support frontmatter by default, though there are many solutions for adding frontmatter to your MDX content, such as:
+>
+> - remark-frontmatter
+> - remark-mdx-frontmatter
+> - gray-matter
+
+## The Solution: Dynamic Routes with Content Separation
+
+### Step 1: Create a Dynamic Route
+
+Instead of using MDX files directly as pages, I created a dynamic route:
+
+```typescript
+// app/blog/[slug]/page.tsx
+export default async function BlogPostPage({ params }: BlogPageProps) {
+  const { slug } = params
+  const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`)
+  const file = fs.readFileSync(filePath, 'utf8')
+  const { content, data } = matter(file)
+
+  return (
+    <article>
+      {data.title && <h1>{data.title}</h1>}
+      {data.date && <time>{data.date}</time>}
+      <MDXRemote source={content} components={useMDXComponents({})} />
+    </article>
+  )
+}
+```
+
+### Step 2: Separate Content from Routes
+
+I moved all MDX files to a <InlineCode>content/blog/</InlineCode> directory:
+
+```
+content/blog/
+├── ditching-longhorn-for-local-path.mdx
+├── homelab-backup-strategy.mdx
+└── ...
+```
+
+This separation follows the pattern recommended in the Next.js documentation for dynamic content.
+
+### Step 3: Parse Frontmatter with gray-matter
+
+Using <InlineCode>gray-matter</InlineCode> to parse frontmatter ensures it's never rendered in the content:
+
+```typescript
+import matter from 'gray-matter'
+
+const { content, data } = matter(file)
+// content: The MDX content without frontmatter
+// data: The frontmatter as an object
+```
+
+## Why This Approach Works
+
+### 1. **No Frontmatter in Output**
+
+By parsing the file with <InlineCode>gray-matter</InlineCode> and only rendering the <InlineCode>content</InlineCode>, frontmatter never appears in the blog post.
+
+### 2. **Access to Metadata**
+
+The <InlineCode>data</InlineCode> object contains all frontmatter values, which can be used for:
+
+- SEO metadata
+- Page titles
+- Display dates
+- Open Graph tags
+
+### 3. **Follows Next.js Best Practices**
+
+This approach matches the [official Next.js MDX documentation](https://nextjs.org/docs/app/guides/mdx) for handling dynamic content with frontmatter.
+
+### 4. **Static Generation Support**
+
+The <InlineCode>generateStaticParams</InlineCode> function enables static generation of all blog posts:
+
+```typescript
+export async function generateStaticParams() {
+  const blogDir = path.join(process.cwd(), 'content/blog')
+  const files = fs.readdirSync(blogDir)
+  const slugs = files
+    .filter((name) => name.endsWith('.mdx'))
+    .map((name) => name.replace('.mdx', ''))
+  return slugs.map((slug) => ({ slug }))
+}
+```
+
+## Bonus: Copy Code Buttons
+
+As part of this refactor, I also implemented copy code buttons for code blocks. The key insight was that MDX components in the app directory need to be client components if they use React hooks:
+
+```typescript
+// mdx-components.tsx
+'use client'
+
+function CopyCodeButton({ code }: { code: string }) {
+  const [copied, setCopied] = useState(false)
+  // ... implementation
+}
+```
+
+## The Final Structure
+
+```
+personal-blog/
+├── app/blog/
+│   ├── [slug]/page.tsx     ← Dynamic route
+│   ├── page.tsx            ← Blog index
+│   └── layout.tsx          ← Blog layout
+├── content/blog/
+│   ├── post-1.mdx          ← Content with frontmatter
+│   └── post-2.mdx
+└── lib/blog.ts             ← Utility functions
+```
+
+## Key Takeaways
+
+1. **MDX files in the app directory render frontmatter by default**
+2. **Use dynamic routes for content with frontmatter**
+3. **Separate content from routes for better organization**
+4. **Use <InlineCode>gray-matter</InlineCode> for reliable frontmatter parsing**
+5. **Client components are required for interactive MDX components**
+
+This approach provides a robust, scalable foundation for a Next.js blog that follows official best practices and handles frontmatter correctly.
+
+---
+
+_This article is based on real troubleshooting experience. All code examples were actually used to fix the issues described._

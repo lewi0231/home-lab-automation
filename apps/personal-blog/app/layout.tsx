@@ -1,4 +1,7 @@
+import { AppSidebar } from '@/components/ui/app-sidebar'
 import { Separator } from '@/components/ui/separator'
+import { SidebarProvider } from '@/components/ui/sidebar'
+import { cn } from '@/lib/utils'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
 import { Geist, Geist_Mono } from 'next/font/google'
@@ -43,14 +46,23 @@ export default function RootLayout({
           storageKey="theme"
           defaultTheme="system"
         >
-          <div className="flex min-h-screen w-full flex-col font-[family-name:var(--font-inter-tight)]">
-            <div className="relative mx-auto w-full max-w-screen-sm flex-1 px-4 pt-20">
-              <Header />
-              <Separator className="mb-8" />
-              {children}
-              <Footer />
+          <SidebarProvider className="">
+            <div className="flex min-h-screen w-full flex-col font-[family-name:var(--font-inter-tight)]">
+              <div className="mx-auto w-full max-w-screen-lg flex-1 px-4 pt-10">
+                <Header />
+                <Separator className="mb-8" />
+                <div
+                  className={cn(
+                    'flex flex-col items-center sm:flex-row sm:items-start',
+                  )}
+                >
+                  <AppSidebar />
+                  <main className="m-auto max-w-screen-sm">{children}</main>
+                </div>
+                <Footer />
+              </div>
             </div>
-          </div>
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>
