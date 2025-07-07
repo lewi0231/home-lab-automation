@@ -39,11 +39,35 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       caption: string
     }) => {
       return (
-        <figure>
-          <img src={src} alt={alt} className="rounded-xl" />
-          <figcaption className="text-center">{caption}</figcaption>
+        <figure
+          className="border-red h-auto w-full border-2" // Debug border
+        >
+          <img src={src} alt={alt} className="h-auto w-full rounded-2xl" />
         </figure>
       )
     },
   }
+}
+
+export const mdxComponents = {
+  pre: CodeBlock, // Direct mapping - no wrapper needed
+  InlineCode, // Custom component for inline code styling
+  BlogDate,
+  Cover: ({
+    src,
+    alt,
+    caption,
+  }: {
+    src: string
+    alt: string
+    caption: string
+  }) => {
+    return (
+      <figure
+        className="border-red h-auto w-full border-2" // Debug border
+      >
+        <img src={src} alt={alt} className="h-auto w-full rounded-2xl" />
+      </figure>
+    )
+  },
 }

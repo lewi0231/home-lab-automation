@@ -1,10 +1,17 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { ReactNode } from 'react'
 import CopyCodeButton from './copy-code-button'
 
-export default function CodeBlock({ children, className, ...props }: any) {
-  const language = className?.replace('language-', '') || 'text'
+export default function CodeBlock({
+  children,
+  className,
+  ...props
+}: {
+  children: ReactNode
+  className: string
+}) {
   const code = children?.toString() || ''
 
   return (

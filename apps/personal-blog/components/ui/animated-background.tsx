@@ -1,14 +1,24 @@
 'use client'
 import { cn } from '@/lib/utils'
-import { AnimatePresence, Transition, motion } from 'motion/react'
+import { AnimatePresence, motion, Transition } from 'motion/react'
 import {
   Children,
   cloneElement,
   ReactElement,
   useEffect,
-  useState,
   useId,
+  useState,
 } from 'react'
+
+type ChildProps = {
+  'data-id': string
+  className?: string
+  onMouseEnter?: () => void
+  onMouseLeave?: () => void
+  onClick?: () => void
+  'data-checked'?: string
+  children?: React.ReactNode
+}
 
 export type AnimatedBackgroundProps = {
   children:
@@ -46,7 +56,7 @@ export function AnimatedBackground({
     }
   }, [defaultValue])
 
-  return Children.map(children, (child: any, index) => {
+  return Children.map(children, (child: ReactElement<ChildProps>, index) => {
     const id = child.props['data-id']
 
     const interactionProps = enableHover

@@ -45,7 +45,7 @@ const items = [
 
 export function AppSidebar() {
   const pathname = usePathname()
-  console.log(pathname)
+
   return (
     <Sidebar
       className="relative mb-8 w-full border-b-1 sm:w-44 sm:border-b-0"

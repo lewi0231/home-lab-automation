@@ -31,7 +31,7 @@ export function getBlogPosts(): BlogPost[] {
       return {
         slug,
         title,
-        date: data.date || '2024-01-01', // Default date if not provided
+        date: data.date || '2025-01-01', // Default date if not provided
         description: data.description,
         content,
       }
@@ -60,6 +60,7 @@ export function getBlogPost(slug: string): BlogPost | null {
       content,
     }
   } catch (error) {
+    console.error(error)
     return null
   }
 }

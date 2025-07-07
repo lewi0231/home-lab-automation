@@ -1,9 +1,10 @@
-import { useMDXComponents } from '@/mdx-components'
+import { mdxComponents } from '@/mdx-components'
 import fs from 'fs'
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { notFound } from 'next/navigation'
 import path from 'path'
+import { BlogDate } from './layout'
 
 interface BlogPageProps {
   params: { slug: string }
@@ -25,21 +26,13 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
   const file = fs.readFileSync(filePath, 'utf8')
   const { content, data } = matter(file)
 
-  // Optionally use data.title, data.date, etc. for SEO or display
+  //TODO- Optionally use data.title, data.date, etc. for SEO or display
 
   return (
     <article>
       {data.title && <h1 className="mb-1 font-bold">{data.title}</h1>}
-      {data.date && (
-        <time className="mb-4 block text-sm text-gray-500 dark:text-gray-400">
-          {new Date(data.date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </time>
-      )}
-      <MDXRemote source={content} components={useMDXComponents({})} />
+      <BlogDate date={data.date} />
+      <MDXRemote source={content} components={mdxComponents} />
     </article>
   )
 }

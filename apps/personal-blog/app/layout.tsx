@@ -57,7 +57,9 @@ export default function RootLayout({
                   )}
                 >
                   <AppSidebar />
-                  <main className="m-auto max-w-screen-sm">{children}</main>
+                  <main className="m-auto mx-10 w-full max-w-screen sm:w-9/13">
+                    {children}
+                  </main>
                 </div>
                 <Footer />
               </div>
