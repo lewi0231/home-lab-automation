@@ -5,12 +5,18 @@ import { Github, Mail } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { EMAIL, SOCIAL_LINKS } from './data'
 
 const GITHUB_LINK = SOCIAL_LINKS[0].link
 
 export function Header() {
+  const [mounted, setMounted] = useState(false)
   const { resolvedTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // const currentTheme = theme === 'system' ? systemTheme : theme
   const isDark = resolvedTheme === 'dark'
@@ -19,11 +25,14 @@ export function Header() {
     <header className="mb-8 flex items-center justify-between">
       <Link href="/" className="flex items-center">
         <Image
-          src={isDark ? '/flowerhead-dark.png' : '/flowerhead-light.png'}
+          src={
+            mounted && isDark ? '/flowerhead-dark.png' : '/flowerhead-light.png'
+          }
           width={70}
           height={70}
           alt="icon"
           className="mr-2"
+          loading="eager"
         />
         <div>
           <p className="text-base font-light text-black sm:text-xl dark:text-white">
