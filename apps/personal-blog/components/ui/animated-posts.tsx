@@ -1,5 +1,5 @@
 'use client'
-import { BlogDate } from '@/app/blog/[slug]/layout'
+
 import { BlogPost } from '@/lib/blog'
 import {
   NUMBER_OF_POSTS,
@@ -8,6 +8,7 @@ import {
   VARIANTS_SECTION,
 } from '@/lib/constants'
 import { cn } from '@/lib/utils'
+import { BlogDate } from '@/mdx-components'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { AnimatedBackground } from './animated-background'

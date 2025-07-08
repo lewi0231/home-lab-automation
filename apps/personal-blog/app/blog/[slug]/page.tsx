@@ -1,13 +1,12 @@
-import { mdxComponents } from '@/mdx-components'
+import { BlogDate, mdxComponents } from '@/mdx-components'
 import fs from 'fs'
 import matter from 'gray-matter'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { notFound } from 'next/navigation'
 import path from 'path'
-import { BlogDate } from './layout'
 
 interface BlogPageProps {
-  params: { slug: string }
+  params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {

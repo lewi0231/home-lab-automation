@@ -1,19 +1,6 @@
 'use client'
 import { ScrollProgress } from '@/components/ui/scroll-progress'
 
-// Date Display Component
-export function BlogDate({ date }: { date: string }) {
-  return (
-    <time className="mb-2 block text-sm text-gray-500 dark:text-gray-400">
-      {new Date(date).toLocaleDateString('en-AU', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}
-    </time>
-  )
-}
-
 export default function LayoutBlogPost({
   children,
 }: {
