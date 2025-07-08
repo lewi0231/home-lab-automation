@@ -21,7 +21,7 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 
 # Set to production environment
-ENV NODE_ENV=development 
+ENV NODE_ENV=production 
 
 # Copy built artifacts and necessary files from builder stage
 COPY --from=builder /app/next.config.mjs ./
