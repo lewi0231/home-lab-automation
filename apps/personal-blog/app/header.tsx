@@ -33,6 +33,7 @@ export function Header() {
           alt="icon"
           className="mr-2"
           loading="eager"
+          priority={true}
         />
         <div>
           <p className="text-base font-light text-black sm:text-xl dark:text-white">

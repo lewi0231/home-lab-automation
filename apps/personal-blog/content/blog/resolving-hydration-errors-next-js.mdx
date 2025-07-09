@@ -1,11 +1,9 @@
 ---
 title: 'Resolving Hydration Errors in Next.js: The Mounting Problem'
 description: 'Learn how to fix the most common source of hydration errors in Next.js applications - the mounting mismatch between server and client rendering.'
-date: '2024-12-19'
+date: '2025-7-8'
 tags: ['nextjs', 'react', 'hydration', 'frontend']
 ---
-
-# Resolving Hydration Errors in Next.js: The Mounting Problem
 
 Hydration errors are one of the most frustrating issues in Next.js development. They occur when the HTML generated on the server doesn't match what React renders on the client. While there are several causes, the most common source is **client-side state that's unavailable during server-side rendering (SSR)**.
 
@@ -13,8 +11,8 @@ Hydration errors are one of the most frustrating issues in Next.js development. 
 
 Hydration is the process where React takes the server-rendered HTML and makes it interactive by attaching event listeners and state. For this to work, the server and client must render identical content.
 
-<Mermaid>
-```sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Server
     participant Browser
     participant React
@@ -25,9 +23,7 @@ Hydration is the process where React takes the server-rendered HTML and makes it
     Browser->>React: Hydrate component
     React-->>Browser: Attach event listeners & state
     Note over Browser: Component is now interactive
-    ```
-
-</Mermaid>
+```
 
 ## The Most Common Cause: Client-Only State
 
@@ -65,8 +61,8 @@ export function Header() {
 2. **Client:** `resolvedTheme` is `'dark'` → renders dark logo
 3. **Result:** DOM mismatch → hydration error
 
-<Mermaid>
-```sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Server
     participant Browser
     participant React
@@ -83,9 +79,7 @@ export function Header() {
     nextThemes-->>React: resolvedTheme = 'dark'
     React-->>Browser: Re-render dark logo
     Note over Browser,React: DOM mismatch! Hydration error
-    ```
-
-</Mermaid>
+```
 
 ## The Solution: Mounting Check Pattern
 

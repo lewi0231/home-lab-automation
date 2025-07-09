@@ -10,10 +10,21 @@ export default function CodeBlock({
   ...props
 }: {
   children: ReactNode
-  className: string
+  className?: string
 }) {
-  const code = children?.toString() || ''
+  // Extract the actual code content from children
+  let code = ''
+  if (typeof children === 'string') {
+    code = children
+  } else if (children && typeof children === 'object' && 'props' in children) {
+    // If children is a React element, extract its children (the actual code)
+    const childrenProps = children.props as { children?: string }
+    code = childrenProps.children || ''
+  } else {
+    code = children?.toString() || ''
+  }
 
+  console.debug('CodeBlock Classname:', className)
   return (
     <div className="group relative">
       <CopyCodeButton code={code} />
@@ -24,7 +35,7 @@ export default function CodeBlock({
         )}
         {...props}
       >
-        <code className="">{children}</code>
+        {children}
       </pre>
     </div>
   )

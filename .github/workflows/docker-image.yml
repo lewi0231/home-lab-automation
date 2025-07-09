@@ -20,14 +20,46 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  detect-changes:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changes.outputs.matrix }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed apps
+        id: changes
+        run: |
+          # Get list of all apps
+          APPS=("personal-blog" "work-rate-calculator" "chris-coombs-blog")
+          CHANGED_APPS=()
+
+          # Check if any files in each app directory have changed
+          for app in "${APPS[@]}"; do
+            if git diff --name-only HEAD~1 | grep -q "^apps/$app/"; then
+              CHANGED_APPS+=("$app")
+            fi
+          done
+
+          # If no specific apps changed but apps/** triggered, build all
+          if [ ${#CHANGED_APPS[@]} -eq 0 ]; then
+            CHANGED_APPS=("${APPS[@]}")
+          fi
+
+          # Create JSON array for matrix
+          JSON_ARRAY=$(printf '%s\n' "${CHANGED_APPS[@]}" | jq -R . | jq -s .)
+          echo "matrix={\"app\":$JSON_ARRAY}" >> $GITHUB_OUTPUT
+
+  build:
+    needs: detect-changes
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.matrix != '{"app":[]}'
 
     strategy:
-      matrix:
-        app:
-          - personal-blog
-          - work-rate-calculator
+      matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     permissions:
       contents: read
