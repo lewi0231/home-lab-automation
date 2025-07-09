@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String?  @db.Text
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Layout and styling
+  layout      String   @default("default") // default, featured, minimal, etc.
+  featured    Boolean  @default(false)
+  coverImage  String?
+  
+  // SEO and metadata
+  metaTitle       String?
+  metaDescription String?
+  tags            String[] // Array of tags
+  
+  // Custom fields for different layouts
+  customFields    Json? // Store layout-specific data as JSON
+  
+  // Author info
+  authorId    String?
+  author      User?   @relation(fields: [authorId], references: [id])
+  
+  @@map("posts")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  bio       String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Blog posts authored by this user
+  posts     Post[]
+  
+  @@map("users")
+}
+
+model Page {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Layout and styling
+  layout      String   @default("default")
+  customFields Json?
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  
+  @@map("pages")
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String @db.Text
+  
+  @@map("settings")
+} 

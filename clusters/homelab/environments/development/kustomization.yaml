@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - apps/personal-blog
+  - apps/personal-blog-db
   - apps/homepage
   - apps/work-rate-calculator
   - certificate.yaml

@@ -1,37 +1,39 @@
-import { BlogDate, mdxComponents } from '@/mdx-components'
-import fs from 'fs'
-import matter from 'gray-matter'
-import { MDXRemote } from 'next-mdx-remote/rsc'
+import { getBlogPost } from '@/lib/blog'
 import { notFound } from 'next/navigation'
-import path from 'path'
 
 interface BlogPageProps {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  const blogDir = path.join(process.cwd(), 'content/blog')
-  const files = fs.readdirSync(blogDir)
-  const slugs = files
-    .filter((name) => name.endsWith('.mdx'))
-    .map((name) => name.replace('.mdx', ''))
-  return slugs.map((slug) => ({ slug }))
+  // This will be updated to fetch from database
+  // For now, return empty array to avoid build-time errors
+  return []
 }
 
 export default async function BlogPostPage({ params }: BlogPageProps) {
   const { slug } = await params
-  const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`)
-  if (!fs.existsSync(filePath)) return notFound()
-  const file = fs.readFileSync(filePath, 'utf8')
-  const { content, data } = matter(file)
+  const post = await getBlogPost(slug)
 
-  //TODO- Optionally use data.title, data.date, etc. for SEO or display
+  if (!post) {
+    return notFound()
+  }
 
   return (
-    <article>
-      {data.title && <h1 className="mb-1 font-bold">{data.title}</h1>}
-      <BlogDate date={data.date} />
-      <MDXRemote source={content} components={mdxComponents} />
+    <article className="prose prose-lg max-w-none">
+      <h1 className="mb-1 font-bold">{post.title}</h1>
+      {post.publishedAt && (
+        <time className="text-sm text-gray-600">
+          {new Date(post.publishedAt).toLocaleDateString()}
+        </time>
+      )}
+      {post.excerpt && (
+        <p className="mb-8 text-lg text-gray-700">{post.excerpt}</p>
+      )}
+      <div
+        className="mt-8"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
     </article>
   )
 }
