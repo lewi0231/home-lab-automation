@@ -68,7 +68,7 @@ export const BLOG_POSTS: BlogPost[] = [
   {
     title: 'Homelab Backup Strategy: From VM Snapshots to Application Data',
     description:
-      'A comprehensive guide to developing a backup strategy for Proxmox + K3s homelab setups, covering VM backups, application data, and practical implementation.',
+      'A comprehensive guide to developing a backup strategy for Proxmox + K3s homelab setups, covering VM backups, application data, and practical implementation. ',
     link: '/blog/homelab-backup-strategy',
     uid: 'homelab-backup-strategy',
   },
