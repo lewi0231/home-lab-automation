@@ -50,9 +50,10 @@ jobs:
           fi
 
           # Create JSON array for matrix
-          JSON_ARRAY=$(printf '%s\n' "${CHANGED_APPS[@]}" | jq -R . | jq -s .)
+          JSON_ARRAY=$(printf '%s\n' "${CHANGED_APPS[@]}" | jq -R . | jq -s -c .)
           echo "matrix={\"app\":$JSON_ARRAY}" >> $GITHUB_OUTPUT
 
+          
   build:
     needs: detect-changes
     runs-on: ubuntu-latest
