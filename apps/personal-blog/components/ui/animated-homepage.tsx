@@ -9,6 +9,7 @@ import {
   VARIANTS_SECTION,
 } from '@/lib/constants'
 import { motion } from 'motion/react'
+import DescriptionParser from '../project-description-parser'
 import AnimatedPosts from './animated-posts'
 import MagneticSocialLink from './magnetic-social'
 import ProjectVideo from './project-video'
@@ -20,7 +21,7 @@ type Props = {
 export default function AnimatedHomePage({ posts }: Props) {
   return (
     <motion.main
-      className="space-y-24"
+      className="space-y-28"
       variants={VARIANTS_CONTAINER}
       initial="hidden"
       animate="visible"
@@ -87,9 +88,7 @@ export default function AnimatedHomePage({ posts }: Props) {
                   {project.name}
                   <span className="absolute bottom-0.5 left-0 block h-[1px] w-full max-w-0 bg-zinc-900 transition-all duration-200 group-hover:max-w-full"></span>
                 </a>
-                <p className="text-base text-zinc-600 dark:text-zinc-400">
-                  {project.description}
-                </p>
+                <DescriptionParser description={project.description} />
               </div>
             </div>
           ))}
@@ -100,6 +99,7 @@ export default function AnimatedHomePage({ posts }: Props) {
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
         id="connect"
+        className="pt-4"
       >
         <h3 className="mb-5 text-2xl font-light tracking-wide">Connect</h3>
         <p className="mb-5 text-zinc-600 dark:text-zinc-400">

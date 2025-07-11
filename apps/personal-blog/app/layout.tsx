@@ -47,17 +47,17 @@ export default function RootLayout({
           defaultTheme="system"
         >
           <SidebarProvider className="">
-            <div className="flex min-h-screen w-full flex-col font-[family-name:var(--font-inter-tight)]">
-              <div className="mx-auto w-full max-w-screen-lg flex-1 px-4 pt-10">
+            <div className="flex min-h-screen w-full flex-1 flex-col font-[family-name:var(--font-inter-tight)]">
+              <div className="mx-auto flex w-full max-w-screen-lg flex-1 flex-col px-4 pt-10">
                 <Header />
-                <Separator className="mb-8" />
+                <Separator className="" />
                 <div
                   className={cn(
-                    'flex flex-col items-center sm:flex-row sm:items-start',
+                    'flex flex-1 flex-col justify-start pt-8 sm:flex-row',
                   )}
                 >
                   <AppSidebar />
-                  <main className="m-auto mx-10 w-full max-w-screen sm:w-9/13">
+                  <main className="mx-0 flex w-full max-w-screen justify-center sm:mx-10 sm:w-9/13">
                     {children}
                   </main>
                 </div>

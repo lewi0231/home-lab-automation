@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
 @plugin '@tailwindcss/typography';
 @custom-variant dark (&:is(.dark *));
 
@@ -142,5 +142,14 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Custom list marker styling for dark mode */
+  .dark .prose ol li::marker {
+    color: rgb(209 213 219); /* text-gray-300 */
+  }
+
+  .dark .prose ul li::marker {
+    color: rgb(209 213 219); /* text-gray-300 */
   }
 }

@@ -1,11 +1,14 @@
+import { ContentBlock } from '@/components/content-renderer'
 import { prisma } from './prisma'
 
 export interface BlogPost {
   id: string
   slug: string
   title: string
-  content: string
+  content: ContentBlock[]
   excerpt?: string
+  description?: string
+  date?: string
   published: boolean
   publishedAt?: Date
   createdAt: Date
@@ -40,7 +43,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
         publishedAt: 'desc',
       },
     })
-    return posts
+    return posts as unknown as BlogPost[]
   } catch (error) {
     console.error('Error fetching blog posts:', error)
     return []
@@ -58,7 +61,7 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
         author: true,
       },
     })
-    return post
+    return post as unknown as BlogPost | null
   } catch (error) {
     console.error('Error fetching blog post:', error)
     return null
@@ -80,7 +83,7 @@ export async function getFeaturedPosts(): Promise<BlogPost[]> {
       },
       take: 3,
     })
-    return posts
+    return posts as unknown as BlogPost[]
   } catch (error) {
     console.error('Error fetching featured posts:', error)
     return []
@@ -103,7 +106,7 @@ export async function getPostsByTag(tag: string): Promise<BlogPost[]> {
         publishedAt: 'desc',
       },
     })
-    return posts
+    return posts as unknown as BlogPost[]
   } catch (error) {
     console.error('Error fetching posts by tag:', error)
     return []
