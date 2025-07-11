@@ -8,10 +8,10 @@ import {
   VARIANTS_SECTION,
 } from '@/lib/constants'
 import { cn } from '@/lib/utils'
-import { BlogDate } from '@/mdx-components'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { AnimatedBackground } from './animated-background'
+import { BlogDate } from './blog-date'
 
 type Props = {
   latestOnly?: boolean
@@ -85,7 +85,11 @@ export default function AnimatedPosts({
                     isBlogPage ? 'gap-1' : '',
                   )}
                 >
-                  {isBlogPage ? <BlogDate date={post.date} /> : ''}
+                  {isBlogPage ? (
+                    <BlogDate date={post.publishedAt || post.createdAt} />
+                  ) : (
+                    ''
+                  )}
                   <h4
                     className={cn(
                       'font-normal tracking-tight dark:text-zinc-100',
@@ -95,7 +99,7 @@ export default function AnimatedPosts({
                     {post.title}
                   </h4>
                   <p className="text-zinc-500 dark:text-zinc-400">
-                    {post.description}
+                    {post.excerpt}
                   </p>
                 </div>
               </Link>

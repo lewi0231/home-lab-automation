@@ -6,7 +6,7 @@ description: 'Understanding Kubernetes storage concepts and implementation for h
 
 <Cover src="/storage.png" alt="Image from the movie Alien - from cosmos.com" />
 
-When I first started with Kubernetes, storage was one of those concepts that seemed simple until it wasn't. I'd read about PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs), but the real-world implications didn't click until I hit a specific problem: my Prometheus pod was stuck in <InlineCode>ContainerCreating</InlineCode> for hours.
+When I first started with Kubernetes, storage was one of those concepts that seemed simple until it wasn't. I'd read about PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs), but the real-world implications didn't click until I hit a specific problem: my Prometheus pod was stuck in `ContainerCreating` for hours.
 
 This article is about that troubleshooting journey and the fundamental concepts I learned along the way.
 
@@ -93,7 +93,7 @@ When you create a PVC, Kubernetes uses the storage class to:
 
 > **Where do PVCs come from?**
 >
-> - **Manual creation:** You can create a PVC yourself by writing a YAML manifest and applying it with <InlineCode>kubectl apply -f my-pvc.yaml</InlineCode>. This is common for simple apps, testing, or when you want full control over the storage claim.
+> - **Manual creation:** You can create a PVC yourself by writing a YAML manifest and applying it with `kubectl apply -f my-pvc.yaml`. This is common for simple apps, testing, or when you want full control over the storage claim.
 > - **Resource-managed creation:** More often, PVCs are created automatically by resources like Helm charts, StatefulSets, or Deployments. For example, when you install Prometheus or Loki via Helm, the chart will usually define a PVC in its templates, and Kubernetes will create it for you. This is the most common pattern for production workloads, as it keeps storage configuration tied to the app.
 > - **Why choose one or the other?** If you want to share a volume between multiple pods or manage storage independently of your app, you might create a PVC manually. If you want storage to be managed as part of your app's lifecycle, let the resource (Helm, StatefulSet, etc.) handle it.
 
@@ -276,28 +276,28 @@ As I worked through these issues, I kept asking myself:
    - Historical data is valuable
    - Without persistence, you lose metrics on pod restart
 
-2. **What's the difference between <InlineCode>ReadWriteOnce</InlineCode> and <InlineCode>ReadWriteMany</InlineCode>?**
+2. **What's the difference between `ReadWriteOnce` and `ReadWriteMany`?**
 
-   - <InlineCode>ReadWriteOnce</InlineCode>: One pod can write, multiple can
+   - `ReadWriteOnce`: One pod can write, multiple can
      read
-   - <InlineCode>ReadWriteMany</InlineCode>: Multiple pods can read and write
-   - Most storage classes only support <InlineCode>ReadWriteOnce</InlineCode>
+   - `ReadWriteMany`: Multiple pods can read and write
+   - Most storage classes only support `ReadWriteOnce`
 
-3. **When should I use <InlineCode>emptyDir</InlineCode> vs PVC?**
+3. **When should I use `emptyDir` vs PVC?**
 
-   - <InlineCode>emptyDir</InlineCode>: Temporary storage, lost on pod restart
+   - `emptyDir`: Temporary storage, lost on pod restart
    - PVC: Persistent storage, survives pod restarts
-   - Use <InlineCode>emptyDir</InlineCode> for cache, temp files
+   - Use `emptyDir` for cache, temp files
    - Use PVC for important data
 
 4. **What happens if my storage node goes down?**
 
-   - With <InlineCode>local-path</InlineCode>: Data on that node is lost
+   - With `local-path`: Data on that node is lost
    - With distributed storage: Data might be available on other nodes
    - Always have backups!
 
 5. **How do I know which storage class to use?**
-   - Check what's available: <InlineCode>kubectl get storageclass</InlineCode>
+   - Check what's available: `kubectl get storageclass`
    - Consider your use case (performance, redundancy, cost)
    - Start simple, optimize later
 

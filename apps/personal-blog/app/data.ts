@@ -29,19 +29,34 @@ type SocialLink = {
 
 export const PROJECTS: Project[] = [
   {
-    name: 'Trailwisdom Travel Blog',
+    name: 'RecursiveTrails Travel Blog',
     description: 'Used Nexjs, Tailwind + Sanity.io',
     link: 'https://trailwisdom.xyz/',
     video: '/trailwisdom.mov',
-    id: 'project1',
+    id: '1',
   },
   {
-    name: 'Trailwisdom Travel Blog',
-    description: 'Used Nexjs, Tailwind + Sanity.io',
-    link: 'https://trailwisdom.xyz/',
-    video:
-      'https://res.cloudinary.com/read-cv/video/upload/t_v_b/v1/1/profileItems/W2azTw5BVbMXfj7F53G92hMVIn32/newProfileItem/d898be8a-7037-4c71-af0c-8997239b050d.mp4?_a=DATAdtAAZAA0',
-    id: 'project2',
+    name: 'My Home Lab: A Brief Tour',
+    description:
+      'Kubernetes K3s, Cloudflared, Traefik, MetalLB, Grafana + Loki, Proxmox + Orange Pi 5, Pfsense, CertManager',
+    link: '/#projects',
+    video: '/homeLabRecording.mov',
+    id: '2',
+  },
+  {
+    name: 'This Blog w Admin Portal',
+    description: `Extended [Nim](https://github.com/ibelick/nim) Starter w Shadcn Components (e.g., Sidebar), Admin Portal w Markdown Parser, Preview Option, (Un)Publish, Delete Options, Prisma and Postgresql`,
+    link: 'https://blog.flowerhead.dev',
+    video: '/blogAdminRecording.mov',
+    id: '3',
+  },
+  {
+    name: 'Work Rate Calculator',
+    description:
+      'Built and hosted for UniPhi Car Detailing.  Provides a simple way of calculating relative percentages based on start time and speed.',
+    link: 'https://work-rate-calculator.flowerhead.dev',
+    video: '/workRateCalculatorRecording.mov',
+    id: '4',
   },
 ]
 
