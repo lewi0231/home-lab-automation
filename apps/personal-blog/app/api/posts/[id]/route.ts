@@ -45,7 +45,7 @@ export async function DELETE(
         id,
       },
     })
-
+    console.debug('Removed Post: ', post.slug)
     return NextResponse.json({ message: 'Post deleted successfully' })
   } catch (error) {
     console.error('Error deleting post:', error)

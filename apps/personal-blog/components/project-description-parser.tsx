@@ -2,7 +2,6 @@ import { marked } from 'marked'
 
 export default function DescriptionParser({
   description,
-  ...props
 }: {
   description: string
 }) {

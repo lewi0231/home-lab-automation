@@ -2,7 +2,6 @@ import React from 'react'
 
 export default function SharedLayout({
   children,
-  ...props
 }: {
   children: React.ReactNode
 }) {
