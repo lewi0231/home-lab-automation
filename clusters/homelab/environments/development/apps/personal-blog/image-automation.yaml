@@ -32,6 +32,7 @@ metadata:
   namespace: development
 spec:
   interval: 1m0s
+  timeout: 300s # Increased timeout to 5 minutes
   sourceRef:
     kind: GitRepository
     name: development

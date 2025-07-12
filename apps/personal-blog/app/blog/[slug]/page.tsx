@@ -1,6 +1,6 @@
 import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
 import { BlogDate } from '@/components/ui/blog-date'
-import { getBlogPost, getBlogPosts } from '@/lib/blog'
+import { getBlogPost, type BlogPost } from '@/lib/blog'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -8,22 +8,19 @@ interface BlogPageProps {
   params: Promise<{ slug: string }>
 }
 
-export async function generateStaticParams() {
-  try {
-    const posts = await getBlogPosts()
-
-    return posts.map((post) => ({
-      slug: post.slug,
-    }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
-  }
-}
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
 
 export default async function BlogPostPage({ params }: BlogPageProps) {
   const { slug } = await params
-  const post = await getBlogPost(slug)
+  let post: BlogPost | null = null
+
+  try {
+    post = await getBlogPost(slug)
+  } catch (error) {
+    console.error('Error fetching blog post:', error)
+    return notFound()
+  }
 
   if (!post) {
     return notFound()
