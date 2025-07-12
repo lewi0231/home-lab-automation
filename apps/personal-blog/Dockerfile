@@ -13,6 +13,9 @@ RUN npm ci
 # Copy the rest of the application code
 COPY . .
 
+# Generate Prisma client (this doesn't need database connection)
+RUN npx prisma generate
+
 # Build the Next.js app
 RUN npm run build
 
@@ -29,6 +32,8 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
+# Copy the generated Prisma client
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Run the application
 USER node
