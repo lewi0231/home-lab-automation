@@ -45,7 +45,14 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
     })
     return posts as unknown as BlogPost[]
   } catch (error) {
-    console.error('Error fetching blog posts:', error)
+    // Handle different types of errors more robustly
+    if (error instanceof Error) {
+      console.error('Error fetching blog posts:', error.message)
+    } else if (error !== null && error !== undefined) {
+      console.error('Error fetching blog posts:', String(error))
+    } else {
+      console.error('Error fetching blog posts: Unknown error')
+    }
     return []
   }
 }
@@ -63,7 +70,14 @@ export async function getBlogPost(slug: string): Promise<BlogPost | null> {
     })
     return post as unknown as BlogPost | null
   } catch (error) {
-    console.error('Error fetching blog post:', error)
+    // Handle different types of errors more robustly
+    if (error instanceof Error) {
+      console.error('Error fetching blog post:', error.message)
+    } else if (error !== null && error !== undefined) {
+      console.error('Error fetching blog post:', String(error))
+    } else {
+      console.error('Error fetching blog post: Unknown error')
+    }
     return null
   }
 }
@@ -85,7 +99,14 @@ export async function getFeaturedPosts(): Promise<BlogPost[]> {
     })
     return posts as unknown as BlogPost[]
   } catch (error) {
-    console.error('Error fetching featured posts:', error)
+    // Handle different types of errors more robustly
+    if (error instanceof Error) {
+      console.error('Error fetching featured posts:', error.message)
+    } else if (error !== null && error !== undefined) {
+      console.error('Error fetching featured posts:', String(error))
+    } else {
+      console.error('Error fetching featured posts: Unknown error')
+    }
     return []
   }
 }
@@ -108,7 +129,14 @@ export async function getPostsByTag(tag: string): Promise<BlogPost[]> {
     })
     return posts as unknown as BlogPost[]
   } catch (error) {
-    console.error('Error fetching posts by tag:', error)
+    // Handle different types of errors more robustly
+    if (error instanceof Error) {
+      console.error('Error fetching posts by tag:', error.message)
+    } else if (error !== null && error !== undefined) {
+      console.error('Error fetching posts by tag:', String(error))
+    } else {
+      console.error('Error fetching posts by tag: Unknown error')
+    }
     return []
   }
 }

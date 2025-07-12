@@ -36,7 +36,7 @@ export default function Mermaid({ children, className }: MermaidProps) {
   useEffect(() => {
     if (!elementRef.current || isRendered || !mounted) return
 
-    // Ensure children is a string
+    // Ensure children is a string and clean it up
     let code = children
     if (Array.isArray(code)) {
       code = code.join('')
@@ -45,6 +45,9 @@ export default function Mermaid({ children, className }: MermaidProps) {
       code = String(code)
     }
 
+    // Trim whitespace and normalize line endings
+    code = code.trim().replace(/\r\n/g, '\n')
+
     // Initialize mermaid only once globally
     if (!mermaidInitialized) {
       mermaid.initialize({
@@ -52,6 +55,17 @@ export default function Mermaid({ children, className }: MermaidProps) {
         theme: 'default',
         securityLevel: 'loose',
         fontFamily: 'monospace',
+        // Add some additional configuration for better rendering
+        flowchart: {
+          useMaxWidth: true,
+          htmlLabels: true,
+        },
+        sequence: {
+          useMaxWidth: true,
+        },
+        gantt: {
+          useMaxWidth: true,
+        },
       })
       mermaidInitialized = true
     }
@@ -67,6 +81,14 @@ export default function Mermaid({ children, className }: MermaidProps) {
       })
       .catch((error) => {
         console.error('Mermaid rendering error:', error)
+        // Show error state in the container
+        if (elementRef.current) {
+          elementRef.current.innerHTML = `
+            <div style="color: red; text-align: center; padding: 1rem;">
+              Failed to render diagram: ${error.message}
+            </div>
+          `
+        }
       })
   }, [children, isRendered, mounted])
 

@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import Image from 'next/image'
+import Mermaid from './ui/mermaid'
 
 export type ContentBlock =
   | { type: 'heading'; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
@@ -116,6 +117,9 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
         )
 
       case 'code':
+        if (block.language === 'mermaid') {
+          return <Mermaid key={index}>{block.code}</Mermaid>
+        }
         return (
           <div key={index} className="mb-4">
             <pre className="overflow-x-auto rounded-lg bg-gray-100 p-4 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
