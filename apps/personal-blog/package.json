@@ -9,10 +9,17 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
-    "migrate:mdx": "tsx scripts/migrate-mdx-to-json.ts"
+    "db:push": "npx dotenv -e .env.development -- npx prisma db push",
+    "db:push:production": "npx dotenv -e .env.production -- npx prisma db push",
+    "db:migrate": "npx prisma migrate dev",
+    "db:studio": "npx prisma studio",
+    "migrate:mdx": "tsx scripts/migrate-mdx-to-json.ts",
+    "dev:development": "NODE_ENV=development npm run dev",
+    "dev:production": "NODE_ENV=production npm run dev",
+    "build:development": "NODE_ENV=development npm run build",
+    "build:production": "NODE_ENV=production npm run build",
+    "start:development": "NODE_ENV=development npm run start",
+    "start:production": "NODE_ENV=production npm run start"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
@@ -40,7 +47,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4.0.0",
-    "@types/node": "^20",
+    "@types/node": "^20.19.7",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",

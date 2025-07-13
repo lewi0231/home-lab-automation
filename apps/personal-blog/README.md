@@ -1,40 +1,104 @@
-<img src="/public/cover.jpg" alt="Cover image representing Nim, a personal website template" width="100%" />
+# Personal Blog
 
-Nim is a free and open-source personal website template built with Next.js 15, React 19, Tailwind CSS v4, and Motion. Designed for developers, designers, and founders, it combines minimalism with delightful animated components powered by [Motion-Primitives](https://motion-primitives.com).
-
-Live demo: [https://nim-fawn.vercel.app](https://nim-fawn.vercel.app)
+A personal blog built with Next.js 15, React 19, Tailwind CSS v4, and Prisma with PostgreSQL (Supabase). Features include admin access control, Mermaid diagram support, and a modern responsive design.
 
 ## Features
 
-- Minimal one-page portfolio layout. blahblah
-- Blog support with MDX.ddd
-- Responsive and accessible design.
-- Easy to use
-- [Motion-Primitives](https://motion-primitives.com) for animated components.
+- Blog posts with MDX support
+- Admin panel with secret key access control
+- Mermaid diagram rendering in blog posts
+- Responsive and accessible design
+- Dark/light mode support
+- PostgreSQL database with Prisma ORM
+- Supabase integration for production database
+
+## Database Setup
+
+This project uses Supabase as the production database. Supabase provides two database URLs:
+
+- `DATABASE_URL`: Used for general database operations and connection pooling
+- `DIRECT_URL`: Used for migrations and direct database access
+
+Prisma automatically selects the appropriate URL based on the operation:
+- Migrations and schema pushes use `DIRECT_URL` (if available)
+- General queries use `DATABASE_URL`
+
+### Environment Variables
+
+Create the following environment files:
+
+**Development** (`.env.development`):
+```
+DATABASE_URL="postgresql://username:password@localhost:5432/blog_dev"
+ADMIN_SECRET="your-secret-key-here"
+```
+
+**Production** (`.env.production`):
+```
+DATABASE_URL="postgresql://postgres:[password]@[project-ref].supabase.co:5432/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres:[password]@[project-ref].supabase.co:5432/postgres"
+ADMIN_SECRET="your-production-secret-key"
+```
 
 ## Getting Started
 
-For detailed setup instructions, refer to the [Installation Guide](./INSTALLATION.md).
-
+1. Install dependencies:
 ```bash
-git clone https://github.com/ibelick/nim.git
-cd nim
 npm install
+```
+
+2. Set up your environment variables (see above)
+
+3. Push the database schema:
+```bash
+# Development
+npm run db:push
+
+# Production (Supabase)
+npm run db:push:production
+```
+
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to see your blog.
 
-## Contributing
+## Available Scripts
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve Nim.
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run db:push` - Push schema to development database
+- `npm run db:push:production` - Push schema to production database
+- `npm run db:studio` - Open Prisma Studio
+- `npm run migrate:mdx` - Migrate MDX content to JSON format
+
+## Environment-Specific Commands
+
+For different environments, use these commands:
+
+```bash
+# Development
+npm run dev:development
+npm run build:development
+npm run start:development
+
+# Production
+npm run dev:production
+npm run build:production
+npm run start:production
+```
+
+## Admin Access
+
+Access the admin panel at `/admin` with the secret key defined in your `ADMIN_SECRET` environment variable.
 
 ## Deployment
 
-You can deploy your site to any hosting platform that supports Next.js. For the easiest deployment experience, consider using Vercel:
+The project is configured for deployment in a Kubernetes cluster with Supabase as the production database. The Dockerfile includes Prisma client generation during build to avoid runtime database access requirements.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fibelick%2Fnim&env=NEXT_PUBLIC_SITE_URL&project-name=nim&repository-name=nim&redirect-url=https%3A%2F%2Ftwitter.com%2Fibelick&demo-title=Nim&demo-description=Nim%20is%20a%20free%20and%20open-source%20minimal%20personal%20website%20template%20built%20with%20Next.js%2015%2C%20React%2019%2C%20and%20Motion-Primitives.&demo-url=https%3A%2F%2Fnim.vercel.app&demo-image=https%3A%2F%2Fraw.githubusercontent.com%2Fibelick%2Fnim%2Frefs%2Fheads%2Fmain%2F.github%2Fassets%2Freadme.png&teamSlug=ibelick)
+## Contributing
 
-## About
-
-Nim is designed to make personal branding effortless and beautiful. If you enjoy it, consider sharing it and exploring [Motion-Primitives Pro](https://pro.motion-primitives.com/).
+This is a personal blog project. Feel free to fork and adapt for your own use.
