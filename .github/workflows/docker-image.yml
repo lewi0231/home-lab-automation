@@ -55,6 +55,7 @@ jobs:
 
           
   build:
+    environment: production
     needs: detect-changes
     runs-on: ubuntu-latest
     if: needs.detect-changes.outputs.matrix != '{"app":[]}'
@@ -127,6 +128,8 @@ jobs:
             NEXT_PUBLIC_ANALYTICS_ENABLED=true
             NEXT_PUBLIC_ENABLE_DEBUG_MODE=false
             NEXT_PUBLIC_ENABLE_CONSOLE_LOGS=false
+            DATABASE_URL=${{secrets.DATABASE_URL}}
+            DIRECT_URL=${{secrets.DIRECT_URL}}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:${{ github.sha }}

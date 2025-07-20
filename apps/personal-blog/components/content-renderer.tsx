@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
+import CloudinaryImage from './ui/cloudinary-image'
 import Mermaid from './ui/mermaid'
 
 export type ContentBlock =
@@ -169,22 +169,7 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
         )
 
       case 'image':
-        return (
-          <figure key={index} className="mb-4">
-            <Image
-              src={block.src}
-              alt={block.alt}
-              className="w-full rounded-lg"
-              width={800}
-              height={400}
-            />
-            {block.caption && (
-              <figcaption className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-                {block.caption}
-              </figcaption>
-            )}
-          </figure>
-        )
+        return <CloudinaryImage key={index} block={block} />
 
       case 'divider':
         return (

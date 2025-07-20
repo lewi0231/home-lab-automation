@@ -1,6 +1,6 @@
 import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
 import { BlogDate } from '@/components/ui/blog-date'
-import { getBlogPost, type BlogPost } from '@/lib/blog'
+import { getBlogPost, getBlogPosts, type BlogPost } from '@/lib/blog'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
@@ -8,8 +8,13 @@ interface BlogPageProps {
   params: Promise<{ slug: string }>
 }
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic'
+// don't need this as we want it to be a static (NOT SSR)
+// export const dynamic = 'force-dynamic'
+
+export async function generateStaticParams() {
+  const posts = await getBlogPosts()
+  return posts.map((post) => ({ slug: post.slug }))
+}
 
 export default async function BlogPostPage({ params }: BlogPageProps) {
   const { slug } = await params
@@ -35,7 +40,7 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
       {post.coverImage && (
         <figure key={post.coverImage} className="mb-10">
           <Image
-            src={`/${post?.coverImage}`}
+            src={post?.coverImage}
             alt="AI Generated Cover Image"
             className="w-full rounded-lg"
             width={800}

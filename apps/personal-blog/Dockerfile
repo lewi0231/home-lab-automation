@@ -16,6 +16,7 @@ COPY . .
 # Set a dummy DATABASE_URL for build time (Prisma generate doesn't need real DB)
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
 
+
 # Generate Prisma client (this doesn't need database connection)
 RUN npx prisma generate
 

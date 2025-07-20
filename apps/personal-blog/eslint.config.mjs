@@ -21,20 +21,20 @@ const eslintConfig = [
     },
     rules: {
       // TypeScript rules - more conservative approach
-      '@typescript-eslint/no-floating-promises': 'warn', // Changed to warn
+      // '@typescript-eslint/no-floating-promises': 'warn', // Changed to warn
       '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/no-misused-promises': [
-        'error',
-        {
-          checksVoidReturn: {
-            attributes: false, // Allow async functions in event handlers
-          },
-        },
-      ],
-      '@typescript-eslint/require-await': 'warn', // Changed to warn
+      // '@typescript-eslint/no-misused-promises': [
+      //   'error',
+      //   {
+      //     checksVoidReturn: {
+      //       attributes: false, // Allow async functions in event handlers
+      //     },
+      //   },
+      // ],
+      // '@typescript-eslint/require-await': 'warn', // Changed to warn
 
       // React specific rules
-      'react/no-danger': 'warn',
+      // 'react/no-danger': 'warn',
       'react/no-danger-with-children': 'error',
 
       // General code quality

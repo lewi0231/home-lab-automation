@@ -3,12 +3,13 @@
 import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import ImageUpload from '@/components/ui/image-upload'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { parseMarkdownToBlocks } from '@/lib/markdown-parser'
 import { useEffect, useState } from 'react'
 
-interface Post {
+export interface Post {
   id: string
   title: string
   slug: string
@@ -241,18 +242,7 @@ export default function AdminPage() {
               placeholder="post-slug"
             />
           </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Cover Image
-            </label>
-            <Input
-              value={newPost.coverImage}
-              onChange={(e) =>
-                setNewPost({ ...newPost, coverImage: e.target.value })
-              }
-              placeholder="cover-image.jpg"
-            />
-          </div>
+          <ImageUpload post={newPost} setNewPost={setNewPost} />
           <div>
             <label className="mb-2 block text-sm font-medium">
               Content (Markdown)
