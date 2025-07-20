@@ -36,6 +36,21 @@ spec:
                 secretKeyRef:
                   name: personal-blog-admin
                   key: ADMIN_ENABLED
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: personal-blog-cloudinary
+                  key: CLOUDINARY_API_KEY
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: personal-blog-cloudinary
+                  key: CLOUDINARY_API_SECRET
+            - name: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: personal-blog-cloudinary
+                  key: NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 ---
 apiVersion: v1
 kind: Service
