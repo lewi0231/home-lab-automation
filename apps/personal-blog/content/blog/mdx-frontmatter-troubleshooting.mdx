@@ -43,7 +43,7 @@ According to the [Next.js MDX documentation](https://nextjs.org/docs/app/guides/
 
 The documentation states:
 
-> Frontmatter is a YAML like key/value pairing that can be used to store data about a page. <InlineCode>@next/mdx</InlineCode> does **not** support frontmatter by default, though there are many solutions for adding frontmatter to your MDX content, such as:
+> Frontmatter is a YAML like key/value pairing that can be used to store data about a page. `@next/mdx` does **not** support frontmatter by default, though there are many solutions for adding frontmatter to your MDX content, such as:
 >
 > - remark-frontmatter
 > - remark-mdx-frontmatter
@@ -75,7 +75,7 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
 
 ### Step 2: Separate Content from Routes
 
-I moved all MDX files to a <InlineCode>content/blog/</InlineCode> directory:
+I moved all MDX files to a `content/blog/` directory:
 
 ```
 content/blog/
@@ -88,7 +88,7 @@ This separation follows the pattern recommended in the Next.js documentation for
 
 ### Step 3: Parse Frontmatter with gray-matter
 
-Using <InlineCode>gray-matter</InlineCode> to parse frontmatter ensures it's never rendered in the content:
+Using `gray-matter` to parse frontmatter ensures it's never rendered in the content:
 
 ```typescript
 import matter from 'gray-matter'
@@ -102,11 +102,11 @@ const { content, data } = matter(file)
 
 ### 1. **No Frontmatter in Output**
 
-By parsing the file with <InlineCode>gray-matter</InlineCode> and only rendering the <InlineCode>content</InlineCode>, frontmatter never appears in the blog post.
+By parsing the file with `gray-matter` and only rendering the `content`, frontmatter never appears in the blog post.
 
 ### 2. **Access to Metadata**
 
-The <InlineCode>data</InlineCode> object contains all frontmatter values, which can be used for:
+The `data` object contains all frontmatter values, which can be used for:
 
 - SEO metadata
 - Page titles
@@ -119,7 +119,7 @@ This approach matches the [official Next.js MDX documentation](https://nextjs.or
 
 ### 4. **Static Generation Support**
 
-The <InlineCode>generateStaticParams</InlineCode> function enables static generation of all blog posts:
+The `generateStaticParams` function enables static generation of all blog posts:
 
 ```typescript
 export async function generateStaticParams() {
@@ -165,7 +165,7 @@ personal-blog/
 1. **MDX files in the app directory render frontmatter by default**
 2. **Use dynamic routes for content with frontmatter**
 3. **Separate content from routes for better organization**
-4. **Use <InlineCode>gray-matter</InlineCode> for reliable frontmatter parsing**
+4. **Use `gray-matter` for reliable frontmatter parsing**
 5. **Client components are required for interactive MDX components**
 
 This approach provides a robust, scalable foundation for a Next.js blog that follows official best practices and handles frontmatter correctly.

@@ -130,6 +130,9 @@ jobs:
             NEXT_PUBLIC_ENABLE_CONSOLE_LOGS=false
             DATABASE_URL=${{secrets.DATABASE_URL}}
             DIRECT_URL=${{secrets.DIRECT_URL}}
+            CLOUDINARY_API_KEY=${{secrets.CLOUDINARY_API_KEY}}
+            CLOUDINARY_API_SECRET=${{secrets.CLOUDINARY_API_SECRET}}
+            NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:${{ github.sha }}
