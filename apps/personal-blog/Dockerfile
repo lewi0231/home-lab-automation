@@ -48,6 +48,8 @@ COPY --from=builder /app/node_modules ./node_modules
 # Copy the generated Prisma client
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
+RUN mkdir -p /app/.next/cache/images && chown -R node:node /app
+
 # Run the application
 USER node
 EXPOSE 3000
