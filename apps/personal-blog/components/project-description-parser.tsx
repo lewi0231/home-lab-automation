@@ -1,3 +1,4 @@
+'use client'
 import { marked } from 'marked'
 import { useEffect, useState } from 'react'
 

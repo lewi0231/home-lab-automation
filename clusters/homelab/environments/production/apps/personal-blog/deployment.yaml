@@ -26,6 +26,11 @@ spec:
                 secretKeyRef:
                   name: personal-blog-db-url
                   key: DATABASE_URL
+            - name: DIRECT_URL
+              valueFrom:
+                secretKeyRef:
+                  name: personal-blog-db-url
+                  key: DIRECT_URL
             - name: ADMIN_ACCESS_KEY
               valueFrom:
                 secretKeyRef:

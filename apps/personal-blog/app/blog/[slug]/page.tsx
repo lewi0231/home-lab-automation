@@ -1,7 +1,7 @@
 import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
 import { BlogDate } from '@/components/ui/blog-date'
+import CloudinaryImage from '@/components/ui/cloudinary-image'
 import { getBlogPost, getBlogPosts, type BlogPost } from '@/lib/blog'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
 interface BlogPageProps {
@@ -38,15 +38,16 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
       </h1>
       {post.publishedAt && <BlogDate date={post.publishedAt} />}
       {post.coverImage && (
-        <figure key={post.coverImage} className="mb-10">
-          <Image
-            src={post?.coverImage}
-            alt="AI Generated Cover Image"
-            className="w-full rounded-lg"
-            width={800}
-            height={400}
-          />
-        </figure>
+        <CloudinaryImage key={post.slug} post={post} />
+        // <figure key={post.coverImage} className="mb-10">
+        //   <Image
+        //     src={post?.coverImage}
+        //     alt="AI Generated Cover Image"
+        //     className="w-full rounded-lg"
+        //     width={800}
+        //     height={400}
+        //   />
+        // </figure>
       )}
       {post.excerpt && (
         <p className="mb-8 text-lg text-gray-700">{post.excerpt}</p>
