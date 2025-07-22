@@ -11,9 +11,19 @@ export const prisma =
       process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']
         : ['error'],
+    // Supabase connection configuration
+    datasources: {
+      db: {
+        // Prisma automatically uses DATABASE_URL for read/write operations
+        // and DIRECT_URL for direct connections (like migrations)
+        url: process.env.DATABASE_URL,
+      },
+    },
   })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-// Don't automatically connect - let Prisma handle connections as needed
-// The connection will be established when the first query is made
+// Graceful shutdown
+process.on('beforeExit', async () => {
+  await prisma.$disconnect()
+})

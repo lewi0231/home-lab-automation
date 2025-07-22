@@ -32,7 +32,8 @@ export const PROJECTS: Project[] = [
     name: 'RecursiveTrails Travel Blog',
     description: 'Used Nexjs, Tailwind + Sanity.io',
     link: 'https://trailwisdom.xyz/',
-    video: '/trailwisdom.mov',
+    video:
+      'https://res.cloudinary.com/dhm2m3rx8/video/upload/q_auto,f_auto/trailwisdom_znglox.mov',
     id: '1',
   },
   {
@@ -40,14 +41,16 @@ export const PROJECTS: Project[] = [
     description:
       'Kubernetes K3s, Cloudflared, Traefik, MetalLB, Grafana + Loki, Proxmox + Orange Pi 5, Pfsense, CertManager',
     link: '/#projects',
-    video: '/homeLabRecording.mov',
+    video:
+      'https://res.cloudinary.com/dhm2m3rx8/video/upload/q_auto,f_auto/homeLabRecording_hdqd4x.mov',
     id: '2',
   },
   {
     name: 'This Blog w Admin Portal',
     description: `Extended [Nim](https://github.com/ibelick/nim) Starter w Shadcn Components (e.g., Sidebar), Admin Portal w Markdown Parser, Preview Option, (Un)Publish, Delete Options, Prisma and Postgresql`,
     link: 'https://blog.flowerhead.dev',
-    video: '/blogAdminRecording.mov',
+    video:
+      'https://res.cloudinary.com/dhm2m3rx8/video/upload/q_auto,f_auto/blogAdminRecording_bghdmn.mov',
     id: '3',
   },
   {
@@ -55,7 +58,8 @@ export const PROJECTS: Project[] = [
     description:
       'Built and hosted for UniPhi Car Detailing.  Provides a simple way of calculating relative percentages based on start time and speed.',
     link: 'https://work-rate-calculator.flowerhead.dev',
-    video: '/workRateCalculatorRecording.mov',
+    video:
+      'https://res.cloudinary.com/dhm2m3rx8/video/upload/q_auto,f_auto/workRateCalculatorRecording_jek2q8.mov',
     id: '4',
   },
 ]

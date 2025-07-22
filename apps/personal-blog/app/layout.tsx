@@ -1,6 +1,7 @@
 import { AppSidebar } from '@/components/ui/app-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { performance } from '@/lib/performance'
 import { cn } from '@/lib/utils'
 import type { Metadata, Viewport } from 'next'
 import { ThemeProvider } from 'next-themes'
@@ -18,6 +19,25 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: 'Paul Richard Lewis - Personal Blog',
   description: 'A record of my tinkering for myself and others.',
+  keywords: [
+    'software engineer',
+    'web development',
+    'blog',
+    'portfolio',
+    'homelab',
+  ],
+  authors: [{ name: 'Paul Richard Lewis' }],
+  openGraph: {
+    title: 'Paul Richard Lewis - Personal Blog',
+    description: 'A record of my tinkering for myself and others.',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Paul Richard Lewis - Personal Blog',
+    description: 'A record of my tinkering for myself and others.',
+  },
+  robots: 'index, follow',
 }
 
 const geist = Geist({
@@ -35,8 +55,26 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  // Initialize performance monitoring
+  if (typeof window !== 'undefined') {
+    performance.measurePageLoad()
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Preload critical resources */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+
+        {/* DNS prefetch for external domains */}
+        <link rel="dns-prefetch" href="//res.cloudinary.com" />
+      </head>
       <body
         className={`${geist.variable} ${geistMono.variable} bg-white tracking-tight antialiased dark:bg-zinc-950`}
       >

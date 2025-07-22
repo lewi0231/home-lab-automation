@@ -1,8 +1,8 @@
 import AnimatedPosts from '@/components/ui/animated-posts'
 import { getBlogPosts, type BlogPost } from '@/lib/blog'
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic'
+// Enable static generation with revalidation
+export const revalidate = 3600 // Revalidate every hour
 
 export default async function BlogPage() {
   let posts: BlogPost[] = []

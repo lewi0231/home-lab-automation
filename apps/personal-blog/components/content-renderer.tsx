@@ -1,6 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
+import { memo } from 'react'
 import CloudinaryImage from './ui/cloudinary-image'
 import Mermaid from './ui/mermaid'
 
@@ -18,7 +19,10 @@ interface ContentRendererProps {
   className?: string
 }
 
-export function ContentRenderer({ content, className }: ContentRendererProps) {
+const ContentRenderer = memo(function ContentRenderer({
+  content,
+  className,
+}: ContentRendererProps) {
   const renderBlock = (block: ContentBlock, index: number) => {
     switch (block.type) {
       case 'heading':
@@ -189,4 +193,6 @@ export function ContentRenderer({ content, className }: ContentRendererProps) {
       {content.map((block, index) => renderBlock(block, index))}
     </div>
   )
-}
+})
+
+export { ContentRenderer }
