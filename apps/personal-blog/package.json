@@ -11,15 +11,14 @@
     "db:generate": "prisma generate",
     "db:push": "npx dotenv -e .env.development -- npx prisma db push",
     "db:push:production": "npx dotenv -e .env.production -- npx prisma db push",
-    "db:migrate": "npx prisma migrate dev",
-    "db:studio": "npx prisma studio",
-    "migrate:mdx": "tsx scripts/migrate-mdx-to-json.ts",
-    "dev:development": "NODE_ENV=development npm run dev",
-    "production": "NODE_ENV=development npx dotenv -e .env.production -- npm run dev",
-    "build:development": "NODE_ENV=development npm run build",
-    "build:production": "NODE_ENV=production npm run build",
-    "start:development": "NODE_ENV=development npm run start",
-    "start:production": "NODE_ENV=production npm run start"
+    "db:migrate": " npx dotenv -e .env.production -- npx prisma migrate dev",
+    "db:studio": " npx dotenv -e .env.production -- npx prisma studio",
+    "dev:development": "NODE_ENV=development  npx dotenv -e .env.development -- npm run dev",
+    "dev:production": "NODE_ENV=development npx dotenv -e .env.production -- npm run dev",
+    "build:development": "NODE_ENV=development npx dotenv -e .env.development -- npm run build",
+    "build:production": "NODE_ENV=production npx dotenv -e .env.production --npm run build",
+    "start:development": "NODE_ENV=development  npx dotenv -e .env.development -- npm run start",
+    "start:production": "NODE_ENV=production  npx dotenv -e .env.production -- npm run start"
   },
   "dependencies": {
     "@prisma/client": "^6.11.1",
