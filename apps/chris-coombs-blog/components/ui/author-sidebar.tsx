@@ -5,7 +5,7 @@ import Image from 'next/image'
 export function AuthorSidebar() {
   return (
     <div className="hidden w-80 flex-shrink-0 lg:block">
-      <Card className="sticky top-8 bg-zinc-950">
+      <Card className="sticky top-8 bg-white dark:bg-zinc-950">
         <CardContent className="p-4">
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="relative h-32 w-32 overflow-hidden rounded-full">

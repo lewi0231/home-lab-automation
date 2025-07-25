@@ -26,20 +26,20 @@ const items = [
     url: '/#posts',
     icon: Calendar,
   },
+  // {
+  //   title: 'Projects',
+  //   url: '/#projects',
+  //   icon: Calendar,
+  // },
   {
-    title: 'Projects',
-    url: '/#projects',
-    icon: Calendar,
+    title: 'Blog',
+    url: '/blog',
+    icon: Inbox,
   },
   {
     title: 'Connect',
     url: '/#connect',
     icon: Calendar,
-  },
-  {
-    title: 'Blog',
-    url: '/blog',
-    icon: Inbox,
   },
 ]
 

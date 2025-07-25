@@ -19,7 +19,7 @@ export default async function BlogPage() {
       posts={posts}
       title="Blog Posts"
       wrapWithMain={true}
-      subtitle="A record of my humble attempts to understand and remember things"
+      subtitle="My prosaic ponderings."
       isBlogPage={true}
     />
   )

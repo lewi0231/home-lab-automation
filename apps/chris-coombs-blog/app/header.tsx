@@ -1,29 +1,16 @@
-'use client'
 import { Magnetic } from '@/components/ui/magnetic'
 import { TextEffect } from '@/components/ui/text-effect'
 import { Mail } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import { SOCIAL_LINKS } from './data'
 
 export function Header() {
-  const [mounted, setMounted] = useState(false)
-  const { resolvedTheme } = useTheme()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // const currentTheme = theme === 'system' ? systemTheme : theme
-  const isDark = resolvedTheme === 'dark'
-
   return (
-    <header className="mb-8 flex items-center justify-between">
+    <header className="mb-8 flex items-center justify-between sm:px-6">
       <Link href="/" className="flex items-center">
         <Image
-          src={mounted && isDark ? '/ccoombs.png' : '/ccoombs.png'}
+          src="/ccoombs.png"
           width={70}
           height={70}
           alt="icon"
