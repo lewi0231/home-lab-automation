@@ -1,4 +1,5 @@
 import { AppSidebar } from '@/components/ui/app-sidebar'
+import { AuthorSidebar } from '@/components/ui/author-sidebar'
 import { Separator } from '@/components/ui/separator'
 import { SidebarProvider } from '@/components/ui/sidebar'
 import { performance } from '@/lib/performance'
@@ -80,7 +81,7 @@ export default function RootLayout({
         >
           <SidebarProvider className="">
             <div className="flex min-h-screen w-full flex-1 flex-col font-[family-name:var(--font-inter-tight)]">
-              <div className="mx-auto flex w-full max-w-screen-lg flex-1 flex-col px-4 pt-10">
+              <div className="mx-auto flex w-full max-w-screen-xl flex-1 flex-col px-4 pt-10">
                 <Header />
                 <Separator className="" />
                 <div
@@ -92,6 +93,7 @@ export default function RootLayout({
                   <main className="mx-0 flex w-full max-w-screen justify-center sm:mx-10 sm:w-9/13">
                     {children}
                   </main>
+                  <AuthorSidebar />
                 </div>
                 <Footer />
               </div>

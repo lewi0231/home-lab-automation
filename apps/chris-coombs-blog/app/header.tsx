@@ -1,14 +1,12 @@
 'use client'
 import { Magnetic } from '@/components/ui/magnetic'
 import { TextEffect } from '@/components/ui/text-effect'
-import { Github, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { EMAIL, SOCIAL_LINKS } from './data'
-
-const GITHUB_LINK = SOCIAL_LINKS[0].link
+import { SOCIAL_LINKS } from './data'
 
 export function Header() {
   const [mounted, setMounted] = useState(false)
@@ -49,23 +47,21 @@ export function Header() {
         </div>
       </Link>
       <div className="flex h-full">
-        <a
-          href={GITHUB_LINK}
-          className="h-full p-2 opacity-85 hover:opacity-65"
-        >
-          <Magnetic>
-            <Github size={20} className="" />
-          </Magnetic>
-        </a>
-
-        <a
-          className="h-full p-2 opacity-85 hover:opacity-65"
-          href={`mailto:${EMAIL}`}
-        >
-          <Magnetic>
-            <Mail size={20} />
-          </Magnetic>
-        </a>
+        {SOCIAL_LINKS.length
+          ? SOCIAL_LINKS.map((item) => {
+              return (
+                <a
+                  key={item.link}
+                  href={item.link}
+                  className="h-full p-2 opacity-85 hover:opacity-65"
+                >
+                  <Magnetic>
+                    <Mail size={20} className="" />
+                  </Magnetic>
+                </a>
+              )
+            })
+          : ''}
       </div>
     </header>
   )
