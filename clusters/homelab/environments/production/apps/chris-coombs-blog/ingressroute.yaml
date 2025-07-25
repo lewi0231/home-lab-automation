@@ -1,0 +1,17 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: chris-coombs-blog
+  namespace: production
+  annotations:
+    kubernetes.io/ingress.class: traefik-public
+spec:
+  entryPoints:
+    - web
+
+  routes:
+    - match: Host(`chriscoombs.flowerhead.dev`)
+      kind: Rule
+      services:
+        - name: chris-coombs-blog
+          port: 80
