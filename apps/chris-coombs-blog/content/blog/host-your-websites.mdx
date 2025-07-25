@@ -1,10 +1,10 @@
-<Cover
-  src="https://cdn.cosmos.so/affd4b79-e848-4dfd-bd42-5f2c4a847365?format=jpeg"
-  alt="Image from the movie Alien - from cosmos.com"
-  caption="cosmos.com"
-/>
+---
+title: 'Host Your Websites on Kubernetes: A Complete Guide'
+date: '2024-06-19'
+description: 'Step-by-step guide to hosting websites on Kubernetes with proper ingress and SSL'
+---
 
-# How to host your own website
+<Cover src="/website.png" alt="AI Art Generated Based On Article Summary" />
 
 One of the benefits of having a home lab is that it's possible to host your own websites. For some reason to me I find this way more inspiring - probably because I know that I have to learn stuff to make this happen.
 
@@ -26,7 +26,8 @@ This guide assumes you already have a Kubernetes cluster running. I'm using k3s 
 Here's what we'll build:
 
 ```
-Internet → Cloudflare → Cloudflare Tunnel → Traefik (External) → Your Application
+Internet → Cloudflare → Cloudflare Tunnel →
+  Traefik (External) → Your Application
 ```
 
 The key components are:
@@ -43,7 +44,8 @@ MetalLB gives your cluster external IP addresses. Without it, LoadBalancer servi
 First, install MetalLB:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
+kubectl apply -f
+https://raw.githubusercontent.com/metallb/metallb/v0.14.9/config/manifests/metallb-native.yaml
 ```
 
 Then configure the IP address pools. Here's my configuration:
@@ -70,14 +72,13 @@ spec:
     - internal-pool
 ```
 
-This reserves IP addresses `10.60.60.60` through `10.60.60.70` for your cluster. Adjust the range to match your network.
+This reserves IP addresses <InlineCode>10.60.60.60</InlineCode> through <InlineCode>10.60.60.70</InlineCode> for your cluster. Adjust the range to match your network.
 
 ## Step 2: Deploy External Traefik
 
 We need a Traefik instance that can receive traffic from the internet. Here's my configuration:
 
 ```yaml
-# clusters/homelab/infrastructure/traefik/external/values.yaml
 globalArguments:
   - '--global.sendanonymoususage=false'
   - '--global.checknewversion=false'
@@ -108,8 +109,10 @@ service:
 
 The key points:
 
-- `ingressClass: traefik-public` - This identifies this Traefik instance
-- `loadBalancerIP: 10.60.60.70` - MetalLB will assign this IP
+- <InlineCode>ingressClass: traefik-public</InlineCode> - This identifies this
+  Traefik instance
+- <InlineCode>loadBalancerIP: 10.60.60.70</InlineCode> - MetalLB will assign
+  this IP
 - Port 80 only (no HTTPS) - We'll handle SSL termination at Cloudflare
 
 ## Step 3: Set up Cloudflare Tunnel
@@ -143,13 +146,13 @@ This will open a browser window for authentication. Complete the login process t
 
 ### 3.3: Create the tunnel
 
-Create a new tunnel (replace `my-tunnel` with your preferred name):
+Create a new tunnel (replace <InlineCode>my-tunnel</InlineCode> with your preferred name):
 
 ```bash
 cloudflared tunnel create my-tunnel
 ```
 
-This will create a tunnel and save the credentials to `~/.cloudflared/[tunnel-id].json`.
+This will create a tunnel and save the credentials to <InlineCode>~/.cloudflared/[tunnel-id].json</InlineCode>.
 
 ### 3.4: Create Kubernetes secret
 
@@ -160,7 +163,7 @@ sudo kubectl create secret generic tunnel-credentials \
   --from-file=credentials.json=~/.cloudflared/[tunnel-id].json
 ```
 
-Replace `[tunnel-id]` with the actual tunnel ID from the previous step.
+Replace <InlineCode>[tunnel-id]</InlineCode> with the actual tunnel ID from the previous step.
 
 ### 3.5: Configure DNS routing
 
@@ -170,14 +173,13 @@ Set up DNS routing for your domain:
 cloudflared tunnel route dns my-tunnel your-domain.com
 ```
 
-Replace `my-tunnel` with your tunnel name and `your-domain.com` with your actual domain.
+Replace <InlineCode>my-tunnel</InlineCode> with your tunnel name and <InlineCode>your-domain.com</InlineCode> with your actual domain.
 
 ### 3.6: Deploy the tunnel to Kubernetes
 
 Now deploy the tunnel configuration to your cluster:
 
 ```yaml
-# clusters/homelab/infrastructure/cloudflare/cloudflare-tunnel-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -234,7 +236,7 @@ data:
     - service: http_status:404
 ```
 
-The tunnel routes traffic for `work-rate-calculator.flowerhead.dev` to your Traefik instance.
+The tunnel routes traffic for <InlineCode>work-rate-calculator.flowerhead.dev</InlineCode> to your Traefik instance.
 
 ### 3.7: Verify tunnel status
 
@@ -256,7 +258,6 @@ kubectl logs -l app=cloudflared
 Now let's deploy a real application. I'll use my work-rate calculator as an example:
 
 ```yaml
-# clusters/homelab/environments/production/apps/work-rate-calculator/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -299,7 +300,6 @@ spec:
 This tells Traefik how to route traffic to your application:
 
 ```yaml
-# clusters/homelab/environments/production/apps/work-rate-calculator/ingressroute.yaml
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -320,9 +320,9 @@ spec:
 
 ## Step 6: Configure DNS
 
-The `cloudflared tunnel route dns` command from Step 3.5 should have already created the necessary DNS records. However, you can verify and configure additional settings in your Cloudflare dashboard:
+The <InlineCode>cloudflared tunnel route dns</InlineCode> command from Step 3.5 should have already created the necessary DNS records. However, you can verify and configure additional settings in your Cloudflare dashboard:
 
-1. **Verify the CNAME record** was created: `work-rate-calculator.flowerhead.dev` → `your-tunnel-name.trycloudflare.com`
+1. **Verify the CNAME record** was created: <InlineCode>work-rate-calculator.flowerhead.dev</InlineCode> → <InlineCode>your-tunnel-name.trycloudflare.com</InlineCode>
 2. **Enable the orange cloud** (proxy) to route traffic through Cloudflare
 3. **Set SSL/TLS encryption mode** to "Full (strict)" since we're using a tunnel
 
@@ -351,9 +351,9 @@ For production applications, you might want to:
 
 Once everything is deployed:
 
-1. Check that MetalLB assigned the IP: `kubectl get svc -n traefik-public`
-2. Verify the tunnel is running: `kubectl get pods -l app=cloudflared`
-3. Test the application: `curl -H "Host: work-rate-calculator.flowerhead.dev" http://10.60.60.70`
+1. Check that MetalLB assigned the IP: <InlineCode>kubectl get svc -n traefik-public</InlineCode>
+2. Verify the tunnel is running: <InlineCode>kubectl get pods -l app=cloudflared</InlineCode>
+3. Test the application: <InlineCode>curl -H "Host: work-rate-calculator.flowerhead.dev" http://10.60.60.70</InlineCode>
 4. Visit your domain in a browser
 
 ## Troubleshooting

@@ -1,10 +1,10 @@
-<Cover
-  src="../../public/computer-arty.jpg"
-  alt="Image from the movie Alien - from cosmos.com"
-  caption="cosmos.com"
-/>
+---
+title: 'Kubernetes Storage Explained: From PVCs to Storage Classes'
+date: '2024-06-05'
+description: 'Understanding Kubernetes storage concepts and implementation for homelab setups'
+---
 
-# Kubernetes Storage: Understanding PVs, PVCs, and When to Use StatefulSets vs Deployments
+<Cover src="/storage.png" alt="Image from the movie Alien - from cosmos.com" />
 
 When I first started with Kubernetes, storage was one of those concepts that seemed simple until it wasn't. I'd read about PersistentVolumes (PVs) and PersistentVolumeClaims (PVCs), but the real-world implications didn't click until I hit a specific problem: my Prometheus pod was stuck in `ContainerCreating` for hours.
 
@@ -15,18 +15,19 @@ This article is about that troubleshooting journey and the fundamental concepts 
 I was setting up monitoring in my homelab cluster when I noticed this:
 
 ```bash
-kubectl get pods -n monitoring | grep prometheus-server
-my-prometheus-server-7cd5f94b67-lnhvd   0/2     ContainerCreating   0   36m
+kubectl get pods -n monitoring | grep prometheus-server \nmy-prometheus-server-7cd5f94b67-lnhvd 0/2 ContainerCreating 0 36m
 ```
 
 The pod had been stuck for 36 minutes. When I dug deeper:
 
 ```bash
-kubectl describe pod my-prometheus-server-7cd5f94b67-lnhvd -n monitoring | tail -10
-Events:
-  Type     Reason              Age   From                     Message
-  ----     ------              ----  ----                     -------
-  Warning  FailedAttachVolume  10s   attachdetach-controller  AttachVolume.Attach failed for volume "pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c" : rpc error: code = Aborted desc = volume pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c is not ready for workloads
+kubectl describe pod my-prometheus-server-7cd5f94b67-lnhvd -n
+  monitoring | tail -10 \n\nEvents: Type Reason Age From Message
+  \n---- ------ ---- ---- -------
+  Warning FailedAttachVolume 10s attachdetach-controller
+  AttachVolume.Attach failed for volume
+  "pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c" : rpc error: code = Aborted desc =
+  volume pvc-d071263c-6cd1-45bf-b7e3-d6681dd35a6c is not ready for workloads
 ```
 
 The error was clear: the pod couldn't attach to its volume. But why?
@@ -277,7 +278,8 @@ As I worked through these issues, I kept asking myself:
 
 2. **What's the difference between `ReadWriteOnce` and `ReadWriteMany`?**
 
-   - `ReadWriteOnce`: One pod can write, multiple can read
+   - `ReadWriteOnce`: One pod can write, multiple can
+     read
    - `ReadWriteMany`: Multiple pods can read and write
    - Most storage classes only support `ReadWriteOnce`
 

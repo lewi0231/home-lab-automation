@@ -1,10 +1,11 @@
-<Cover
-  src="../../public/computer-arty.jpg"
-  alt="Image from the movie Alien - from cosmos.com"
-  caption="cosmos.com"
-/>
+---
+title: 'Homelab Backup Strategy: From VM Snapshots to Application Data'
+date: '2024-06-26'
+description: 'Developing a comprehensive backup strategy for Proxmox + K3s homelab setups'
+---
 
-# Homelab Backup Strategy: From VM Snapshots to Application Data
+<Cover src="/storage.png" alt="AI Inspired Art Based on Article Description" />
+{/* TODO - generate art pic for this */}
 
 When I first set up my homelab, I was so focused on getting Kubernetes running that I completely overlooked backups. It wasn't until I had a stable cluster with monitoring, applications, and months of configuration work that I realized: "What happens if my Optiplex 7050 dies?"
 
@@ -192,6 +193,81 @@ git clone https://github.com/username/homelab.git /backup/git-repos/homelab
 - ❌ Manual intervention needed
 - ❌ Risk of forgetting to connect drive
 - ❌ Limited by drive size
+
+### Real-World USB Backup Setup: Filesystem Lessons and Troubleshooting
+
+Recently, I went through the process of setting up a USB drive as backup storage directly on my Proxmox host. Here's a step-by-step account of what worked, what didn't, and what I learned:
+
+**1. Preparing the USB Drive**
+
+I started by wiping and reformatting the USB drive using the shell (on a FreeBSD-based system, but the process is similar on Linux):
+
+```bash
+# Destroy old partition table (if needed)
+gpart destroy -F /dev/da0
+# Create a new MBR partition table
+gpart create -s mbr /dev/da0
+# Add a FAT32 partition
+gpart add -t fat32 /dev/da0
+# Format as FAT32
+newfs_msdos -F 32 -L EXTERNAL /dev/da0s1
+# Mount the drive
+mkdir /mnt/usbdrive
+mount -t msdosfs /dev/da0s1 /mnt/usbdrive
+df -h
+```
+
+**2. The FAT32 Limitation**
+
+At first, I used FAT32 for maximum compatibility. However, when running Proxmox backups, I hit a critical issue: **FAT32 has a 4GB maximum file size limit**. This caused backup jobs to fail with errors like:
+
+```
+zstd: error 70 : Write error : cannot write block : File too large
+ERROR: vma_queue_write: write error - Broken pipe
+```
+
+Even though the USB drive had plenty of free space, any backup file larger than 4GB would fail. This is a hard limit of the FAT32 filesystem.
+
+**3. Solution: Reformat as ext4**
+
+To fix this, I reformatted the USB drive as ext4 (a modern Linux filesystem with no practical file size limits):
+
+```bash
+umount /mnt/usbbackup
+mkfs.ext4 /dev/sda1
+mount /dev/sda1 /mnt/usbbackup
+```
+
+I also updated <InlineCode>/etc/fstab</InlineCode> to mount the drive as ext4 at boot:
+
+```
+/dev/sda1  /mnt/usbbackup  ext4  defaults  0  0
+```
+
+> **Tip:** If you edit <InlineCode>/etc/fstab</InlineCode>, run <InlineCode>systemctl daemon-reload</InlineCode> to ensure systemd picks up the changes.
+
+**4. What is vfat?**
+
+- <InlineCode>vfat</InlineCode> is the Linux driver for FAT filesystems
+  (including FAT32 and FAT16) that support long filenames.
+- When mounting a FAT32 drive, you use <InlineCode>vfat</InlineCode> as the filesystem type in Linux.
+- For ext4, use <InlineCode>ext4</InlineCode> in <InlineCode>/etc/fstab</InlineCode> and mount commands.
+
+**5. Running the Backups**
+
+After switching to ext4, Proxmox backups ran smoothly—even for large VMs. The backup job was scheduled for Sunday at 1 AM, set to keep the last 4 backups, and used snapshot mode for minimal downtime. Email notifications were enabled for failures.
+
+**6. Lessons Learned**
+
+- **Always check filesystem limits** before using a drive for large files.
+- **FAT32 is not suitable** for VM backups due to the 4GB file size cap.
+- **ext4 is ideal** for Linux/Proxmox backup drives (unless you need cross-platform compatibility).
+- **Update <InlineCode>/etc/fstab</InlineCode>** after reformatting, and reload systemd if prompted.
+- **Test your backup and restore process** after making changes.
+
+**Summary:**
+
+Plugging a USB drive directly into your Proxmox host is a simple and effective backup solution, but make sure to use a modern filesystem like ext4 to avoid file size issues. Always test your setup with a real backup and restore to ensure reliability.
 
 ### Option 3: Cloud Storage
 

@@ -1,0 +1,87 @@
+'use client'
+
+import { PROJECTS, SOCIAL_LINKS } from '@/app/data'
+import { BlogPost } from '@/lib/blog'
+
+import {
+  TRANSITION_SECTION,
+  VARIANTS_CONTAINER,
+  VARIANTS_SECTION,
+} from '@/lib/constants'
+import { motion } from 'motion/react'
+import { memo } from 'react'
+import DescriptionParser from '../project-description-parser'
+import AnimatedPosts from './animated-posts'
+import MagneticSocialLink from './magnetic-social'
+import ProjectVideo from './project-video'
+
+type Props = {
+  posts: BlogPost[]
+}
+
+const AnimatedHomePage = memo(function AnimatedHomePage({ posts }: Props) {
+  return (
+    <motion.main
+      className="space-y-28"
+      variants={VARIANTS_CONTAINER}
+      initial="hidden"
+      animate="visible"
+    >
+      <AnimatedPosts posts={posts} title="Latest Posts" latestOnly={true} />
+      {PROJECTS.length ? (
+        <motion.section
+          variants={VARIANTS_SECTION}
+          transition={TRANSITION_SECTION}
+          id="projects"
+        >
+          <h3 className="mb-5 text-2xl font-light tracking-wide">
+            Latest Projects
+          </h3>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {PROJECTS.map((project) => (
+              <div key={project.id} className="space-y-2">
+                <div className="relative rounded-2xl bg-zinc-50/40 p-1 ring-1 ring-zinc-200/50 ring-inset dark:bg-zinc-950/40 dark:ring-zinc-800/50">
+                  <ProjectVideo src={project.video} />
+                </div>
+                <div className="px-1">
+                  <a
+                    className="font-base group relative inline-block font-[450] text-zinc-900 dark:text-zinc-50"
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {project.name}
+                    <span className="absolute bottom-0.5 left-0 block h-[1px] w-full max-w-0 bg-zinc-900 transition-all duration-200 group-hover:max-w-full"></span>
+                  </a>
+                  <DescriptionParser description={project.description} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.section>
+      ) : (
+        ''
+      )}
+      <motion.section
+        variants={VARIANTS_SECTION}
+        transition={TRANSITION_SECTION}
+        id="connect"
+        className="pt-4"
+      >
+        <h3 className="mb-5 text-2xl font-light tracking-wide">Connect</h3>
+        <p className="mb-5 text-zinc-600 dark:text-zinc-400">
+          Whether you have a project or just want to connect, please reach out:
+        </p>
+        <div className="flex items-center justify-start space-x-3">
+          {SOCIAL_LINKS.map((link) => (
+            <MagneticSocialLink key={link.label} link={link.link}>
+              {link.label}
+            </MagneticSocialLink>
+          ))}
+        </div>
+      </motion.section>
+    </motion.main>
+  )
+})
+
+export default AnimatedHomePage

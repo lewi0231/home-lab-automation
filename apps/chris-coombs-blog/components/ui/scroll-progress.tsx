@@ -1,8 +1,8 @@
 'use client'
 
-import { motion, SpringOptions, useScroll, useSpring } from 'motion/react'
 import { cn } from '@/lib/utils'
-import { RefObject } from 'react'
+import { motion, SpringOptions, useScroll, useSpring } from 'motion/react'
+import { RefObject, useEffect, useState } from 'react'
 
 export type ScrollProgressProps = {
   className?: string
@@ -21,6 +21,12 @@ export function ScrollProgress({
   springOptions,
   containerRef,
 }: ScrollProgressProps) {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   const { scrollYProgress } = useScroll({
     container: containerRef,
     layoutEffect: Boolean(containerRef?.current),
@@ -30,6 +36,11 @@ export function ScrollProgress({
     ...DEFAULT_SPRING_OPTIONS,
     ...(springOptions ?? {}),
   })
+
+  // Don't render until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return null
+  }
 
   return (
     <motion.div

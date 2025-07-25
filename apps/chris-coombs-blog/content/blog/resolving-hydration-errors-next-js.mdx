@@ -1,0 +1,245 @@
+---
+title: 'Resolving Hydration Errors in Next.js: The Mounting Problem'
+description: 'Learn how to fix the most common source of hydration errors in Next.js applications - the mounting mismatch between server and client rendering.'
+date: '2025-7-8'
+tags: ['nextjs', 'react', 'hydration', 'frontend']
+---
+
+Hydration errors are one of the most frustrating issues in Next.js development. They occur when the HTML generated on the server doesn't match what React renders on the client. While there are several causes, the most common source is **client-side state that's unavailable during server-side rendering (SSR)**.
+
+## What is Hydration?
+
+Hydration is the process where React takes the server-rendered HTML and makes it interactive by attaching event listeners and state. For this to work, the server and client must render identical content.
+
+```mermaid
+sequenceDiagram
+    participant Server
+    participant Browser
+    participant React
+
+    Server->>React: Render component (SSR)
+    React-->>Server: Generate HTML
+    Server-->>Browser: Send HTML
+    Browser->>React: Hydrate component
+    React-->>Browser: Attach event listeners & state
+    Note over Browser: Component is now interactive
+```
+
+## The Most Common Cause: Client-Only State
+
+The biggest culprit is using values that are only available in the browser (like `localStorage`, `window`, or theme preferences) without proper mounting checks.
+
+### The Problem: Theme-Dependent Rendering
+
+Here's a typical scenario that causes hydration errors:
+
+```tsx
+'use client'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+
+export function Header() {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
+  return (
+    <header>
+      <Image
+        src={isDark ? '/dark-logo.png' : '/light-logo.png'}
+        width={70}
+        height={70}
+        alt="Logo"
+      />
+    </header>
+  )
+}
+```
+
+**What happens:**
+
+1. **Server:** `resolvedTheme` is `undefined` → renders light logo
+2. **Client:** `resolvedTheme` is `'dark'` → renders dark logo
+3. **Result:** DOM mismatch → hydration error
+
+```mermaid
+sequenceDiagram
+    participant Server
+    participant Browser
+    participant React
+    participant nextThemes
+
+    Server->>React: Render Header (SSR)
+    React->>nextThemes: Get theme (unavailable)
+    nextThemes-->>React: resolvedTheme = undefined
+    React-->>Server: Render light logo
+    Server-->>Browser: Send HTML (light logo)
+
+    Browser->>React: Hydrate Header
+    React->>nextThemes: Get theme (now available)
+    nextThemes-->>React: resolvedTheme = 'dark'
+    React-->>Browser: Re-render dark logo
+    Note over Browser,React: DOM mismatch! Hydration error
+```
+
+## The Solution: Mounting Check Pattern
+
+The fix is to wait until the component has mounted on the client before rendering client-dependent content:
+
+```tsx
+'use client'
+import { useTheme } from 'next-themes'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+
+export function Header() {
+  const [mounted, setMounted] = useState(false)
+  const { resolvedTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isDark = resolvedTheme === 'dark'
+
+  return (
+    <header>
+      <Image
+        src={mounted && isDark ? '/dark-logo.png' : '/light-logo.png'}
+        width={70}
+        height={70}
+        alt="Logo"
+      />
+    </header>
+  )
+}
+```
+
+**How it works:**
+
+1. **Server:** `mounted` is `false` → renders light logo (default)
+2. **Client (initial):** `mounted` is `false` → renders light logo (matches server)
+3. **Client (after mount):** `mounted` is `true` → renders correct logo
+4. **Result:** No hydration error, smooth transition
+
+## Other Common Sources of Hydration Errors
+
+### 1. Date/Time Rendering
+
+```tsx
+// ❌ Problematic
+const now = new Date()
+return <div>Current time: {now.toLocaleTimeString()}</div>
+
+// ✅ Fixed
+const [time, setTime] = useState('')
+useEffect(() => {
+  setTime(new Date().toLocaleTimeString())
+}, [])
+```
+
+### 2. Window/Document Access
+
+```tsx
+// ❌ Problematic
+const isMobile = window.innerWidth < 768
+
+// ✅ Fixed
+const [isMobile, setIsMobile] = useState(false)
+useEffect(() => {
+  setIsMobile(window.innerWidth < 768)
+}, [])
+```
+
+### 3. Random Values
+
+```tsx
+// ❌ Problematic
+const randomId = Math.random().toString()
+
+// ✅ Fixed
+const [randomId, setRandomId] = useState('')
+useEffect(() => {
+  setRandomId(Math.random().toString())
+}, [])
+```
+
+## Best Practices for Avoiding Hydration Errors
+
+### 1. Use the Mounting Pattern
+
+Always check if the component is mounted before rendering client-dependent content:
+
+```tsx
+const [mounted, setMounted] = useState(false)
+
+useEffect(() => {
+  setMounted(true)
+}, [])
+
+// Only render client-dependent content after mount
+if (!mounted) {
+  return <div>Loading...</div> // or a skeleton
+}
+```
+
+### 2. Provide Server-Safe Defaults
+
+Ensure your server and client render the same initial state:
+
+```tsx
+// Server and client both start with the same default
+const [theme, setTheme] = useState('light') // not undefined
+```
+
+### 3. Use `suppressHydrationWarning` Sparingly
+
+Only use this for truly unavoidable cases:
+
+```tsx
+<div suppressHydrationWarning>{new Date().toLocaleTimeString()}</div>
+```
+
+### 4. Test with Different Themes/States
+
+Always test your app with:
+
+- Different theme preferences
+- Different screen sizes
+- Different browsers
+- Incognito mode (no localStorage)
+
+## Debugging Hydration Errors
+
+### 1. Check the Console
+
+Look for warnings like:
+
+```
+Warning: Text content did not match. Server: "Light" Client: "Dark"
+```
+
+### 2. Use React DevTools
+
+The React DevTools can help identify which component is causing the mismatch.
+
+### 3. Add Debug Logging
+
+```tsx
+console.log('Server/Client render:', { mounted, theme, isDark })
+```
+
+## Summary
+
+Hydration errors occur when server and client render different content. The most common cause is client-only state (like themes, dates, or browser APIs) being used without proper mounting checks.
+
+**The key is to:**
+
+1. **Wait for mounting** before rendering client-dependent content
+2. **Provide consistent defaults** for server and client
+3. **Test thoroughly** with different states and environments
+
+By following the mounting pattern and these best practices, you can eliminate most hydration errors in your Next.js applications.
+
+---
+
+_This pattern is especially important when using libraries like `next-themes`, `framer-motion`, or any component that depends on browser APIs._
