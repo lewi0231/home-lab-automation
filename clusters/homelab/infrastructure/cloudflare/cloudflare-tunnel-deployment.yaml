@@ -63,4 +63,6 @@ data:
       service: http://traefik-public.traefik-public.svc.cluster.local:80
     - hostname: "blog.flowerhead.dev"
       service: http://traefik-public.traefik-public.svc.cluster.local:80
+    - hostname: "chriscoombs.flowerhead.dev"
+      service: http://traefik-public.traefik-public.svc.cluster.local:80
     - service: http_status:404
