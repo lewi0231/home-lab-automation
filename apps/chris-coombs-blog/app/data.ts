@@ -33,14 +33,14 @@ export const PROJECTS: Project[] = [
 ]
 
 export const WORK_EXPERIENCE: WorkExperience[] = [
-  {
-    company: 'Fivecast',
-    title: 'Graduate Software Developer',
-    start: '2022',
-    end: '2024',
-    link: 'https://trailwisdom.xyz',
-    id: 'work1',
-  },
+  // {
+  //   company: 'Fivecast',
+  //   title: 'Graduate Software Developer',
+  //   start: '2022',
+  //   end: '2024',
+  //   link: 'https://trailwisdom.xyz',
+  //   id: 'work1',
+  // },
 ]
 
 export const SOCIAL_LINKS: SocialLink[] = [

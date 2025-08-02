@@ -41,6 +41,7 @@ export default function AnimatedPosts({
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
         id="posts"
+        className={cn('w-3/4')}
       >
         <div className={cn(isBlogPage ? 'mb-10' : 'mb-5')}>
           <h2
@@ -114,7 +115,7 @@ export default function AnimatedPosts({
     <>
       {wrapWithMain ? (
         <motion.main
-          className="space-y-24"
+          className="flex w-full justify-center space-y-24"
           variants={VARIANTS_CONTAINER}
           initial="hidden"
           animate="visible"
