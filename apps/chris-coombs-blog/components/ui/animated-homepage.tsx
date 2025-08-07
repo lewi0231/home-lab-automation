@@ -1,6 +1,6 @@
 'use client'
 
-import { PROJECTS, SOCIAL_LINKS } from '@/app/data'
+import { EMAIL, PROJECTS, SOCIAL_MEDIA } from '@/app/data'
 import { BlogPost } from '@/lib/blog'
 
 import {
@@ -73,11 +73,27 @@ const AnimatedHomePage = memo(function AnimatedHomePage({ posts }: Props) {
           Whether you have a project or just want to connect, please reach out:
         </p>
         <div className="flex items-center justify-start space-x-3">
-          {SOCIAL_LINKS.map((link) => (
-            <MagneticSocialLink key={link.label} link={link.link}>
-              {link.label}
-            </MagneticSocialLink>
-          ))}
+          <MagneticSocialLink key={EMAIL} link={EMAIL}>
+            Email
+          </MagneticSocialLink>
+          <MagneticSocialLink
+            key={SOCIAL_MEDIA.facebook.link}
+            link={SOCIAL_MEDIA.facebook.link}
+          >
+            {SOCIAL_MEDIA.facebook.label}
+          </MagneticSocialLink>
+          <MagneticSocialLink
+            key={SOCIAL_MEDIA.instagram.link}
+            link={SOCIAL_MEDIA.instagram.link}
+          >
+            {SOCIAL_MEDIA.instagram.label}
+          </MagneticSocialLink>
+          <MagneticSocialLink
+            key={SOCIAL_MEDIA.youtube.link}
+            link={SOCIAL_MEDIA.youtube.link}
+          >
+            {SOCIAL_MEDIA.youtube.label}
+          </MagneticSocialLink>
         </div>
       </motion.section>
     </motion.main>

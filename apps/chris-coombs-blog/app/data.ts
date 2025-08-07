@@ -15,9 +15,18 @@ type WorkExperience = {
   id: string
 }
 
-type SocialLink = {
+export type SocialLink = {
   label: string
   link: string
+  iconPath?: string
+  iconName?: string
+}
+
+export type SocialMediaLinks = {
+  email: SocialLink
+  youtube: SocialLink
+  facebook: SocialLink
+  instagram: SocialLink
 }
 
 export const PROJECTS: Project[] = [
@@ -43,19 +52,27 @@ export const WORK_EXPERIENCE: WorkExperience[] = [
   // },
 ]
 
-export const SOCIAL_LINKS: SocialLink[] = [
-  {
+// Object structure for easy access by type
+export const SOCIAL_MEDIA: SocialMediaLinks = {
+  email: {
     label: 'Email',
-    link: 'mailto:tophcoombs@gmail.com',
+    link: 'mailto:tofaco.car23@gmail.com',
   },
-  // {
-  //   label: 'Twitter',
-  //   link: 'https://twitter.com/',
-  // },
-  // {
-  //   label: 'Instagram',
-  //   link: 'https://www.instagram.com/',
-  // },
-]
+  youtube: {
+    label: 'YouTube',
+    link: 'https://www.youtube.com/channel/UCqe0n9hWtewTojEPg7WyRaQ',
+    iconPath: '/youtube.svg',
+  },
+  facebook: {
+    label: 'Facebook',
+    link: 'https://www.facebook.com/profile.php?id=61579022346377',
+    iconPath: '/facebook.svg',
+  },
+  instagram: {
+    label: 'Instagram',
+    link: 'https://www.instagram.com/tofaco/',
+    iconPath: '/instagram.svg',
+  },
+} as const
 
-export const EMAIL = 'tophcoombs@gmail.com'
+export const EMAIL = 'tofaco.car23@gmail.com'

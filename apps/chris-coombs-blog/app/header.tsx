@@ -1,11 +1,14 @@
+'use client'
+
 import { Magnetic } from '@/components/ui/magnetic'
 import { TextEffect } from '@/components/ui/text-effect'
-import { Mail } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { SOCIAL_LINKS } from './data'
+import { SOCIAL_MEDIA } from './data'
 
 export function Header() {
+  const { facebook, instagram, youtube } = SOCIAL_MEDIA
+
   return (
     <header className="mb-8 flex items-center justify-between sm:px-6">
       <Link href="/" className="flex items-center">
@@ -34,21 +37,57 @@ export function Header() {
         </div>
       </Link>
       <div className="flex h-full">
-        {SOCIAL_LINKS.length
-          ? SOCIAL_LINKS.map((item) => {
-              return (
-                <a
-                  key={item.link}
-                  href={item.link}
-                  className="h-full p-2 opacity-85 hover:opacity-65"
-                >
-                  <Magnetic>
-                    <Mail size={20} className="" />
-                  </Magnetic>
-                </a>
-              )
-            })
-          : ''}
+        <a
+          key={instagram.link}
+          href={instagram.link}
+          className="h-full p-2 opacity-85 hover:opacity-65"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Magnetic>
+            <Image
+              src={instagram.iconPath ?? ''}
+              width={12}
+              height={12}
+              alt="social icon"
+              className="h-5 w-5"
+            />
+          </Magnetic>
+        </a>
+        <a
+          key={facebook.link}
+          href={facebook.link}
+          className="h-full p-2 opacity-85 hover:opacity-65"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Magnetic>
+            <Image
+              src={facebook.iconPath ?? ''}
+              width={12}
+              height={12}
+              alt="social icon"
+              className="h-5 w-5"
+            />
+          </Magnetic>
+        </a>
+        <a
+          key={youtube.link}
+          href={youtube.link}
+          className="h-full p-2 opacity-85 hover:opacity-65"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Magnetic>
+            <Image
+              src={youtube.iconPath ?? ''}
+              width={16}
+              height={16}
+              alt="social icon"
+              className="h-5 w-5"
+            />
+          </Magnetic>
+        </a>
       </div>
     </header>
   )
