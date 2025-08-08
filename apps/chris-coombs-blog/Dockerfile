@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # Use Node.js alpine as base image instead of plain alpine
 FROM node:18-alpine AS builder
 
@@ -13,24 +14,20 @@ RUN npm ci
 # Copy the rest of the application code
 COPY . .
 
-# Set environment variables for build time
-ARG CC_DATABASE_URL
-ARG CC_DIRECT_URL
-ARG CLOUDINARY_API_SECRET
-ARG CLOUDINARY_API_KEY
-ARG NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-ENV DATABASE_URL=$CC_DATABASE_URL
-ENV DIRECT_URL=$CC_DIRECT_URL
-ENV CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET
-ENV CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY
-ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=$NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-
-
-# Generate Prisma client (this doesn't need database connection)
-RUN npx prisma generate
-
-# Build the Next.js app
-RUN npm run build
+# Build the Next.js app using ephemeral secrets (not persisted in layers)
+RUN --mount=type=secret,id=CC_DATABASE_URL \
+    --mount=type=secret,id=CC_DIRECT_URL \
+    --mount=type=secret,id=CLOUDINARY_API_KEY \
+    --mount=type=secret,id=CLOUDINARY_API_SECRET \
+    --mount=type=secret,id=NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME \
+    DATABASE_URL="$(cat /run/secrets/CC_DATABASE_URL 2>/dev/null || true)" \
+    DIRECT_URL="$(cat /run/secrets/CC_DIRECT_URL 2>/dev/null || true)" \
+    CLOUDINARY_API_KEY="$(cat /run/secrets/CLOUDINARY_API_KEY 2>/dev/null || true)" \
+    CLOUDINARY_API_SECRET="$(cat /run/secrets/CLOUDINARY_API_SECRET 2>/dev/null || true)" \
+    NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME="$(cat /run/secrets/NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME 2>/dev/null || true)" \
+    && export DATABASE_URL DIRECT_URL CLOUDINARY_API_KEY CLOUDINARY_API_SECRET NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME \
+    && npx prisma generate \
+    && npm run build
 
 # Production image
 FROM node:18-alpine AS runner

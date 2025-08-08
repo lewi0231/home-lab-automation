@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import type { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function PATCH(
@@ -21,7 +22,7 @@ export async function PATCH(
       customFields,
     } = body
 
-    const updateData: any = {}
+    const updateData: Prisma.PostUpdateInput = {}
 
     // Only update fields that are provided
     if (published !== undefined) {
