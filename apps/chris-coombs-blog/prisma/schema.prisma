@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("DATABASE_URL" )
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -12,7 +12,7 @@ model Post {
   id              String    @id @default(cuid())
   title           String
   slug            String    @unique
-  content         Json
+  content         String    // Store raw markdown content
   excerpt         String?
   published       Boolean   @default(false)
   publishedAt     DateTime?
@@ -28,10 +28,10 @@ model Post {
   authorId        String?
   author          User?     @relation(fields: [authorId], references: [id])
 
-  @@map("posts")
   @@index([published, publishedAt(sort: Desc)])
   @@index([published, featured])
   @@index([published, tags])
+  @@map("posts")
 }
 
 model User {
@@ -60,8 +60,8 @@ model Page {
   metaTitle       String?
   metaDescription String?
 
-  @@map("pages")
   @@index([published])
+  @@map("pages")
 }
 
 model Setting {

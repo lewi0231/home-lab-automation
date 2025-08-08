@@ -8,13 +8,8 @@ async function addTestPost() {
       data: {
         title: 'Test Post',
         slug: 'test-post',
-        content: [
-          {
-            type: 'paragraph',
-            content:
-              'This is a test post to verify the database connection is working.',
-          },
-        ],
+        content:
+          'This is a test post to verify the database connection is working.',
         excerpt: 'A test post for development',
         published: true,
         publishedAt: new Date(),

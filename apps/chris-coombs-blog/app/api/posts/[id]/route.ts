@@ -8,16 +8,42 @@ export async function PATCH(
   try {
     const { id } = await params
     const body = await request.json()
-    const { published } = body
+    const {
+      published,
+      title,
+      slug,
+      content,
+      excerpt,
+      coverImage,
+      metaTitle,
+      metaDescription,
+      tags,
+      customFields,
+    } = body
+
+    const updateData: any = {}
+
+    // Only update fields that are provided
+    if (published !== undefined) {
+      updateData.published = published
+      updateData.publishedAt = published ? new Date() : null
+    }
+    if (title !== undefined) updateData.title = title
+    if (slug !== undefined) updateData.slug = slug
+    if (content !== undefined) updateData.content = content
+    if (excerpt !== undefined) updateData.excerpt = excerpt
+    if (coverImage !== undefined) updateData.coverImage = coverImage
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle
+    if (metaDescription !== undefined)
+      updateData.metaDescription = metaDescription
+    if (tags !== undefined) updateData.tags = tags
+    if (customFields !== undefined) updateData.customFields = customFields
 
     const post = await prisma.post.update({
       where: {
         id,
       },
-      data: {
-        published,
-        publishedAt: published ? new Date() : null,
-      },
+      data: updateData,
       include: {
         author: true,
       },

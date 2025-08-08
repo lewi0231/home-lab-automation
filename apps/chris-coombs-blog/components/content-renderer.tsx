@@ -1,7 +1,8 @@
 'use client'
 
+import { parseMarkdownToBlocks } from '@/lib/markdown-parser'
 import { cn } from '@/lib/utils'
-import { memo } from 'react'
+import { memo, useEffect, useState } from 'react'
 import CloudinaryImage from './ui/cloudinary-image'
 import Mermaid from './ui/mermaid'
 
@@ -15,7 +16,7 @@ export type ContentBlock =
   | { type: 'divider' }
 
 interface ContentRendererProps {
-  content: ContentBlock[]
+  content: ContentBlock[] | string
   className?: string
 }
 
@@ -23,6 +24,40 @@ const ContentRenderer = memo(function ContentRenderer({
   content,
   className,
 }: ContentRendererProps) {
+  const [parsedContent, setParsedContent] = useState<ContentBlock[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const parseContent = async () => {
+      if (!content) {
+        setParsedContent([])
+        return
+      }
+
+      if (typeof content === 'string') {
+        if (content.trim() === '') {
+          setParsedContent([])
+          return
+        }
+
+        setIsLoading(true)
+        try {
+          const blocks = await parseMarkdownToBlocks(content)
+          setParsedContent(blocks)
+        } catch (error) {
+          console.error('Error parsing markdown:', error)
+          setParsedContent([])
+        } finally {
+          setIsLoading(false)
+        }
+      } else {
+        setParsedContent(content)
+      }
+    }
+
+    parseContent()
+  }, [content])
+
   const renderBlock = (block: ContentBlock, index: number) => {
     switch (block.type) {
       case 'heading':
@@ -188,9 +223,21 @@ const ContentRenderer = memo(function ContentRenderer({
     }
   }
 
+  if (isLoading) {
+    return (
+      <div className={cn('max-w-none', className)}>
+        <div className="animate-pulse">
+          <div className="mb-4 h-4 rounded bg-gray-200"></div>
+          <div className="mb-4 h-4 w-3/4 rounded bg-gray-200"></div>
+          <div className="mb-4 h-4 w-1/2 rounded bg-gray-200"></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={cn('max-w-none', className)}>
-      {content.map((block, index) => renderBlock(block, index))}
+      {parsedContent.map((block, index) => renderBlock(block, index))}
     </div>
   )
 })

@@ -1,4 +1,4 @@
-import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
+import { ContentRenderer } from '@/components/content-renderer'
 import { BlogDate } from '@/components/ui/blog-date'
 import CloudinaryImage from '@/components/ui/cloudinary-image'
 import { getBlogPost, getBlogPosts, type BlogPost } from '@/lib/blog'
@@ -52,7 +52,7 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
       {post.excerpt && (
         <p className="mb-8 text-lg text-gray-700">{post.excerpt}</p>
       )}
-      <ContentRenderer content={post.content as ContentBlock[]} />
+      <ContentRenderer content={post.content} />
     </article>
   )
 }

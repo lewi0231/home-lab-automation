@@ -1,11 +1,10 @@
-import { ContentBlock } from '@/components/content-renderer'
 import { prisma } from './prisma'
 
 export interface BlogPost {
   id: string
   slug: string
   title: string
-  content: ContentBlock[]
+  content: string
   excerpt?: string
   description?: string
   date?: string

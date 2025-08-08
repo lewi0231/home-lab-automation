@@ -128,7 +128,7 @@ async function migrateMdxToDatabase() {
           where: { slug },
           data: {
             title: data.title || slug.replace(/-/g, ' '),
-            content: blocks,
+            content: content, // Store raw markdown content
             excerpt: data.description,
             published: true,
             publishedAt: data.date ? new Date(data.date) : new Date(),
@@ -143,7 +143,7 @@ async function migrateMdxToDatabase() {
           data: {
             slug,
             title: data.title || slug.replace(/-/g, ' '),
-            content: blocks,
+            content: content, // Store raw markdown content
             excerpt: data.description,
             published: true,
             publishedAt: data.date ? new Date(data.date) : new Date(),

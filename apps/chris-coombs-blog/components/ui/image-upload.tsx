@@ -35,7 +35,7 @@ export default function ImageUpload({ post, setNewPost }: Props) {
     if (typeof result?.info === 'string') return
     if (result?.info?.secure_url) {
       const imageUrl = result.info.secure_url
-      setNewPost({ ...post, coverImage: imageUrl })
+      setNewPost((prevPost) => ({ ...prevPost, coverImage: imageUrl }))
     }
   }
 
