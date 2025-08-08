@@ -10,7 +10,7 @@ export function AuthorSidebar() {
           <div className="flex flex-col items-center space-y-4 text-center">
             <div className="relative h-32 w-32 overflow-hidden rounded-full">
               <Image
-                src="/thegraduate.jpeg"
+                src="/tofa.jpeg"
                 alt="Chris Coombs"
                 fill
                 className="object-cover"

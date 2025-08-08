@@ -41,7 +41,7 @@ export default function AnimatedPosts({
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
         id="posts"
-        className={cn('w-3/4')}
+        className={cn('')}
       >
         <div className={cn(isBlogPage ? 'mb-10' : 'mb-5')}>
           <h2

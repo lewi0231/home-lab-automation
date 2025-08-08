@@ -12,6 +12,8 @@ export default function MagneticSocialLink({
       <a
         href={link}
         className="group relative inline-flex shrink-0 items-center gap-[1px] rounded-full bg-zinc-100 px-2.5 py-1 text-sm text-black transition-colors duration-200 hover:bg-zinc-950 hover:text-zinc-50 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+        target="_blank"
+        rel="noopener noreferrer"
       >
         {children}
         <svg

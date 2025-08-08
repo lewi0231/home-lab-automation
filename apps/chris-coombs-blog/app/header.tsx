@@ -2,9 +2,10 @@
 
 import { Magnetic } from '@/components/ui/magnetic'
 import { TextEffect } from '@/components/ui/text-effect'
+import { Mail } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { SOCIAL_MEDIA } from './data'
+import { EMAIL, SOCIAL_MEDIA } from './data'
 
 export function Header() {
   const { facebook, instagram, youtube } = SOCIAL_MEDIA
@@ -13,7 +14,7 @@ export function Header() {
     <header className="mb-8 flex items-center justify-between sm:px-6">
       <Link href="/" className="flex items-center">
         <Image
-          src="/ccoombs.png"
+          src="/logo.png"
           width={70}
           height={70}
           alt="icon"
@@ -36,11 +37,22 @@ export function Header() {
           </TextEffect>
         </div>
       </Link>
-      <div className="flex h-full">
+      <div className="flex h-full items-center">
+        <a
+          key={EMAIL}
+          href={`mailto:${EMAIL}?subject=Hello%20Chris!`}
+          className="flex h-full items-center p-2 opacity-85 hover:opacity-65"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Magnetic>
+            <Mail size={20} />
+          </Magnetic>
+        </a>
         <a
           key={instagram.link}
           href={instagram.link}
-          className="h-full p-2 opacity-85 hover:opacity-65"
+          className="flex h-full items-center p-2 opacity-85 hover:opacity-65"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -57,7 +69,7 @@ export function Header() {
         <a
           key={facebook.link}
           href={facebook.link}
-          className="h-full p-2 opacity-85 hover:opacity-65"
+          className="flex h-full items-center p-2 opacity-85 hover:opacity-65"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -74,7 +86,7 @@ export function Header() {
         <a
           key={youtube.link}
           href={youtube.link}
-          className="h-full p-2 opacity-85 hover:opacity-65"
+          className="flex h-full items-center p-2 opacity-85 hover:opacity-65"
           target="_blank"
           rel="noopener noreferrer"
         >

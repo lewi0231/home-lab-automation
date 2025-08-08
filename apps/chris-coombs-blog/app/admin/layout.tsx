@@ -17,7 +17,6 @@ export default function LayoutBlogPost({
           bounce: 0,
         }}
       />
-
       <SharedLayout>{children}</SharedLayout>
     </>
   )

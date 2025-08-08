@@ -73,7 +73,10 @@ const AnimatedHomePage = memo(function AnimatedHomePage({ posts }: Props) {
           Whether you have a project or just want to connect, please reach out:
         </p>
         <div className="flex items-center justify-start space-x-3">
-          <MagneticSocialLink key={EMAIL} link={EMAIL}>
+          <MagneticSocialLink
+            key={EMAIL}
+            link={`mailto:${EMAIL}?subject=Hello%20Chris!`}
+          >
             Email
           </MagneticSocialLink>
           <MagneticSocialLink
