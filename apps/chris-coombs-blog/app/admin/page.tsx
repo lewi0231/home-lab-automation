@@ -374,7 +374,7 @@ export default function AdminPage() {
               onClick={handleCreateNewPost}
               className="flex items-center gap-2"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4 hover:cursor-pointer" />
               Create New Post
             </Button>
           )}
@@ -491,12 +491,12 @@ export default function AdminPage() {
                     Preview
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[400px] sm:w-[540px]">
+                <SheetContent side="right" className="w-[500px] sm:w-[740px]">
                   <SheetHeader>
                     <SheetTitle>Preview</SheetTitle>
                   </SheetHeader>
-                  <div className="mt-4 max-h-[calc(100vh-120px)] overflow-y-auto">
-                    <div className="prose max-w-none">
+                  <div className="mt-4 max-h-[calc(100vh-120px)] overflow-y-auto px-4">
+                    <div className="prose max-w-none text-gray-800 dark:text-gray-200">
                       <ContentRenderer content={parsedBlocks} />
                     </div>
                   </div>
@@ -549,7 +549,11 @@ export default function AdminPage() {
                   <div className="ml-4">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="hover:cursor-pointer"
+                        >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
