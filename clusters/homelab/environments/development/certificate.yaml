@@ -10,5 +10,5 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - personal-blog.development.flowerhead.dev
-    - dashboard.development.flowerhead.dev
+    - dashboard.flowerhead.dev
     - work-rate-calculator.development.flowerhead.dev

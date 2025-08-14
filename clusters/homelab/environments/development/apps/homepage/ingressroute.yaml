@@ -10,7 +10,7 @@ spec:
     - websecure
   routes:
     - kind: Rule
-      match: Host(`dashboard.development.flowerhead.dev`)
+      match: Host(`dashboard.flowerhead.dev`)
       services:
         - kind: Service
           name: homepage

@@ -9,7 +9,7 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "db:generate": "prisma generate",
-    "db:push": "npx dotenv -e .env.development -- npx prisma db push",
+    "db:push": "NODE_ENV=development npx dotenv -e .env.development -- npx prisma db push",
     "db:push:production": "npx dotenv -e .env.production -- npx prisma db push",
     "db:migrate": " npx dotenv -e .env.production -- npx prisma migrate dev",
     "db:studio": " npx dotenv -e .env.production -- npx prisma studio",

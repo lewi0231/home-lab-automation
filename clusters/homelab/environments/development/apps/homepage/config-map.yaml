@@ -23,6 +23,14 @@ data:
         - Cloudflare:
             - abbr: CL
               href: https://cloudflare.com
+    - Blogs (Production):
+        - Personal Blog:
+            href: https://personal-blog.flowerhead.dev/
+            description: My staged blog in the cluster
+        - Chris Coombs:
+            href: https://chris-coombs.flowerhead.dev/
+            description: Production Chris Coombs Blog
+
   services.yaml: |
     - Web Apps:
         - Personal Blog:
@@ -46,9 +54,6 @@ data:
             description: Kubernetes Overview
 
     - Services:
-        - Pi Hole:
-            href: https://pihole.flowerhead.dev/admin
-            description: Pi Hole - which is my dns router.
         - Pfsense:
             href: http://pfsense.flowerhead.dev
             description: My Router and DHCP server
