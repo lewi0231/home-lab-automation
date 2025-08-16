@@ -56,7 +56,7 @@ jobs:
   build:
     environment: production
     needs: detect-changes
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     if: needs.detect-changes.outputs.matrix != '{"app":[]}'
 
     strategy:
@@ -162,8 +162,8 @@ jobs:
             CLOUDINARY_API_KEY=${{secrets.CLOUDINARY_API_KEY}}
             CLOUDINARY_API_SECRET=${{secrets.CLOUDINARY_API_SECRET}}
             NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=${{secrets.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}}
-            CC_DATABASE_URL=${{secrets.CC_DATABASE_URL}}
-            CC_DIRECT_URL=${{secrets.CC_DIRECT_URL}}
+            CC_DATABASE_URL=postgresql://postgres:0e12a7216c73fd5f3a1b5c44f20c827c@chris-coombs-db-pgbouncer.database.svc.cluster.local:5432/postgres
+            CC_DIRECT_URL=postgresql://postgres:0e12a7216c73fd5f3a1b5c44f20c827c@chris-coombs-db-pgbouncer.database.svc.cluster.local:5432/postgres
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.app }}:${{ github.sha }}

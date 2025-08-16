@@ -337,3 +337,15 @@ kubectl --namespace monitoring port-forward $POD_NAME 9091
 For more information on running Prometheus, visit:
 https://prometheus.io/
 `
+
+## HOSTING GITHUB actions runner
+
+I'm hosting a github actions runner on my homelab. I'm using the following helm chart: `https://artifacthub.io/packages/helm/actions-runner-controller/actions-runner-controller`
+
+NOTES:
+
+1. Get the application URL by running these commands:
+   export POD_NAME=$(kubectl get pods --namespace actions -l "app.kubernetes.io/name=actions-runner-controller,app.kubernetes.io/instance=actions-runner-controller" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace actions $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace actions port-forward $POD_NAME 8080:$CONTAINER_PORT
