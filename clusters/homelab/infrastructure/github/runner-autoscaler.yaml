@@ -4,9 +4,9 @@ metadata:
   name: chris-coombs-blog-runner-autoscaler
   namespace: actions
 spec:
-  # Scale between 0-3 runners (adjust based on your needs)
+  # Scale between 0-1 runners for testing (adjust based on your needs)
   minReplicas: 0
-  maxReplicas: 3
+  maxReplicas: 1
 
   # Target the runner deployment we just created
   scaleTargetRef:

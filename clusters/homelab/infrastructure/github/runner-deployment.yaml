@@ -18,39 +18,20 @@ spec:
         - chris-coombs-blog
         - k3s-local
 
-      # Use Node.js 18 compatible runner image for your blog builds
-      image: summerwind/actions-runner:ubuntu-20.04
+      # Use latest runner image (might be cached or more available)
+      image: summerwind/actions-runner:latest
 
-      # Resource allocation for Node.js builds + Docker
+      # Reduced resource allocation to fit cluster capacity
       resources:
         requests:
-          cpu: 2000m # 2 CPU cores for Node.js builds
-          memory: 4Gi # 4GB RAM for npm dependencies
+          cpu: 500m # 0.5 CPU cores
+          memory: 1Gi # 1GB RAM
         limits:
-          cpu: 4000m # Allow bursting to 4 cores
-          memory: 8Gi # Max 8GB RAM
+          cpu: 2000m # Allow bursting to 2 cores
+          memory: 4Gi # Max 4GB RAM
 
-      # Environment variables for the runner
-      env:
-        - name: DOCKER_HOST
-          value: tcp://localhost:2376
-        - name: DOCKER_TLS_VERIFY
-          value: "1"
-        - name: DOCKER_CERT_PATH
-          value: /certs/client
-
-      # Docker-in-Docker sidecar for building containers
-      dockerdWithinRunnerContainer: false
-      dockerEnabled: true
-
-      # Volume mounts for Docker certificates
-      volumeMounts:
-        - name: docker-certs
-          mountPath: /certs
-
-      volumes:
-        - name: docker-certs
-          emptyDir: {}
+      # Disable Docker for initial testing - we'll add it back once basic runner works
+      dockerEnabled: false
 
       # Tolerations to allow scheduling on any node
       tolerations:
