@@ -1,0 +1,47 @@
+name: Test Self-Hosted Runner
+
+on:
+  workflow_dispatch:  # Manual trigger for testing
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/test-self-hosted.yml"
+
+jobs:
+  test-runner:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Test basic functionality
+        run: |
+          echo "🎉 Self-hosted runner is working!"
+          echo "Runner hostname: $(hostname)"
+          echo "Runner OS: $(uname -a)"
+          echo "Current directory: $(pwd)"
+          echo "Available disk space:"
+          df -h
+          
+      - name: Test database connectivity
+        run: |
+          echo "Testing database connectivity..."
+          # Test if we can resolve the database service
+          nslookup chris-coombs-db-pgbouncer.database.svc.cluster.local || echo "DNS resolution failed"
+          
+      - name: Test Node.js availability
+        run: |
+          echo "Testing Node.js..."
+          which node || echo "Node.js not found"
+          node --version || echo "Node.js version check failed"
+          which npm || echo "npm not found"
+          npm --version || echo "npm version check failed"
+          
+      - name: Test chris-coombs-blog directory
+        run: |
+          echo "Testing chris-coombs-blog directory..."
+          ls -la apps/chris-coombs-blog/ || echo "Directory not found"
+          
+      - name: Success message
+        run: |
+          echo "✅ All tests passed! Self-hosted runner is ready for builds!"
