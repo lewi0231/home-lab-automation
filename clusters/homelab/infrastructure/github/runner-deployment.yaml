@@ -1,7 +1,7 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: RunnerDeployment
 metadata:
-  name: chris-coombs-blog-runner
+  name: homelab-apps-runner
   namespace: actions
   annotations:
     # Prevent Karpenter from evicting these pods during scaling
@@ -10,12 +10,13 @@ spec:
   template:
     spec:
       # Repository-level runner for personal account
-      repository: lewi0231/home-lab-automation
+      # repository: lewi0231/home-lab-automation
+      organization: lewi0231
 
       # Labels that workflows will use to target these runners
       labels:
         - self-hosted
-        - chris-coombs-blog
+        - homelab-apps
         - k3s-local
 
       # Use latest runner image (might be cached or more available)
@@ -30,8 +31,9 @@ spec:
           cpu: 2000m # Allow bursting to 2 cores
           memory: 4Gi # Max 4GB RAM
 
-      # Disable Docker for initial testing - we'll add it back once basic runner works
-      dockerEnabled: false
+      # Enable Docker with sidecar container (Docker-in-Docker)
+      dockerEnabled: true
+      dockerdWithinRunnerContainer: false
 
       # Tolerations to allow scheduling on any node
       tolerations:

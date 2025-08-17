@@ -9,7 +9,7 @@ on:
 
 jobs:
   test-runner:
-    runs-on: self-hosted
+    runs-on: [self-hosted, homelab-apps]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

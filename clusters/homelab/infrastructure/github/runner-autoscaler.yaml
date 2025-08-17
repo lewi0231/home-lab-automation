@@ -1,17 +1,17 @@
 apiVersion: actions.summerwind.dev/v1alpha1
 kind: HorizontalRunnerAutoscaler
 metadata:
-  name: chris-coombs-blog-runner-autoscaler
+  name: homelab-apps-runner-autoscaler
   namespace: actions
 spec:
-  # Scale between 0-1 runners for testing (adjust based on your needs)
+  # Scale between 0-3 runners to handle parallel builds if needed
   minReplicas: 0
   maxReplicas: 1
 
   # Target the runner deployment we just created
   scaleTargetRef:
     kind: RunnerDeployment
-    name: chris-coombs-blog-runner
+    name: homelab-apps-runner
 
   # Scaling triggers - this will scale up when workflow jobs are queued
   scaleUpTriggers:

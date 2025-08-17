@@ -7,7 +7,7 @@ actionsMetrics:
       tag: v0.13.1
   serviceAnnotations: {}
   serviceMonitor:
-    enable: false
+    enabled: false
     interval: 1m
     namespace: ""
     timeout: 30s
@@ -73,18 +73,26 @@ enableLeaderElection: true
 fullnameOverride: ""
 githubWebhookServer:
   affinity: {}
-  enabled: false
+  enabled: true
   fullnameOverride: ""
   imagePullSecrets: []
   ingress:
-    annotations: {}
-    enabled: false
+    annotations:
+      cert-manager.io/cluster-issuer: "cluster-issuer-staging"
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+      traefik.ingress.kubernetes.io/router.tls: "true"
+    enabled: true
     hosts:
       - extraPaths: []
-        host: chart-example.local
-        paths: []
-    ingressClassName: ""
-    tls: []
+        host: github-webhook.flowerhead.dev
+        paths:
+          - path: /
+            pathType: Prefix
+    ingressClassName: "traefik-public"
+    tls:
+      - hosts:
+          - github-webhook.flowerhead.dev
+        secretName: github-webhook-tls
   lifecycle: {}
   logFormat: text
   nameOverride: ""
@@ -99,7 +107,7 @@ githubWebhookServer:
   resources: {}
   secret:
     create: false
-    enabled: false
+    enabled: true
     github_webhook_secret_token: ""
     name: github-webhook-server
   securityContext: {}
@@ -137,7 +145,7 @@ metrics:
       tag: v0.13.1
   serviceAnnotations: {}
   serviceMonitor:
-    enable: false
+    enabled: false
     interval: 1m
     namespace: ""
     timeout: 30s
