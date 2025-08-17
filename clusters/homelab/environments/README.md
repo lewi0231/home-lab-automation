@@ -47,8 +47,13 @@ To add a new application to an environment:
 
 ## Current Applications
 
-- **Development**: personal-blog
-- **Production**: personal-blog, dashboard
+- **Development**: personal-blog (from personal-blog repository)
+- **Production**: personal-blog (from personal-blog repository), dashboard
+
+## Repository Structure
+
+- **personal-blog**: Applications from the `personal-blog` repository
+- **Other apps**: Applications from the `home-lab-automation` repository
 
 # Production and Development
 

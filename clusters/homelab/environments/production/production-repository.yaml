@@ -7,6 +7,6 @@ spec:
   interval: 1m0s
   ref:
     branch: main
-  url: https://github.com/lewi0231/home-lab-automation
+  url: https://github.com/lewi0231/personal-blog
   secretRef:
     name: git-credentials
