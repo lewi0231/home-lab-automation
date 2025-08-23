@@ -1,0 +1,54 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: personal-blog-runner
+  namespace: actions
+  annotations:
+    # Prevent Karpenter from evicting these pods during scaling
+    karpenter.sh/do-not-evict: "true"
+spec:
+  replicas: 0
+  template:
+    spec:
+      # Repository-level runner for personal-blog repository
+      repository: lewi0231/personal-blog
+
+      # Labels that workflows will use to target these runners
+      labels:
+        - self-hosted
+        - personal-blog
+        - k3s-local
+
+      # Use latest runner image (might be cached or more available)
+      image: summerwind/actions-runner:latest
+
+      # Reduced resource allocation to fit cluster capacity
+      resources:
+        requests:
+          cpu: 500m # 0.5 CPU cores
+          memory: 1Gi # 1GB RAM
+        limits:
+          cpu: 2000m # Allow bursting to 2 cores
+          memory: 4Gi # Max 4GB RAM
+
+      # Enable Docker with sidecar container (Docker-in-Docker)
+      dockerEnabled: true
+      dockerdWithinRunnerContainer: false
+
+      # Add image pull secrets for GHCR authentication
+      imagePullSecrets:
+        - name: ghcr-credentials
+
+      # Remove tolerations to respect master node taint
+      tolerations: [] # Empty or remove entirely to respect node taints
+
+      # Node affinity to prefer nodes with more resources (but respect taints)
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: node.kubernetes.io/instance-type
+                    operator: NotIn
+                    values: ["t3.nano", "t3.micro"]

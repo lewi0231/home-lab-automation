@@ -349,3 +349,25 @@ NOTES:
   export CONTAINER_PORT=$(kubectl get pod --namespace actions $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
   echo "Visit http://127.0.0.1:8080 to use your application"
   kubectl --namespace actions port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+# PgBouncer
+
+I'm using pgbouncer to manage connections to the databases. I'm using the following helm chart: `https://artifacthub.io/packages/helm/icoretech/pgbouncer`
+
+NOTES:
+
+1. Get the application URL by running these commands:
+   export POD_NAME=$(kubectl get pods --namespace actions -l "app.kubernetes.io/name=actions-runner-controller,app.kubernetes.io/instance=actions-runner-controller" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace actions $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace actions port-forward $POD_NAME 8080:$CONTAINER_PORT
+
+2. Install pgbouncer
+   helm upgrade -n database pgbouncer icoretech/pgbouncer \
+   --set-string config.databases.personal-blog-db.password="$(kubectl get -n database secret personal-blog-db-postgresql -o jsonpath='{.data.postgres-password}' | base64 -d)" \
+   --set-string config.databases.chris-coombs-db.password="$(kubectl get -n database secret chris-coombs-db-postgresql -o jsonpath='{.data.postgres-password}' | base64 -d)" \
+   --set-string config.userlist.postgres=3175bce1d3201d16594cebf9d7eb3f9d \
+   --set-string config.adminPassword=postgres \
+   --set-string config.adminUser=postgres \
+   --reset-values \
+   -f homelab/infrastructure/pgbouncer/values.yaml

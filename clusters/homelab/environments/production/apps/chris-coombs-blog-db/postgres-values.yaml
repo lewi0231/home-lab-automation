@@ -2,12 +2,10 @@
 postgresql:
   enabled: true
   auth:
-    existingSecret: "chris-coombs-db"
+    existingSecret: "chris-coombs-db-postgresql"
     existingSecretKeys:
-      adminPasswordKey: "POSTGRES_PASSWORD"
-      userPasswordKey: "POSTGRES_PASSWORD"
-      databaseKey: "POSTGRES_DB"
-      usernameKey: "POSTGRES_USER"
+      adminPasswordKey: "postgres-password"
+      userPasswordKey: "postgres-password"
     # database: "postgres"
     # username: "lewi0231"
 
@@ -44,3 +42,8 @@ postgresql:
       periodSeconds: 10
       timeoutSeconds: 3
       failureThreshold: 6
+auth:
+  enablePostgresUser: true
+  postgresPassword: "postgres" # Set your desired password here
+  adminPasswordKey: postgres-password
+  userPasswordKey: postgres-password

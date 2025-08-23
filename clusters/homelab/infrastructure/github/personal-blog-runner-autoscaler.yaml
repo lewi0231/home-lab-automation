@@ -1,0 +1,16 @@
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: personal-blog-runner-autoscaler
+  namespace: actions
+spec:
+  scaleTargetRef:
+    name: personal-blog-runner
+  minReplicas: 1
+  maxReplicas: 1
+  # Use metrics-based scaling for polling approach
+  metrics:
+    - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+      repositoryNames:
+        - lewi0231/personal-blog
+  scaleDownDelaySecondsAfterScaleOut: 300

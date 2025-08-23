@@ -34,7 +34,7 @@ actionsMetricsServer:
   podLabels: {}
   podSecurityContext: {}
   priorityClassName: ""
-  replicaCount: 1
+  replicaCount: 0
   resources: {}
   secret:
     create: false
@@ -71,68 +71,6 @@ defaultScaleDownDelay: 10m
 dockerRegistryMirror: ""
 enableLeaderElection: true
 fullnameOverride: ""
-githubWebhookServer:
-  affinity: {}
-  enabled: true
-  fullnameOverride: ""
-  imagePullSecrets: []
-  ingress:
-    annotations:
-      cert-manager.io/cluster-issuer: "cluster-issuer-staging"
-      traefik.ingress.kubernetes.io/router.entrypoints: websecure
-      traefik.ingress.kubernetes.io/router.tls: "true"
-    enabled: true
-    hosts:
-      - extraPaths: []
-        host: github-webhook.flowerhead.dev
-        paths:
-          - path: /
-            pathType: Prefix
-    ingressClassName: "traefik-public"
-    tls:
-      - hosts:
-          - github-webhook.flowerhead.dev
-        secretName: github-webhook-tls
-  lifecycle: {}
-  logFormat: text
-  nameOverride: ""
-  nodeSelector: {}
-  podAnnotations: {}
-  podDisruptionBudget:
-    enabled: false
-  podLabels: {}
-  podSecurityContext: {}
-  priorityClassName: ""
-  replicaCount: 1
-  resources: {}
-  secret:
-    create: false
-    enabled: true
-    github_webhook_secret_token: ""
-    name: github-webhook-server
-  securityContext: {}
-  service:
-    annotations: {}
-    loadBalancerSourceRanges: []
-    ports:
-      - name: http
-        port: 80
-        protocol: TCP
-        targetPort: http
-    type: ClusterIP
-  serviceAccount:
-    annotations: {}
-    create: true
-    name: ""
-  terminationGracePeriodSeconds: 10
-  tolerations: []
-  useRunnerGroupsVisibility: false
-image:
-  actionsRunnerImagePullSecrets: []
-  actionsRunnerRepositoryAndTag: summerwind/actions-runner:latest
-  dindSidecarRepositoryAndTag: docker:dind
-  pullPolicy: IfNotPresent
-  repository: summerwind/actions-runner-controller
 imagePullSecrets: []
 labels: {}
 logFormat: text
@@ -170,7 +108,7 @@ scope:
 securityContext: {}
 service:
   annotations: {}
-  port: 443
+  port: 80
   type: ClusterIP
 serviceAccount:
   annotations: {}
