@@ -56,7 +56,7 @@ jobs:
   build:
     environment: production
     needs: detect-changes
-    runs-on: [homelab-apps]
+    runs-on: ubuntu-latest
     if: needs.detect-changes.outputs.matrix != '{"app":[]}'
 
     strategy:
