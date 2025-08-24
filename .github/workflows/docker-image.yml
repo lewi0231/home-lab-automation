@@ -34,7 +34,7 @@ jobs:
         id: changes
         run: |
           # Get list of all apps
-          APPS=("personal-blog" "work-rate-calculator" "chris-coombs-blog")
+          APPS=( "work-rate-calculator" "chris-coombs-blog")
           CHANGED_APPS=()
 
           # Check if any files in each app directory have changed

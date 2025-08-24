@@ -2,6 +2,8 @@
 
 A personal blog built with Next.js 15, React 19, Tailwind CSS v4, and Prisma with PostgreSQL (Supabase). Features include admin access control, Mermaid diagram support, and a modern responsive design.
 
+## Deployment
+
 ## Features
 
 - Blog posts with MDX support
