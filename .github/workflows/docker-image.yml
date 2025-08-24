@@ -56,7 +56,7 @@ jobs:
   build:
     environment: production
     needs: detect-changes
-    runs-on: [self-hosted, homelab-apps]
+    runs-on: [homelab-apps]
     if: needs.detect-changes.outputs.matrix != '{"app":[]}'
 
     strategy:
