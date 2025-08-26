@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
       coverImage,
       metaTitle,
       metaDescription,
+      contentWarning,
       tags = [],
       customFields,
     } = body
@@ -52,6 +53,7 @@ export async function POST(request: NextRequest) {
         coverImage,
         metaTitle,
         metaDescription,
+        contentWarning,
         tags,
         customFields,
       },

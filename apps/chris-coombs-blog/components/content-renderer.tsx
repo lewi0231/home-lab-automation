@@ -62,7 +62,7 @@ const ContentRenderer = memo(function ContentRenderer({
     switch (block.type) {
       case 'heading':
         const headingClasses = cn(
-          'font-medium tracking-tight ',
+          'font-medium tracking-tight dark:text-gray-300',
           block.level === 1 && 'mb-4 text-3xl',
           block.level === 2 && 'mt-8 mb-3 text-2xl',
           block.level === 3 && 'mt-6 mb-2 text-xl',
@@ -146,7 +146,10 @@ const ContentRenderer = memo(function ContentRenderer({
 
       case 'paragraph':
         return (
-          <p key={index} className="mb-4 leading-relaxed">
+          <p
+            key={index}
+            className="mb-4 leading-relaxed text-gray-800 dark:text-gray-300"
+          >
             <span
               dangerouslySetInnerHTML={{
                 __html: block.text,

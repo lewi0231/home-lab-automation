@@ -4,21 +4,15 @@ import { BlogPost } from '@/lib/blog'
 import { CldImage } from 'next-cloudinary'
 import { ContentBlock } from '../content-renderer'
 
-type BlockProps = {
-  block: Extract<ContentBlock, { type: 'image' }>
-  post?: never
+type Props = {
+  block?: Extract<ContentBlock, { type: 'image' }>
+  coverImage?: BlogPost['coverImage']
+  title?: BlogPost['title']
 }
 
-type PostProps = {
-  post: BlogPost
-  block?: never
-}
-
-type Props = BlockProps | PostProps
-
-export default function CloudinaryImage({ block, post }: Props) {
-  const src = block ? block.src : post.coverImage
-  const alt = block ? block.alt : post.title
+export default function CloudinaryImage({ block, coverImage, title }: Props) {
+  const src = block ? block.src : coverImage
+  const alt = block ? block.alt : title
 
   return (
     <figure className="mb-4">

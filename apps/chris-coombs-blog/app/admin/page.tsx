@@ -1,6 +1,8 @@
 'use client'
 
-import { ContentBlock, ContentRenderer } from '@/components/content-renderer'
+// import { ContentBlock } from '@/components/content-renderer'
+import Post from '@/components/post'
+import { BlogDate } from '@/components/ui/blog-date'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -20,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
-import { parseMarkdownToBlocks } from '@/lib/markdown-parser'
+// import { parseMarkdownToBlocks } from '@/lib/markdown-parser'
 import { Edit, Eye, EyeOff, MoreHorizontal, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -34,6 +36,7 @@ export interface Post {
   content?: string
   excerpt?: string
   coverImage?: string
+  contentWarning?: string
 }
 
 interface FormData {
@@ -42,6 +45,7 @@ interface FormData {
   content: string
   excerpt: string
   coverImage: string
+  contentWarning?: string
 }
 
 export default function AdminPage() {
@@ -53,12 +57,13 @@ export default function AdminPage() {
     content: '',
     excerpt: '',
     coverImage: '',
+    contentWarning: '',
   })
   const [editingPost, setEditingPost] = useState<Post | null>(null)
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [accessKey, setAccessKey] = useState('')
-  const [parsedBlocks, setParsedBlocks] = useState<ContentBlock[]>([])
+  // const [parsedBlocks, setParsedBlocks] = useState<ContentBlock[]>([])
 
   useEffect(() => {
     // Check for persisted admin access
@@ -162,6 +167,7 @@ export default function AdminPage() {
           content: '',
           excerpt: '',
           coverImage: '',
+          contentWarning: '',
         })
         setShowCreateForm(false)
         fetchPosts()
@@ -248,14 +254,18 @@ export default function AdminPage() {
   const handleEditPost = (post: Post) => {
     setEditingPost(post)
     setShowCreateForm(true)
+    // Scroll to top of the page
+    setTimeout(() => {
+      document.getElementById('top')?.scrollIntoView({ behavior: 'smooth' })
+    }, 300)
   }
 
-  const handlePreviewContent = async (content: string) => {
-    if (content) {
-      const blocks = await parseMarkdownToBlocks(content)
-      setParsedBlocks(blocks)
-    }
-  }
+  // const handlePreviewContent = async (content: string) => {
+  //   if (content) {
+  //     const blocks = await parseMarkdownToBlocks(content)
+  //     setParsedBlocks(blocks)
+  //   }
+  // }
 
   const resetForm = () => {
     setNewPost({
@@ -264,6 +274,7 @@ export default function AdminPage() {
       content: '',
       excerpt: '',
       coverImage: '',
+      contentWarning: '',
     })
     setEditingPost(null)
     setShowCreateForm(false)
@@ -286,6 +297,7 @@ export default function AdminPage() {
       content: '',
       excerpt: '',
       coverImage: '',
+      contentWarning: '',
     })
   }
 
@@ -298,6 +310,7 @@ export default function AdminPage() {
         content: editingPost.content || '',
         excerpt: editingPost.excerpt || '',
         coverImage: editingPost.coverImage || '',
+        contentWarning: editingPost.contentWarning || '',
       }
     }
     return newPost
@@ -367,21 +380,23 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto px-8">
       <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl">Blog Admin</h1>
+        <h1 className="text-3xl" id="top">
+          Blog Admin
+        </h1>
         <div className="flex items-center gap-4">
           {!showCreateForm && (
             <Button
               onClick={handleCreateNewPost}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 hover:cursor-pointer"
             >
-              <Plus className="h-4 w-4 hover:cursor-pointer" />
+              <Plus className="h-4 w-4" />
               Create New Post
             </Button>
           )}
           <Button
             variant="outline"
             onClick={handleLogout}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:cursor-pointer"
           >
             Logout
           </Button>
@@ -437,7 +452,9 @@ export default function AdminPage() {
               </label>
               <textarea
                 value={
-                  editingPost ? editingPost.content || '' : newPost.content
+                  editingPost
+                    ? editingPost.content || ''
+                    : newPost.content || ''
                 }
                 onChange={(e) => {
                   if (editingPost) {
@@ -448,6 +465,29 @@ export default function AdminPage() {
                 }}
                 placeholder="Write your post in markdown..."
                 className="min-h-[300px] w-full rounded-md border p-3 font-mono text-sm"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-sm font-medium">
+                Content Warning
+              </label>
+              <Input
+                value={
+                  editingPost
+                    ? editingPost.contentWarning
+                    : newPost.contentWarning
+                }
+                onChange={(e) => {
+                  if (editingPost) {
+                    setEditingPost({
+                      ...editingPost,
+                      contentWarning: e.target.value,
+                    })
+                  } else {
+                    setNewPost({ ...newPost, contentWarning: e.target.value })
+                  }
+                }}
+                placeholder="Content warning"
               />
             </div>
             <div>
@@ -478,26 +518,45 @@ export default function AdminPage() {
                 <SheetTrigger asChild>
                   <Button
                     variant="outline"
-                    onClick={() =>
-                      handlePreviewContent(
-                        editingPost
-                          ? editingPost.content || ''
-                          : newPost.content,
-                      )
-                    }
+                    // onClick={() =>
+                    //   handlePreviewContent(
+                    //     editingPost
+                    //       ? editingPost.content || ''
+                    //       : newPost.content,
+                    //   )
+                    // }
                     className="hover:cursor-pointer"
                   >
                     <Eye className="mr-2 h-4 w-4" />
                     Preview
                   </Button>
                 </SheetTrigger>
-                <SheetContent side="right" className="w-[500px] sm:w-[740px]">
+                <SheetContent side="right" className="px-10 sm:max-w-2/3">
                   <SheetHeader>
                     <SheetTitle>Preview</SheetTitle>
                   </SheetHeader>
                   <div className="mt-4 max-h-[calc(100vh-120px)] overflow-y-auto px-4">
                     <div className="prose max-w-none text-gray-800 dark:text-gray-200">
-                      <ContentRenderer content={parsedBlocks} />
+                      {editingPost ? (
+                        <Post
+                          coverImage={editingPost.coverImage}
+                          content={editingPost?.content || ''}
+                          excerpt={editingPost.excerpt}
+                          title={editingPost.title}
+                          slug={editingPost.slug}
+                          contentWarning={editingPost.contentWarning}
+                        />
+                      ) : (
+                        <Post
+                          coverImage={newPost.coverImage}
+                          content={newPost.content}
+                          excerpt={newPost.excerpt}
+                          title={newPost.title}
+                          slug={newPost.slug}
+                          contentWarning={newPost.contentWarning}
+                        />
+                      )}
+                      {/* <ContentRenderer content={post} /> */}
                     </div>
                   </div>
                 </SheetContent>
@@ -521,15 +580,13 @@ export default function AdminPage() {
         <h2 className="mb-4 text-2xl font-bold">All Posts</h2>
         <div className="space-y-4">
           {posts.map((post) => (
-            <Card key={post.id} className="relative">
+            <Card key={post.id} className="relative py-0">
               <CardContent className="px-4 py-4">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <h3 className="font-semibold">{post.title}</h3>
-                    <p className="text-sm text-gray-600">{post.slug}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(post.createdAt).toLocaleDateString()}
-                    </p>
+                    <p className="text-sm text-gray-600">{post.excerpt}</p>
+                    <BlogDate date={post.createdAt} />
                   </div>
 
                   {/* Status Badge */}
@@ -558,23 +615,27 @@ export default function AdminPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditPost(post)}>
+                        <DropdownMenuItem
+                          onClick={() => handleEditPost(post)}
+                          className="hover:cursor-pointer"
+                        >
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() =>
-                            handlePreviewContent(post.content || '')
-                          }
+                        {/* <DropdownMenuItem
+                        onClick={() =>
+                          handlePreviewContent(post.content || '')
+                        }
                         >
                           <Eye className="mr-2 h-4 w-4" />
                           Preview
-                        </DropdownMenuItem>
+                        </DropdownMenuItem> */}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() =>
                             togglePublishStatus(post.id, post.published)
                           }
+                          className="hover:cursor-pointer"
                         >
                           {post.published ? (
                             <>
@@ -591,7 +652,7 @@ export default function AdminPage() {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() => deletePost(post.id, post.title)}
-                          className="text-red-600 focus:text-red-600"
+                          className="text-red-600 hover:cursor-pointer focus:text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete

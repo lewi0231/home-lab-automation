@@ -1,8 +1,15 @@
 'use client'
 import { Card, CardContent } from '@/components/ui/card'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 export function AuthorSidebar() {
+  const pathname = usePathname()
+
+  if (pathname.includes('admin')) {
+    return <></>
+  }
+
   return (
     <div className="hidden w-80 flex-shrink-0 lg:block">
       <Card className="sticky top-8 bg-white dark:bg-zinc-950">

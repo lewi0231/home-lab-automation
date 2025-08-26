@@ -1,6 +1,4 @@
-import { ContentRenderer } from '@/components/content-renderer'
-import { BlogDate } from '@/components/ui/blog-date'
-import CloudinaryImage from '@/components/ui/cloudinary-image'
+import Post from '@/components/post'
 import { getBlogPost, getBlogPosts, type BlogPost } from '@/lib/blog'
 import { notFound } from 'next/navigation'
 
@@ -26,33 +24,20 @@ export default async function BlogPostPage({ params }: BlogPageProps) {
     console.error('Error fetching blog post:', error)
     return notFound()
   }
-
+  console.log(post?.contentWarning)
   if (!post) {
     return notFound()
   }
 
   return (
-    <article className="prose prose-lg max-w-none">
-      <h1 className="mb-1 text-3xl font-light text-gray-800 dark:text-gray-300">
-        {post.title}
-      </h1>
-      {post.publishedAt && <BlogDate date={post.publishedAt} />}
-      {post.coverImage && (
-        <CloudinaryImage key={post.slug} post={post} />
-        // <figure key={post.coverImage} className="mb-10">
-        //   <Image
-        //     src={post?.coverImage}
-        //     alt="AI Generated Cover Image"
-        //     className="w-full rounded-lg"
-        //     width={800}
-        //     height={400}
-        //   />
-        // </figure>
-      )}
-      {post.excerpt && (
-        <p className="mb-8 text-lg text-gray-700">{post.excerpt}</p>
-      )}
-      <ContentRenderer content={post.content} />
-    </article>
+    <Post
+      content={post.content}
+      title={post.title}
+      coverImage={post.coverImage}
+      excerpt={post.excerpt}
+      slug={post.slug}
+      publishedAt={post.publishedAt}
+      contentWarning={post.contentWarning}
+    />
   )
 }

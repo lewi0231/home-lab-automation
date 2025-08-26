@@ -17,7 +17,7 @@ spec:
         - name: ghcr-credentials
       containers:
         - name: chris-coombs-blog
-          image: ghcr.io/lewi0231/home-lab-automation-chris-coombs-blog:latest # {"$imagepolicy": "production:chris-coombs-blog"}
+          image: ghcr.io/lewi0231/home-lab-automation-chris-coombs-blog:latest
           ports:
             - containerPort: 80
           env:

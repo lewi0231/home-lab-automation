@@ -17,6 +17,7 @@ export interface BlogPost {
   coverImage?: string
   metaTitle?: string
   metaDescription?: string
+  contentWarning?: string
   tags: string[]
   customFields?: Record<string, unknown>
   authorId?: string

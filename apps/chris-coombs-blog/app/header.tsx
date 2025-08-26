@@ -4,14 +4,12 @@ import InstagramIcon from '@/components/icons'
 import { Magnetic } from '@/components/ui/magnetic'
 import { TextEffect } from '@/components/ui/text-effect'
 import { Mail } from 'lucide-react'
-import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { EMAIL, SOCIAL_MEDIA } from './data'
 
 export function Header() {
   const { facebook, instagram, youtube } = SOCIAL_MEDIA
-  const { resolvedTheme } = useTheme()
 
   return (
     <header className="mb-8 flex items-center justify-between sm:px-6">
@@ -60,11 +58,7 @@ export function Header() {
           rel="noopener noreferrer"
         >
           <Magnetic>
-            {resolvedTheme === 'dark' ? (
-              <InstagramIcon fill="#ffffff" />
-            ) : (
-              <InstagramIcon />
-            )}
+            <InstagramIcon />
           </Magnetic>
         </a>
         <a

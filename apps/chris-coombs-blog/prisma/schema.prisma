@@ -23,6 +23,7 @@ model Post {
   coverImage      String?
   metaTitle       String?
   metaDescription String?
+  contentWarning  String?
   tags            String[]
   customFields    Json?
   authorId        String?
