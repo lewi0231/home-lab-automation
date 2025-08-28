@@ -8,7 +8,11 @@ metadata:
 data:
   kubernetes.yaml: |
     mode: cluster
-  settings.yaml: ""
+  settings.yaml: |
+    title: HomeLab Dashboard
+    theme: dark
+    color: slate
+    language: en
   #settings.yaml: |
   #  providers:
   #    longhorn:
@@ -23,22 +27,24 @@ data:
         - Cloudflare:
             - abbr: CL
               href: https://cloudflare.com
-    - Blogs (Production):
+    - Blogs:
         - Personal Blog:
-            href: https://personal-blog.flowerhead.dev/
-            description: My staged blog in the cluster
-        - Chris Coombs:
-            href: https://chris-coombs.flowerhead.dev/
-            description: Production Chris Coombs Blog
+            - abbr: FH
+              href: https://blog.flowerhead.dev
+              description: My Public Blog
+        - Chris Coombs Blog:
+            - abbr: CCB
+              href: https://chriscoombs.flowerhead.dev
+              description: Chris's blog
 
   services.yaml: |
     - Web Apps:
-        - Personal Blog:
-            href: https://personal-blog.development.flowerhead.dev/
-            description: My staged blog in the cluster
         - Work Rate Calculator:
-            href: https://work-rate-calculator.development.flowerhead.dev
-            description: My staged Work Rate Calculator
+            href: https://work-rate-calculator.flowerhead.dev
+            description: Work Rate Calculator which is to be used for UniPhi
+        - Home Assistant:
+            href: http://http://10.30.30.81:8123/lovelace/default_view
+            description: Home Assistant App
     - Monitoring:
         - Traefik-Private:
             href: https://traefik-private.flowerhead.dev
@@ -47,16 +53,24 @@ data:
             href: https://traefik-public.flowerhead.dev
             description: Traefik (External) Dashboard
         - Grafana Logs:
-            href: https://grafana.flowerhead.dev/d/5c9297f3-6b35-45d4-b627-e7cf2b7a726a/system-logs?orgId=1&from=now-30m&to=now&timezone=browser
+            href: https://grafana.flowerhead.dev
             description: Kubernetes System Logs
         - Grafana Metrics:
-            href: https://grafana.flowerhead.dev/d/kubernetes-overview/kubernetes-overview?orgId=1&from=now-30m&to=now&timezone=browser&refresh=30s
+            href: https://grafana.flowerhead.dev
             description: Kubernetes Overview
 
-    - Services:
+    - Devices:
         - Pfsense:
             href: http://pfsense.flowerhead.dev
             description: My Router and DHCP server
+        - Managed Switch:
+            href: http://switch.flowerhead.dev
+            description: TPLinkEAP Switch
+        - Proxmox Server:
+            href: http://proxmox.flowerhead.dev:8006
+            description: This is my proxmox server.
+        - Access Point:
+            href: http://access-point.flowerhead.dev
 
   widgets.yaml: |
     - kubernetes:
@@ -81,3 +95,6 @@ data:
         provider: duckduckgo
         target: _blank
   docker.yaml: ""
+  proxmox.yaml: ""
+  unifi.yaml: ""
+  traefik.yaml: ""

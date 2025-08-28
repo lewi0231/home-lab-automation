@@ -63,7 +63,7 @@ jobs:
       matrix: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
 
     permissions:
-      contents: read
+      contents: write
       packages: write
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
@@ -72,6 +72,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
@@ -127,12 +129,12 @@ jobs:
           # Output version for use in tags
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
 
-          # Commit the version file
+          # Commit the version file with better error handling
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add "$VERSION_FILE"
-          git commit -m "Bump version for ${{ matrix.app }} to v1.0.$NEW_VERSION" || true
-          git push || true
+          git commit -m "Bump version for ${{ matrix.app }} to v1.0.$NEW_VERSION" || echo "No changes to commit"
+          git push origin HEAD:main || echo "Push failed, continuing with build"
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
