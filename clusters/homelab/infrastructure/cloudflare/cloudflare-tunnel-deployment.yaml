@@ -67,4 +67,8 @@ data:
       service: http://traefik-public.traefik-public.svc.cluster.local:80
     - hostname: "github-webhook.flowerhead.dev"
       service: http://traefik-public.traefik-public.svc.cluster.local:80
+    - hostname: "dh.flowerhead.dev"
+      service: http://traefik-public.traefik-public.svc.cluster.local:80
+    - hostname: "blog-db.flowerhead.dev"
+      service: tcp://pgbouncer.database.svc.cluster.local:5432
     - service: http_status:404

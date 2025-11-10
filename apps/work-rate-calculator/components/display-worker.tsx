@@ -1,3 +1,5 @@
+"use client";
+
 import { formatToTwoDecimals } from "@/lib/utils";
 import { Worker } from "@/types/worker";
 import { Minus, Plus } from "lucide-react";

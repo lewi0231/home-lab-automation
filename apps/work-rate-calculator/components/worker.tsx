@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { type Worker } from "@/types/worker";
 import { Plus } from "lucide-react";
