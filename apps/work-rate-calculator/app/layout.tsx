@@ -1,3 +1,4 @@
+import Footer from "@/components/footer";
 import Nav from "@/components/nav";
 import React from "react";
 import "./global.css";
@@ -9,14 +10,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col max-w-[1200px] m-auto">
+      <body
+        className="min-h-screen flex flex-col"
+        style={{
+          paddingRight: "0px important!",
+          paddingLeft: "0px important!",
+        }}
+      >
         <Nav />
         <main className="flex-grow p-4">{children}</main>
-        <footer className="text-center py-8 text-gray-600 text-sm">
-          <div className="">
-            <p>&copy; {new Date().getFullYear()} flowerhead.dev</p>
-          </div>
-        </footer>
+        <Footer />
       </body>
     </html>
   );

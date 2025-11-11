@@ -121,4 +121,11 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  body[data-scroll-locked] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
 }
