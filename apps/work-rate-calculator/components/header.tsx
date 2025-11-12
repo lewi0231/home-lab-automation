@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils";
 function Header({
   children,
   textClassName,
+  subText,
 }: {
   children: string;
   textClassName?: string;
+  subText?: string;
 }) {
   return (
     <header className="flex justify-center flex-col items-start w-1/2">
@@ -17,10 +19,7 @@ function Header({
       >
         {children}
       </h2>
-      <p className="text-sm text-muted-foreground">
-        Please add or alter the default values as you like. Note that setting
-        changes will be lost on page refresh.
-      </p>
+      <p className="text-sm text-muted-foreground">{subText}</p>
     </header>
   );
 }

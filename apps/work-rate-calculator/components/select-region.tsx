@@ -19,6 +19,12 @@ type SelectCarYardRegionProps = {
   onSelect?: (region: CarYardRegion) => void;
   placeholder?: string;
   triggerClassName?: string;
+  handleUpdateWorker?: (
+    region: CarYardRegion,
+    updater: (
+      worker: ScheduleRequestPayload["employees"][number]
+    ) => ScheduleRequestPayload["employees"][number]
+  ) => void;
 };
 
 const SelectCarYardRegion = ({

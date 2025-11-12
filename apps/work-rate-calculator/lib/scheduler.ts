@@ -94,6 +94,7 @@ export const payload: ScheduleRequestPayload = {
       max_employees: 4,
       hours_required: 6.0,
       linked_yard: [6, 1],
+      per_week: [1, 0],
     },
     {
       id: 6,
@@ -103,6 +104,7 @@ export const payload: ScheduleRequestPayload = {
       min_employees: 3,
       max_employees: 4,
       hours_required: 12.0,
+      per_week: [1, 0],
     },
     {
       id: 9,
@@ -114,13 +116,14 @@ export const payload: ScheduleRequestPayload = {
       hours_required: 8.0,
       required_days: ["monday"],
       startTime: "08:30",
+      per_week: [1, 0],
     },
   ],
-  days: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+  days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
   yard_groups: {
     reynella_group: [5, 6],
   },
-  max_hours_per_day: 5.0,
+  max_hours_per_day: 7.0,
   earliest_start_time: "06:00",
   travel_buffer_minutes: 30,
 };

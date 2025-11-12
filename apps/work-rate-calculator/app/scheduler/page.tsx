@@ -1,47 +1,14 @@
 "use client";
 
-import AddNameField from "@/components/add-name-field";
-import Counter from "@/components/counter";
+import EmployeeAvailabilityDisplay from "@/components/employee-availability-display";
 import Header from "@/components/header";
+import InputCounter from "@/components/input-counter";
 import SelectCarYardRegion from "@/components/select-region";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import {
-  CarYardRegion,
-  DayOfWeek,
-  Employee,
-  payload,
-  ScheduleRequestPayload,
-} from "@/lib/scheduler";
-import { cn } from "@/lib/utils";
+import { CAR_YARD_HEADINGS, DAYS_OF_WEEK } from "@/lib/constants";
+import { Employee, payload, ScheduleRequestPayload } from "@/lib/scheduler";
 import { useState } from "react";
-
-const daysOfTheWeek = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-] as DayOfWeek[];
-
-const availabilityHeadings = [
-  ...daysOfTheWeek,
-  "excluded region",
-  "under performing",
-] as const;
-
-const carYardHeadings = [
-  "yard id",
-  "times per week",
-  "days between",
-  "region",
-  "min workers",
-  "max workers",
-  "approx hours",
-  "required day",
-];
 
 const CarYardCustomizationDisplay = ({
   carYards,
@@ -57,15 +24,20 @@ const CarYardCustomizationDisplay = ({
 }) => {
   return (
     <section className="w-full mx-auto">
-      <Header>Car Yard Details</Header>
-      <div className="grid grid-cols-[minmax(12rem,1fr)_repeat(7,minmax(3rem,1fr))_10rem] space-y-4 py-4">
+      <Header
+        subText="Please add or alter the default values as you like. Note that setting
+        changes will be lost on page refresh."
+      >
+        Car Yard Details
+      </Header>
+      <div className="grid grid-cols-[minmax(12rem,1fr)_repeat(7,minmax(3rem,1fr))_minmax(10rem,1fr)] border-b pb-4 text-wrap pt-10">
         <div aria-hidden />
-        {carYardHeadings.map((heading) => (
+        {CAR_YARD_HEADINGS.map((heading) => (
           <div
             key={heading}
-            className="flex h-24 w-full items-center justify-center"
+            className="flex w-full items-center justify-center border-r"
           >
-            <span className="-rotate-90 w-24 origin-center text-sm text-muted-foreground">
+            <span className="text-center text-sm text-muted-foreground h-full">
               {heading}
             </span>
           </div>
@@ -87,38 +59,41 @@ const CarYardCustomizationDisplay = ({
               <span>{yard.id}</span>
             </div>
             <div className="flex items-center justify-center border-r py-2 text-center">
-              <Counter
+              <InputCounter
+                min={1}
+                step={1}
                 value={visitsRequired}
-                min={0}
-                max={7}
                 onValueChange={(newValue) =>
                   onUpdateCarYard(yard.id, (current) => {
-                    const [, currentGapDays = 0] = current.per_week ?? [0, 0];
+                    const [, currentGapDays = 0] = current.per_week ?? [1, 0];
                     return {
                       ...current,
                       per_week: [newValue, currentGapDays],
                     };
                   })
                 }
-                aria-label={`${yard.name} visits per week`}
+                max={3}
+                ariaLabel={`${yard.name} visits per week`}
               />
             </div>
             <div className="flex items-center justify-center py-2 text-center">
-              <Counter
-                value={daysBetweenVisits}
+              <InputCounter
                 min={0}
-                max={14}
-                className=""
-                onValueChange={(newValue) =>
+                step={1}
+                value={daysBetweenVisits}
+                disabled={visitsRequired <= 1}
+                onValueChange={(newValue) => {
+                  if (yard.per_week?.[0] <= 1) return;
                   onUpdateCarYard(yard.id, (current) => {
-                    const [currentVisits = 0] = current.per_week ?? [0, 0];
+                    const [currentVisits = 1] = current.per_week ?? [1, 0];
                     return {
                       ...current,
                       per_week: [currentVisits, newValue],
                     };
-                  })
-                }
-                aria-label={`${yard.name} days between visits`}
+                  });
+                }}
+                max={6}
+                ariaLabel={`${yard.name} days between visits`}
               />
             </div>
             <div className="flex items-center justify-center border-r py-2 text-center">
@@ -135,60 +110,58 @@ const CarYardCustomizationDisplay = ({
               />
             </div>
             <div className="flex items-center justify-center border-r py-2 text-center">
-              <Counter
+              <InputCounter
+                min={1}
+                step={1}
                 value={yard.min_employees}
-                min={0}
-                max={yard.max_employees}
                 onValueChange={(newValue) =>
                   onUpdateCarYard(yard.id, (current) => {
-                    const nextMax = Math.max(current.max_employees, newValue);
                     return {
                       ...current,
                       min_employees: newValue,
-                      max_employees: nextMax,
                     };
                   })
                 }
-                aria-label={`${yard.name} minimum workers`}
+                max={yard.max_employees}
+                ariaLabel={`${yard.name} minimum employees`}
               />
             </div>
             <div className="flex items-center justify-center border-r py-2 text-center">
-              <Counter
-                value={yard.max_employees}
+              <InputCounter
                 min={yard.min_employees}
-                max={10}
+                step={1}
+                value={yard.max_employees}
                 onValueChange={(newValue) =>
-                  onUpdateCarYard(yard.id, (current) => ({
-                    ...current,
-                    max_employees: Math.max(newValue, current.min_employees),
-                  }))
+                  onUpdateCarYard(yard.id, (current) => {
+                    return {
+                      ...current,
+                      max_employees: newValue,
+                    };
+                  })
                 }
-                aria-label={`${yard.name} maximum workers`}
+                max={4}
+                ariaLabel={`${yard.name} maximum employees`}
               />
             </div>
             <div className="flex items-center justify-center border-r py-2 text-center">
-              <Input
-                type="number"
-                inputMode="decimal"
-                step={0.5}
+              <InputCounter
                 min={0}
+                step={0.5}
                 value={yard.hours_required}
-                onChange={(event) => {
-                  const nextValue = Number(event.target.value);
-                  if (Number.isNaN(nextValue)) {
-                    return;
-                  }
-                  onUpdateCarYard(yard.id, (current) => ({
-                    ...current,
-                    hours_required: nextValue,
-                  }));
-                }}
-                className="h-10 text-center border-none "
-                aria-label={`${yard.name} hours required`}
+                onValueChange={(newValue) =>
+                  onUpdateCarYard(yard.id, (current) => {
+                    return {
+                      ...current,
+                      hours_required: newValue,
+                    };
+                  })
+                }
+                max={24}
+                ariaLabel={`${yard.name} hours required`}
               />
             </div>
             <div className="flex items-center justify-center gap-2 border-r py-2 text-center">
-              {daysOfTheWeek.map((day) => {
+              {DAYS_OF_WEEK.map((day) => {
                 const isChecked = (yard.required_days ?? []).includes(day);
                 return (
                   <label
@@ -209,7 +182,8 @@ const CarYardCustomizationDisplay = ({
                             required.delete(day);
                           }
 
-                          const ordered = daysOfTheWeek.filter((weekday) =>
+                          // Preserve the display order to prevent layout jitter.
+                          const ordered = DAYS_OF_WEEK.filter((weekday) =>
                             required.has(weekday)
                           );
 
@@ -238,50 +212,15 @@ const SchedulerPage = () => {
   );
   const [carYards, setCarYards] = useState(payload.car_yards);
 
-  const handleRemoveAvailability = (
-    dayToRemove: DayOfWeek,
-    workerId: number
-  ) => {
-    setWorkers((prev) => {
-      return prev.map((worker) => {
-        if (worker.id === workerId) {
-          const newAvailability = worker.available_days.filter(
-            (day) => day !== dayToRemove
-          );
-          return { ...worker, available_days: newAvailability };
-        }
-        return worker;
-      });
-    });
-  };
-
-  const handleAddAvailability = (workerId: number, selectedDay: DayOfWeek) => {
-    setWorkers((prev) => {
-      return prev.map((worker) => {
-        if (worker.id === workerId) {
-          const newAvailability = [
-            ...new Set([...worker.available_days, selectedDay]),
-          ];
-          return { ...worker, available_days: newAvailability };
-        }
-        return worker;
-      });
-    });
-  };
-
-  const handleEmployeePerformanceFlag = (
+  const handleUpdateWorker = (
     workerId: number,
-    checked: boolean
+    updater: (
+      worker: ScheduleRequestPayload["employees"][number]
+    ) => ScheduleRequestPayload["employees"][number]
   ) => {
     setWorkers((prev) => {
       return prev.map((worker) => {
-        if (workerId === worker.id) {
-          return {
-            ...worker,
-            ranking: checked ? "below_average" : "excellent",
-          };
-        }
-        return worker;
+        return worker.id === workerId ? updater(worker) : worker;
       });
     });
   };
@@ -306,23 +245,6 @@ const SchedulerPage = () => {
     });
   };
 
-  const handleChangeExcludedRegion = (
-    workerId: number,
-    region: CarYardRegion
-  ) => {
-    setWorkers((prev) => {
-      return prev.map((worker) => {
-        if (worker.id === workerId) {
-          return {
-            ...worker,
-            not_region: region,
-          };
-        }
-        return worker;
-      });
-    });
-  };
-
   const handleUpdateCarYard = (
     yardId: number,
     updater: (
@@ -336,74 +258,11 @@ const SchedulerPage = () => {
 
   return (
     <main className="w-full min-h-screen flex flex-col justify-start items-start px-10 max-w-[1200px] mx-auto">
-      <div className="w-full space-y-4">
-        <Header>Employee Availability</Header>
-        {/* Availability rotated headings row */}
-        <div className="grid grid-cols-[minmax(12rem,1fr)_repeat(6,minmax(3rem,1fr))_repeat(2,minmax(4rem,1.5fr))]">
-          <div className="" />
-          {availabilityHeadings.map((heading, index) => {
-            return (
-              <div
-                className={cn(
-                  " text-muted-foreground font-medium text-sm  w-full flex justify-center items-center h-24"
-                )}
-                key={heading}
-              >
-                <span className="-rotate-90 origin-center font-medium w-24  break-words">
-                  {heading}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="w-full flex flex-col divide-y">
-          {workers.map((worker) => (
-            <div
-              key={worker.id}
-              className="grid grid-cols-[minmax(12rem,1fr)_repeat(6,minmax(3rem,1fr))_repeat(2,minmax(4rem,1.5fr))] w-full py-4"
-            >
-              <div className="font-medium border-r">{worker.name}</div>
-              {daysOfTheWeek.map((day) => (
-                <div
-                  key={`${worker.id}-${day}`}
-                  className="w-full flex justify-center items-center "
-                >
-                  <Checkbox
-                    className=""
-                    checked={worker.available_days.includes(day)}
-                    onCheckedChange={(checked) =>
-                      checked
-                        ? handleAddAvailability(worker.id, day)
-                        : handleRemoveAvailability(day, worker.id)
-                    }
-                  />
-                </div>
-              ))}
-              <div className="flex items-center justify-center border-l overflow-hidden">
-                <SelectCarYardRegion
-                  worker={worker}
-                  handleSelectRegion={handleChangeExcludedRegion}
-                />
-              </div>
-
-              <div className="flex items-center justify-center border-l">
-                <Checkbox
-                  className=""
-                  checked={worker.ranking === "below_average"}
-                  onCheckedChange={(checked) =>
-                    handleEmployeePerformanceFlag(
-                      worker.id,
-                      checked.valueOf() as boolean
-                    )
-                  }
-                />
-              </div>
-            </div>
-          ))}
-          <AddNameField handleAddWorker={handleAddWorker} />
-        </div>
-      </div>
-      {/* Car Yard Details */}
+      <EmployeeAvailabilityDisplay
+        workers={workers}
+        onUpdateWorker={handleUpdateWorker}
+        onAddWorker={handleAddWorker}
+      />
       <CarYardCustomizationDisplay
         carYards={carYards}
         onUpdateCarYard={handleUpdateCarYard}
