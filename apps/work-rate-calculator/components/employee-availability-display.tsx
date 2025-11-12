@@ -44,7 +44,7 @@ const EmployeeAvailabilityDisplay = ({
   };
 
   return (
-    <section className="w-full space-y-4">
+    <section className="w-full space-y-4 border-b pb-4">
       <Header
         subText="Please add or alter the default values as you like. Note that setting
         changes will be lost on page refresh."
@@ -62,7 +62,7 @@ const EmployeeAvailabilityDisplay = ({
             key={heading}
           >
             <span className=" text-center font-medium text-wrap">
-              {heading}
+              {heading.charAt(0).toUpperCase() + heading.substring(1)}
             </span>
           </div>
         ))}

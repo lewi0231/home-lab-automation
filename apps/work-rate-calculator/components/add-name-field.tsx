@@ -3,13 +3,19 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 
-function AddNameField({
-  handleAddWorker,
-}: {
-  handleAddWorker: (name: string) => void;
-}) {
-  const [name, setName] = useState("");
+type Props =
+  | {
+      handleAddWorker?: (name: string) => void;
+      handleAddCarYard: (name: string) => void;
+    }
+  | {
+      handleAddWorker: (name: string) => void;
+      handleAddCarYard?: (name: string) => void;
+    };
 
+function AddNameField({ handleAddWorker, handleAddCarYard }: Props) {
+  const [name, setName] = useState("");
+  const isWorker = !!handleAddWorker;
   return (
     <div className=" flex divide-y gap-6 w-full justify-center py-6 ">
       <Input
@@ -23,12 +29,12 @@ function AddNameField({
         variant="default"
         className="flex-1 cursor-pointer"
         onClick={(e) => {
-          handleAddWorker(name);
+          isWorker ? handleAddWorker(name) : handleAddCarYard(name);
           setName("");
         }}
       >
         <Plus />
-        <span>Worker</span>
+        <span>{isWorker ? "Worker" : "Car Yard"}</span>
       </Button>
     </div>
   );

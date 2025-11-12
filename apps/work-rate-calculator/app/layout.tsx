@@ -12,10 +12,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className="min-h-screen flex flex-col"
-        style={{
-          paddingRight: "0px important!",
-          paddingLeft: "0px important!",
-        }}
+        // style={{
+        //   paddingRight: "0px important!",
+        //   paddingLeft: "0px important!",
+        // }}
       >
         <Nav />
         <main className="flex-grow p-4">{children}</main>

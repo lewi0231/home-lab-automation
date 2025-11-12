@@ -86,7 +86,7 @@ export const payload: ScheduleRequestPayload = {
       per_week: [2, 2],
     },
     {
-      id: 5,
+      id: 2,
       name: "Reynella Kia",
       priority: "medium",
       region: "south",
@@ -97,7 +97,7 @@ export const payload: ScheduleRequestPayload = {
       per_week: [1, 0],
     },
     {
-      id: 6,
+      id: 3,
       name: "Reynella All",
       priority: "low",
       region: "south",
@@ -107,7 +107,7 @@ export const payload: ScheduleRequestPayload = {
       per_week: [1, 0],
     },
     {
-      id: 9,
+      id: 4,
       name: "EasyAuto123 Tender",
       priority: "high",
       region: "central",
