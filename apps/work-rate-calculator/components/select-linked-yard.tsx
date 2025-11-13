@@ -42,15 +42,15 @@ const SelectLinkedYard = ({
   const selectedValue = value?.toString() ?? "none";
 
   return (
-    <div className="w-full overflow-hidden">
+    <div className=" overflow-hidden w-3/4">
       <Select onValueChange={handleChange} value={selectedValue}>
-        <SelectTrigger className={cn("w-full", triggerClassName)}>
-          <SelectValue placeholder={placeholder} />
+        <SelectTrigger className={cn("w-full h-full", triggerClassName)}>
+          <SelectValue placeholder={placeholder} className="" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="">
           <SelectGroup>
             <SelectLabel>Linked Yard</SelectLabel>
-            <SelectItem value="none">None</SelectItem>
+            <SelectItem value="none"></SelectItem>
             {availableYards.map((yard) => (
               <SelectItem key={yard.id} value={yard.id.toString()}>
                 {yard.name} (ID: {yard.id})

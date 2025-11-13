@@ -3,12 +3,14 @@ import InputCounter from "@/components/input-counter";
 import SelectLinkedYard from "@/components/select-linked-yard";
 import SelectCarYardRegion from "@/components/select-region";
 import { Checkbox } from "@/components/ui/checkbox";
+import TimePicker from "@/components/ui/time-picker";
 import { CAR_YARD_HEADINGS, DAYS_OF_WEEK } from "@/lib/constants";
 import { ScheduleRequestPayload } from "@/lib/scheduler";
 import AddNameField from "./add-name-field";
 
 type CarYardCustomizationDisplayProps = {
   carYards: ScheduleRequestPayload["car_yards"];
+  baseStartTime: string; // Format: "HH:MM" - from general settings
   onUpdateCarYard: (
     yardId: number,
     updater: (
@@ -16,10 +18,13 @@ type CarYardCustomizationDisplayProps = {
     ) => ScheduleRequestPayload["car_yards"][number]
   ) => void;
   onAddCarYard: (name: string) => void;
+  numWorkers: number;
 };
 
 const CarYardCustomizationDisplay = ({
+  numWorkers,
   carYards,
+  baseStartTime,
   onUpdateCarYard,
   onAddCarYard,
 }: CarYardCustomizationDisplayProps) => {
@@ -33,12 +38,12 @@ const CarYardCustomizationDisplay = ({
       </Header>
       <div className="overflow-x-auto">
         {/* Header row with sticky name column placeholder */}
-        <div className="grid grid-cols-[12rem_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_minmax(5rem,1fr)_minmax(12rem,1fr)]  border-b pb-4 text-wrap pt-10 min-w-fit">
+        <div className="grid grid-cols-[12rem_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_repeat(3,minmax(5rem,1fr))_minmax(10rem,1fr)_minmax(8rem,1fr)_minmax(5rem,1fr)_minmax(12rem,1fr)]  border-b pb-4 text-wrap pt-10 min-w-fit">
           {/* Sticky name column header - empty since name is self-explanatory */}
           <div className="sticky left-0 z-20 bg-background border-r" />
-          {CAR_YARD_HEADINGS.map((heading) => (
+          {CAR_YARD_HEADINGS.map((heading, index) => (
             <div
-              key={heading}
+              key={heading + index}
               className="flex w-full items-center justify-center border-r"
             >
               <span className="text-center text-sm text-muted-foreground h-full">
@@ -54,7 +59,7 @@ const CarYardCustomizationDisplay = ({
           return (
             <div
               key={yard.id}
-              className="grid grid-cols-[12rem_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_minmax(5rem,1fr)_minmax(12rem,1fr)]  divide-y min-w-fit"
+              className="grid grid-cols-[12rem_repeat(3,minmax(5rem,1fr))_minmax(8rem,1fr)_repeat(3,minmax(5rem,1fr))_minmax(10rem,1fr)_minmax(8rem,1fr)_minmax(5rem,1fr)_minmax(12rem,1fr)]  divide-y min-w-fit"
             >
               {/* Sticky name column - stays visible while scrolling */}
               <div className="sticky left-0 z-10 bg-background flex items-center justify-start py-4 font-medium border-r">
@@ -63,7 +68,7 @@ const CarYardCustomizationDisplay = ({
               <div className="flex items-center justify-center border-r py-2 text-center">
                 <span>{yard.id}</span>
               </div>
-              <div className="flex items-center justify-center border-r py-2 text-center">
+              <div className="flex items-center justify-center border-r py-2 text-center bg-muted/50">
                 <InputCounter
                   min={1}
                   step={1}
@@ -81,7 +86,7 @@ const CarYardCustomizationDisplay = ({
                   ariaLabel={`${yard.name} visits per week`}
                 />
               </div>
-              <div className="flex items-center justify-center py-2 text-center">
+              <div className="flex items-center justify-center py-2 text-center bg-muted/50">
                 <InputCounter
                   min={0}
                   step={1}
@@ -114,7 +119,7 @@ const CarYardCustomizationDisplay = ({
                   placeholder="Select region"
                 />
               </div>
-              <div className="flex items-center justify-center border-r py-2 text-center">
+              <div className="flex items-center justify-center border-r py-2 text-center bg-muted/50">
                 <InputCounter
                   min={1}
                   step={1}
@@ -127,15 +132,23 @@ const CarYardCustomizationDisplay = ({
                       };
                     })
                   }
-                  max={yard.max_employees}
+                  max={
+                    yard.max_employees <= numWorkers
+                      ? yard.max_employees
+                      : numWorkers
+                  }
                   ariaLabel={`${yard.name} minimum employees`}
                 />
               </div>
-              <div className="flex items-center justify-center border-r py-2 text-center">
+              <div className="flex items-center justify-center border-r py-2 text-center bg-muted/50">
                 <InputCounter
                   min={yard.min_employees}
                   step={1}
-                  value={yard.max_employees}
+                  value={
+                    yard.max_employees <= numWorkers
+                      ? yard.max_employees
+                      : numWorkers
+                  }
                   onValueChange={(newValue) =>
                     onUpdateCarYard(yard.id, (current) => {
                       return {
@@ -166,6 +179,27 @@ const CarYardCustomizationDisplay = ({
                 />
               </div>
               <div className="flex items-center justify-center border-r py-2 text-center">
+                <TimePicker
+                  value={yard.startTime ?? baseStartTime}
+                  onChange={(time) =>
+                    onUpdateCarYard(yard.id, (current) => {
+                      // If the time matches the base time, remove the override
+                      if (time === baseStartTime) {
+                        const { startTime, ...rest } = current;
+                        return rest;
+                      }
+                      return {
+                        ...current,
+                        startTime: time,
+                      };
+                    })
+                  }
+                  id={`start-time-${yard.id}`}
+                  ariaLabel={`${yard.name} start time`}
+                  className="w-full space-y-0"
+                />
+              </div>
+              <div className="flex items-center justify-center border-r py-2 text-center bg-muted/50">
                 <SelectLinkedYard
                   carYards={carYards}
                   currentYardId={yard.id}
@@ -188,7 +222,7 @@ const CarYardCustomizationDisplay = ({
                   placeholder="None"
                 />
               </div>
-              <div className="flex items-center justify-center border-r py-2 text-center">
+              <div className="flex items-center justify-center border-r py-2 text-center bg-muted/50">
                 <InputCounter
                   min={0}
                   step={1}

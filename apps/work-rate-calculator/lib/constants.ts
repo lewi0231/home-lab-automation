@@ -17,13 +17,14 @@ export const AVAILABILITY_HEADINGS = [
 
 export const CAR_YARD_HEADINGS = [
   "yard id",
-  "per w'k",
-  "days betw.",
+  "per week",
+  "no. days gap",
   "region",
-  "min w'k's",
-  "max w'k's",
-  "length h'rs",
+  "min workers",
+  "max workers",
+  "length in hours",
+  "start time",
   "linked yard",
-  "gap days",
-  "required",
+  "no. days gap",
+  "required days",
 ];

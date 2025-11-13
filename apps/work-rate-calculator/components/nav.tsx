@@ -1,21 +1,22 @@
 "use client";
 
+import { UseIsScrollTop } from "@/hooks/use-is-scroll-top";
+import { cn } from "@/lib/utils";
 import { Mail } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import Logo from "./logo";
 
 const Nav = () => {
+  const { isTop } = UseIsScrollTop();
+
   return (
-    <nav className="flex items-center justify-between px-10 py-4  border-b-2 border-gray-50">
-      <div className="flex items-center space-x-2">
-        <Image
-          src="/flowerhead.png"
-          alt="Work Rate Calculator Logo"
-          width={80}
-          height={80}
-        />
-        <h1 className="text-xl font-semibold">flowerHead.dev</h1>
-      </div>
+    <nav
+      className={cn(
+        "fixed w-full flex items-center justify-between px-10 py-4   transition-all duration-500 backdrop-blur-2xl -translate-y-20",
+        isTop ? "opacity-100 translate-y-0" : "opacity-0"
+      )}
+    >
+      <Logo />
       <div>
         <Link href="scheduler">Scheduler</Link>
       </div>

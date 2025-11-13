@@ -45,6 +45,41 @@ export interface ScheduleRequestPayload {
   travel_buffer_minutes?: number;
 }
 
+// Response types from the roster API
+export interface Assignment {
+  employee_id: number;
+  employee_name: string;
+  car_yard_id: number;
+  car_yard_name: string;
+  day: DayOfWeek;
+  start_time: string;
+  finish_time: string;
+}
+
+export interface YardSchedule {
+  car_yard_id: number;
+  car_yard_name: string;
+  workers: string[];
+  start_time: string;
+  finish_time: string;
+}
+
+export interface DayRoster {
+  day: DayOfWeek;
+  yards: YardSchedule[];
+}
+
+export interface RosterStructure {
+  days: DayRoster[];
+}
+
+export interface ScheduleResponse {
+  status: string;
+  assignments?: Assignment[];
+  roster: RosterStructure;
+  stats?: Record<string, unknown>;
+}
+
 export const payload: ScheduleRequestPayload = {
   employees: [
     {
@@ -73,6 +108,30 @@ export const payload: ScheduleRequestPayload = {
       ],
       not_region: "south",
     },
+    {
+      id: 4,
+      name: "Nitish",
+      ranking: "excellent",
+      available_days: [
+        "tuesday",
+        "wednesday",
+        "thursday",
+        "friday",
+        "saturday",
+      ],
+    },
+    {
+      id: 5,
+      name: "Sanskar",
+      ranking: "excellent",
+      available_days: ["monday", "tuesday", "thursday", "friday"],
+    },
+    {
+      id: 6,
+      name: "Sam",
+      ranking: "below_average",
+      available_days: ["tuesday", "thursday", "friday"],
+    },
   ],
   car_yards: [
     {
@@ -88,18 +147,18 @@ export const payload: ScheduleRequestPayload = {
     {
       id: 2,
       name: "Reynella Kia",
-      priority: "medium",
+      priority: "high",
       region: "south",
       min_employees: 2,
       max_employees: 4,
       hours_required: 6.0,
-      linked_yard: [6, 1],
+      linked_yard: [3, 1],
       per_week: [1, 0],
     },
     {
       id: 3,
       name: "Reynella All",
-      priority: "low",
+      priority: "high",
       region: "south",
       min_employees: 3,
       max_employees: 4,
@@ -115,15 +174,80 @@ export const payload: ScheduleRequestPayload = {
       max_employees: 4,
       hours_required: 8.0,
       required_days: ["monday"],
-      startTime: "08:30",
+      startTime: "08:30:00",
+      per_week: [1, 0],
+    },
+    {
+      id: 5,
+      name: "EasyAuto123 Warehouse",
+      priority: "high",
+      region: "central",
+      min_employees: 2,
+      max_employees: 3,
+      hours_required: 3.5,
+      required_days: ["friday"],
+      startTime: "08:30:00",
+      per_week: [1, 0],
+    },
+    {
+      id: 6,
+      name: "Hillcrest New/Used",
+      priority: "high",
+      region: "north",
+      min_employees: 2,
+      max_employees: 3,
+      hours_required: 7,
+      required_days: ["thursday"],
+      per_week: [1, 0],
+    },
+    {
+      id: 7,
+      name: "Eblen Suburu",
+      priority: "high",
+      region: "central",
+      min_employees: 1,
+      max_employees: 2,
+      hours_required: 3.5,
+      per_week: [2, 2],
+    },
+    {
+      id: 8,
+      name: "Stillwell Ford",
+      priority: "high",
+      region: "central",
+      min_employees: 1,
+      max_employees: 1,
+      hours_required: 2,
+      per_week: [1, 0],
+    },
+    {
+      id: 9,
+      name: "Main North Toyota",
+      priority: "high",
+      region: "north",
+      min_employees: 2,
+      max_employees: 3,
+      hours_required: 6,
+      required_days: ["friday"],
+      per_week: [1, 0],
+    },
+    {
+      id: 10,
+      name: "MG Reynella",
+      priority: "high",
+      region: "south",
+      min_employees: 1,
+      max_employees: 2,
+      hours_required: 5,
+      required_days: ["thursday"],
       per_week: [1, 0],
     },
   ],
   days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
-  yard_groups: {
-    reynella_group: [5, 6],
-  },
+  // yard_groups: {
+  //   reynella_group: [5, 6],
+  // },
   max_hours_per_day: 7.0,
-  earliest_start_time: "06:00",
+  earliest_start_time: "06:00:00",
   travel_buffer_minutes: 30,
 };

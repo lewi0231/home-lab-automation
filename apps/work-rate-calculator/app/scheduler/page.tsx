@@ -3,13 +3,16 @@
 import CarYardCustomizationDisplay from "@/components/car-yard-customization-display";
 import EmployeeAvailabilityDisplay from "@/components/employee-availability-display";
 import GeneralSettingsDisplay from "@/components/general-settings-display";
+import { RosterDisplaySheet } from "@/components/roster-display-sheet";
 import { Button } from "@/components/ui/button";
+import { generateRoster } from "@/lib/actions";
 import { DAYS_OF_WEEK } from "@/lib/constants";
 import {
   CarYard,
   Employee,
   payload,
   ScheduleRequestPayload,
+  ScheduleResponse,
 } from "@/lib/scheduler";
 import { useState } from "react";
 
@@ -17,13 +20,17 @@ const SchedulerPage = () => {
   const [workers, setWorkers] = useState<ScheduleRequestPayload["employees"]>(
     payload.employees
   );
+  const [isLoading, setIsLoading] = useState(false);
+
   const [carYards, setCarYards] = useState(payload.car_yards);
   const [maxHoursPerDay, setMaxHoursPerDay] = useState(
-    payload.max_hours_per_day ?? 7.0
+    payload.max_hours_per_day ?? 6.0
   );
   const [earliestStartTime, setEarliestStartTime] = useState(
-    payload.earliest_start_time ?? "06:00"
+    payload.earliest_start_time ?? "06:00:00"
   );
+  const [rosterDisplayIsOpen, setRosterDisplayIsOpen] = useState(false);
+  const [rosterData, setRosterData] = useState<ScheduleResponse | null>(null);
 
   const handleUpdateWorker = (
     workerId: number,
@@ -36,6 +43,30 @@ const SchedulerPage = () => {
         return worker.id === workerId ? updater(worker) : worker;
       });
     });
+  };
+
+  const handleGenerateRoster = async () => {
+    console.log(earliestStartTime);
+    const data: ScheduleRequestPayload = {
+      ...payload,
+      employees: workers,
+      car_yards: carYards,
+      days: DAYS_OF_WEEK,
+      earliest_start_time: earliestStartTime,
+      max_hours_per_day: maxHoursPerDay,
+    };
+
+    try {
+      setIsLoading(true);
+      const response = await generateRoster(data);
+      console.log(response);
+      setRosterData(response as ScheduleResponse);
+      setRosterDisplayIsOpen(true);
+    } catch (error) {
+      console.error("Failed to generate roster:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAddWorker = (name: string) => {
@@ -78,7 +109,7 @@ const SchedulerPage = () => {
   };
 
   return (
-    <main className="w-full min-h-screen flex flex-col justify-start items-start px-10 max-w-[1200px] mx-auto">
+    <main className="w-full min-h-screen flex flex-col justify-start items-start max-w-[1200px] mx-auto pt-20 pb-12 space-y-10">
       <GeneralSettingsDisplay
         maxHoursPerDay={maxHoursPerDay}
         earliestStartTime={earliestStartTime}
@@ -93,18 +124,27 @@ const SchedulerPage = () => {
       />
       <CarYardCustomizationDisplay
         carYards={carYards}
+        baseStartTime={earliestStartTime}
         onUpdateCarYard={handleUpdateCarYard}
         onAddCarYard={handleAddCarYard}
+        numWorkers={workers.length}
       />
 
-      <div className="w-full text-center py-14">
+      <div className="w-full flex justify-center pt-4">
         <Button
           size="lg"
-          className="h-xl py-8 mx-auto cursor-pointer  text-2xl w-xl"
+          className="min-w-[200px] h-12 px-8 text-lg font-semibold cursor-pointer"
+          onClick={handleGenerateRoster}
+          disabled={isLoading}
         >
           Generate Roster
         </Button>
       </div>
+      <RosterDisplaySheet
+        isOpen={rosterDisplayIsOpen}
+        onOpenChange={(newState) => setRosterDisplayIsOpen(newState)}
+        rosterData={rosterData}
+      />
     </main>
   );
 };

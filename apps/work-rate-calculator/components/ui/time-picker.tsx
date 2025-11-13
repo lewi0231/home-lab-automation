@@ -26,7 +26,7 @@ const TimePicker = ({
     // Convert to HH:MM format if needed (remove seconds)
     const timeValue = event.target.value;
     const [hours, minutes] = timeValue.split(":");
-    onChange(`${hours}:${minutes}`);
+    onChange(`${hours}:${minutes}:00`);
   };
 
   // Ensure value is in HH:MM:SS format for the input (HTML time input requires this)

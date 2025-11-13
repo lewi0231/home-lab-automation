@@ -31,6 +31,28 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: [
+          {
+            loader: "@svgr/webpack",
+            options: {
+              icon: false,
+              dimensions: false,
+              svgProps: {
+                className: "{props.className}",
+              },
+              replaceAttrValues: {
+                "#141a46": "currentColor",
+              },
+            },
+          },
+        ],
+        as: "*.js",
+      },
+    },
+  },
 };
 
 export default nextConfig;
